@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "988554465892",
+    "project_id": "hospital-managemet-application",
+    "storage_bucket": "hospital-managemet-application.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988554465892:android:724d07f5b985896b648571",
+        "android_client_info": {
+          "package_name": "com.example.hospitalmanagementapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "988554465892-uth6j8kdpdt8h5c9ah4j37le2mvh7r30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1vLhtZbdQt_P0nuVhkuVpvanWCyMEcPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "988554465892-uth6j8kdpdt8h5c9ah4j37le2mvh7r30.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
