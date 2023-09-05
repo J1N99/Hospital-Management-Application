@@ -3,9 +3,11 @@ package com.example.hospitalmanagementapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
+import com.example.hospitalmanagementapplication.fragment.Loader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.DocumentSnapshot
@@ -16,7 +18,7 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySigninBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-
+    private lateinit var progressDialog: Loader
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySigninBinding.inflate(layoutInflater)
@@ -31,22 +33,27 @@ class SignInActivity : AppCompatActivity() {
         }
 
         binding.button.setOnClickListener {
-            //TODO(Button need to click twice)
             val email = binding.emailEt.text.toString()
             val pass = binding.passET.text.toString()
-            val currentUser = firebaseAuth.currentUser
 
             if (email.isNotEmpty() && pass.isNotEmpty()) {
-                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
-                    if (it.isSuccessful) {
+                progressDialog = Loader(this)
+                progressDialog.show()
+
+                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val currentUser = firebaseAuth.currentUser
+
                         if (currentUser != null) {
                             val userId = currentUser.uid
                             val usersRef = firestore.collection("users")
                             Log.d("Firestore", "${userId}")
 
-                            usersRef.document(userId).get().addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    val document: DocumentSnapshot? = task.result
+                            usersRef.document(userId).get().addOnCompleteListener { innerTask ->
+                                progressDialog.dismiss() // Dismiss the progressDialog here
+
+                                if (innerTask.isSuccessful) {
+                                    val document: DocumentSnapshot? = innerTask.result
                                     if (document != null && document.exists()) {
                                         Log.d("Firestore", "Document exists. Going to HomeActivity.")
                                         successLoginAndGotDetails()
@@ -55,22 +62,28 @@ class SignInActivity : AppCompatActivity() {
                                         goRegisterUserDetails()
                                     }
                                 } else {
-                                    Log.e("Firestore", "Error getting document: ${task.exception?.message}")
-                                    Toast.makeText(this@SignInActivity, "Firestore Error:${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                    Log.e("Firestore", "Error getting document: ${innerTask.exception?.message}")
+                                    Toast.makeText(this@SignInActivity, "Firestore Error:${innerTask.exception?.message}", Toast.LENGTH_LONG).show()
                                 }
                             }
+                        } else {
+                            progressDialog.dismiss()
+                            Log.e("FirebaseAuth", "Current user is null.")
+                            Toast.makeText(this@SignInActivity, "Authentication Error", Toast.LENGTH_LONG).show()
                         }
                     } else {
-                        Toast.makeText(this@SignInActivity, it.exception?.message, Toast.LENGTH_SHORT).show()
+                        progressDialog.dismiss()
+                        Toast.makeText(this@SignInActivity, task.exception?.message, Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
                 Toast.makeText(this@SignInActivity, "Please enter all the required fields!!", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 
-    private fun successLoginAndGotDetails() {
+        private fun successLoginAndGotDetails() {
         Log.v("Test", "test")
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
