@@ -1,10 +1,13 @@
 package com.example.hospitalmanagementapplication
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
 import com.example.hospitalmanagementapplication.fragment.Loader
@@ -43,28 +46,48 @@ class SignInActivity : AppCompatActivity() {
                 firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val currentUser = firebaseAuth.currentUser
-
                         if (currentUser != null) {
-                            val userId = currentUser.uid
-                            val usersRef = firestore.collection("users")
-                            Log.d("Firestore", "${userId}")
+                            if(currentUser.isEmailVerified) {
 
-                            usersRef.document(userId).get().addOnCompleteListener { innerTask ->
-                                progressDialog.dismiss() // Dismiss the progressDialog here
+                                val userId = currentUser.uid
+                                val usersRef = firestore.collection("users")
+                                Log.d("Firestore", "${userId}")
 
-                                if (innerTask.isSuccessful) {
-                                    val document: DocumentSnapshot? = innerTask.result
-                                    if (document != null && document.exists()) {
-                                        Log.d("Firestore", "Document exists. Going to HomeActivity.")
-                                        successLoginAndGotDetails()
+                                usersRef.document(userId).get().addOnCompleteListener { innerTask ->
+                                    progressDialog.dismiss()
+
+                                    if (innerTask.isSuccessful) {
+                                        val document: DocumentSnapshot? = innerTask.result
+                                        if (document != null && document.exists()) {
+                                            Log.d(
+                                                "Firestore",
+                                                "Document exists. Going to HomeActivity."
+                                            )
+                                            successLoginAndGotDetails()
+                                        } else {
+                                            Log.d(
+                                                "Firestore",
+                                                "Document does not exist. Going to userDetailsActivity."
+                                            )
+                                            goRegisterUserDetails()
+                                        }
                                     } else {
-                                        Log.d("Firestore", "Document does not exist. Going to userDetailsActivity.")
-                                        goRegisterUserDetails()
+                                        Log.e(
+                                            "Firestore",
+                                            "Error getting document: ${innerTask.exception?.message}"
+                                        )
+                                        Toast.makeText(
+                                            this@SignInActivity,
+                                            "Firestore Error:${innerTask.exception?.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
-                                } else {
-                                    Log.e("Firestore", "Error getting document: ${innerTask.exception?.message}")
-                                    Toast.makeText(this@SignInActivity, "Firestore Error:${innerTask.exception?.message}", Toast.LENGTH_LONG).show()
                                 }
+                            }
+                            else{
+                                FirebaseAuth.getInstance().signOut()
+                                progressDialog.dismiss()
+                                showVerificationDialog()
                             }
                         } else {
                             progressDialog.dismiss()
@@ -102,5 +125,27 @@ class SignInActivity : AppCompatActivity() {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    fun showVerificationDialog() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
+
+        builder.setView(dialogView)
+        val dialog = builder.create()
+
+        val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        buttonDismiss.setOnClickListener {
+                dialog.dismiss()
+        }
+
+        // Add a listener to handle the user's action when dismissing the dialog
+        dialog.setOnDismissListener(DialogInterface.OnDismissListener {
+            // You can take further action here if needed
+            Toast.makeText(this, "Dialog dismissed", Toast.LENGTH_SHORT).show()
+        })
+
+        dialog.show()
     }
 }

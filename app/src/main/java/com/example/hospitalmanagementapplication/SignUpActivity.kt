@@ -1,9 +1,12 @@
 package com.example.hospitalmanagementapplication
 
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.example.hospitalmanagementapplication.databinding.ActivitySignupBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -43,8 +46,21 @@ class SignUpActivity:AppCompatActivity() {
                                  .addOnCompleteListener {
 
                                      if (it.isSuccessful) {
-                                         val intent = Intent(this, SignInActivity::class.java)
-                                         startActivity(intent)
+                                          val user= firebaseAuth.currentUser
+                                         user?.sendEmailVerification()
+                                             ?.addOnCompleteListener { verificationTask ->
+                                                 if (verificationTask.isSuccessful) {
+                                                  showVerificationDialog()
+                                                 }
+                                                 else
+                                                 {
+                                                     val errorMessage = verificationTask.exception?.message
+                                                     if (errorMessage != null) {
+                                                         Toast.makeText(this, "Failed to send verification email: $errorMessage", Toast.LENGTH_LONG).show()
+                                                     }
+                                                 }
+                                             }
+
                                      } else {
 
                                          //this is create the exception if error
@@ -66,5 +82,29 @@ class SignUpActivity:AppCompatActivity() {
                     Toast.makeText(this,"Please fill in all the required field",Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    fun showVerificationDialog() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
+
+        builder.setView(dialogView)
+        val dialog = builder.create()
+
+        val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        buttonDismiss.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Add a listener to handle the user's action when dismissing the dialog
+        dialog.setOnDismissListener(DialogInterface.OnDismissListener {
+            // You can take further action here if needed
+            Toast.makeText(this, "Dialog dismissed", Toast.LENGTH_SHORT).show()
+        })
+
+        dialog.show()
     }
 }
