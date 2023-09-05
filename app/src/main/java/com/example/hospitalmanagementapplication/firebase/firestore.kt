@@ -16,18 +16,17 @@ class firestore {
 
     fun registerUserDetails(activity: userDetailsActivity, user: User) {
 
-
+        //create collection names, is exist just use
         mFirestore.collection("users")
-
+                //create document id
             .document(user.id)
-
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
             .set(user, SetOptions.merge())
             .addOnSuccessListener { documentReference ->
-                Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: $documentReference")
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
 
                 // Create an Intent to start the HomeActivity
                 val intent = Intent(activity, HomeActivity::class.java)
-
                 // Start the HomeActivity using the intent
                 activity.startActivity(intent)
             }

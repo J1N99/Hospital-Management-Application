@@ -81,5 +81,5 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
-    <include layout="@layout/footer" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
