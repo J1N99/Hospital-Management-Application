@@ -28,7 +28,10 @@
             android:name=".HomeActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".userDetailsActivity"
+            android:exported="false">
 
+        </activity>
     </application>
 
 </manifest>
