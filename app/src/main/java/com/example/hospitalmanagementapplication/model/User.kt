@@ -5,5 +5,7 @@ data class User(
     val firstname:String="",
     val lastname:String="",
     val gender:Boolean,
-    val DOB:String=""
+    val DOB:String="",
+    val ic:String="",
+    val position:Number=1
 )

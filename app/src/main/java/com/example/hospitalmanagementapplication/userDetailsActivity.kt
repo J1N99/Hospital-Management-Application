@@ -32,10 +32,9 @@ class userDetailsActivity : AppCompatActivity() {
 
         binding.ageET.setOnClickListener {
             // Get the current date
-            val c = Calendar.getInstance()
-            val year = c.get(Calendar.YEAR)
-            val month = c.get(Calendar.MONTH)
-            val day = c.get(Calendar.DAY_OF_MONTH)
+            val year = 1999
+            val month = 10
+            val day =25
 
             // Create a date picker dialog
             val datePickerDialog = DatePickerDialog(
@@ -65,9 +64,11 @@ class userDetailsActivity : AppCompatActivity() {
             val firstname = binding.firstNameEt.text.toString()
             val dob = binding.ageET.text.toString()
             val gender = binding.radioMale.isChecked
+            val icNumber=binding.icNumberET.toString()
+            val position=1
 
 
-            val user = User(userId, lastname, firstname, gender,dob)
+            val user = User(userId, lastname, firstname, gender,dob,icNumber,position)
             firestore().registerUserDetails(this,user)
 
         }
