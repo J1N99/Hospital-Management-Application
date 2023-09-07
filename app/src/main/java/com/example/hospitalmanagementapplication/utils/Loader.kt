@@ -1,10 +1,8 @@
-package com.example.hospitalmanagementapplication.fragment
+package com.example.hospitalmanagementapplication.utils
 
 import android.app.Dialog
 import android.content.Context
-import android.view.ViewGroup.LayoutParams
 import android.view.Window
-import android.widget.ProgressBar
 import com.example.hospitalmanagementapplication.R
 
 class Loader(context: Context) {

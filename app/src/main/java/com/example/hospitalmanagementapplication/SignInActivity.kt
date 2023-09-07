@@ -5,14 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
-import com.example.hospitalmanagementapplication.fragment.Loader
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -32,6 +30,10 @@ class SignInActivity : AppCompatActivity() {
 
         binding.navigationSignUp.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
+        }
+        binding.navigationForgetPassword.setOnClickListener{
+            val intent = Intent(this, ForgetPasswordActivity::class.java)
             startActivity(intent)
         }
 

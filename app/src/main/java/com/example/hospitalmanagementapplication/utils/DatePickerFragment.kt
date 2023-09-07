@@ -1,4 +1,4 @@
-package com.example.hospitalmanagementapplication.fragment
+package com.example.hospitalmanagementapplication.utils
 
 import android.app.DatePickerDialog
 import android.app.Dialog

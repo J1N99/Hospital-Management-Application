@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.hospitalmanagementapplication.databinding.ActivitySignupBinding
+import com.example.hospitalmanagementapplication.utils.PasswordValidation
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -33,13 +34,9 @@ class SignUpActivity:AppCompatActivity() {
 
                      if(password==(confirmPassword))
                      {
-                         if(password.length<8)
+                         if(!PasswordValidation.isPasswordValid(password))
                          {
-                             Toast.makeText(this,"The password length should longer than 8".toString(),Toast.LENGTH_LONG).show()
-                         }
-                         else if (!password.any { it.isDigit() } || !password.any { it.isLetter() })
-                         {
-                             Toast.makeText(this,"The password should include a character and a digit".toString(),Toast.LENGTH_LONG).show()
+                             Toast.makeText(this,"The password length should One upper and lower cast ,digit and special Char".toString(),Toast.LENGTH_LONG).show()
                          }
                          else {
                              firebaseAuth.createUserWithEmailAndPassword(email, password)

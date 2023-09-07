@@ -30,7 +30,9 @@
         </activity>
         <activity android:name=".userDetailsActivity"
             android:exported="false">
-
+        </activity>
+        <activity android:name=".ForgetPasswordActivity"
+            android:exported="false">
         </activity>
     </application>
 
