@@ -31,10 +31,30 @@ class userDetailsActivity : AppCompatActivity() {
         }
 
         binding.ageET.setOnClickListener {
-            // Get the current date
-            val year = 1999
-            val month = 10
-            val day =25
+
+            var ic=binding.icNumberET.text.toString()
+            var year=0;
+            var month=0;
+            var day=0;
+            if (ic.length>=6) {
+
+                    var icyear = ic.substring(0, 2).toInt()
+                    year = if (icyear in 51..99) {
+                        1900 + icyear
+
+                    } else {
+                        2000 + icyear
+                    }
+                    month = ic.substring(2, 4).toInt() - 1
+                    day = ic.substring(4, 6).toInt()
+
+            }
+            else{
+                year=1999
+                month=10
+                day=25
+            }
+
 
             // Create a date picker dialog
             val datePickerDialog = DatePickerDialog(

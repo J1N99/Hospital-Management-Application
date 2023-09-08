@@ -17,6 +17,7 @@ class SignUpActivity:AppCompatActivity() {
     private lateinit var firebaseAuth:FirebaseAuth
     override fun onCreate(saveInstanceState:Bundle?)
     {
+            //TODO all process add on spinner loader
             super.onCreate(saveInstanceState)
             binding= ActivitySignupBinding.inflate(layoutInflater)
             setContentView(binding.root)
