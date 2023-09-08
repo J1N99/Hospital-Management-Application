@@ -24,6 +24,8 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        // Set Home selected
+        bottomNavigationView.setSelectedItemId(R.id.home);
         IntentManager(this, bottomNavigationView)
 
         firebaseAuth = FirebaseAuth.getInstance()

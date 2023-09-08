@@ -1,14 +1,13 @@
 package com.example.hospitalmanagementapplication
 
-import android.content.Intent
+
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityProfileBinding
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+
 
 class ProfileActivity:AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
@@ -22,7 +21,11 @@ class ProfileActivity:AppCompatActivity() {
         setContentView(binding.root)
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView.setSelectedItemId(R.id.profile);
         IntentManager(this, bottomNavigationView)
+
+
+
 
 
 
