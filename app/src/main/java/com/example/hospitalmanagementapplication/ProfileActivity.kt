@@ -1,6 +1,7 @@
 package com.example.hospitalmanagementapplication
 
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityProfileBinding
@@ -19,18 +20,19 @@ class ProfileActivity:AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.setSelectedItemId(R.id.profile);
         IntentManager(this, bottomNavigationView)
-
-
-
-
-
-
         firebaseAuth = FirebaseAuth.getInstance()
 
 
+    }
+    override fun onBackPressed() {
+        // Create an Intent to navigate to TargetActivity
+        val intent = Intent(this, ForgetPasswordActivity::class.java)
+        startActivity(intent)
+
+        // Optionally, finish the current activity to remove it from the back stack
+        finish()
     }
 }
