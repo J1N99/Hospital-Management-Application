@@ -100,8 +100,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="IC Number"
-            android:focusable="false"
-            android:clickable="true"
+            android:inputType="number"
+            android:maxLength="12"
             />
 
     </com.google.android.material.textfield.TextInputLayout>

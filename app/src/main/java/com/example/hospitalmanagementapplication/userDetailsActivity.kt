@@ -64,7 +64,7 @@ class userDetailsActivity : AppCompatActivity() {
             val firstname = binding.firstNameEt.text.toString()
             val dob = binding.ageET.text.toString()
             val gender = binding.radioMale.isChecked
-            val icNumber=binding.icNumberET.toString()
+            val icNumber=binding.icNumberET.text.toString()
             val position=1
 
 
