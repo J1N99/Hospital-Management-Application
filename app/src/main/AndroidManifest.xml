@@ -37,6 +37,12 @@
         <activity android:name=".ProfileActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".AllUserActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".UpdatePositionActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

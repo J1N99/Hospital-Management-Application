@@ -3,10 +3,7 @@ package com.example.hospitalmanagementapplication.firebase
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
-import android.media.session.MediaSessionManager.RemoteUserInfo
-import android.provider.SyncStateContract.Constants
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.model.User
@@ -68,6 +65,66 @@ class firestore {
     }
 
     fun updateDocument(collectionName: String, documentId: String, data: Map<String, Any>, merge: Boolean = true) {
+        val documentReference = mFirestore.collection(collectionName).document(documentId)
+
+        if (merge) {
+            // Use merge option to merge the new data with existing data, creating the document if it doesn't exist
+            documentReference.set(data, SetOptions.merge())
+                .addOnSuccessListener {
+                    println("Success update")
+                }
+                .addOnFailureListener { e ->
+                    // Handle errors
+                    println("Error updating document: $e")
+                }
+        } else {
+            // Overwrite existing data with the new data
+            documentReference.set(data)
+                .addOnSuccessListener {
+                    println("Success update")
+                }
+                .addOnFailureListener { e ->
+                    // Handle errors
+                    println("Error updating document: $e")
+                }
+        }
+    }
+
+
+    fun getAllUsers(callback: (List<User>) -> Unit) {
+        val usersCollection = mFirestore.collection("users")
+
+        usersCollection.get()
+            .addOnSuccessListener { result ->
+                val userList = mutableListOf<User>()
+
+                for (document in result) {
+                    val userId = document.id
+                    val firstname = document.getString("firstname").toString()
+                    val lastname = document.getString("lastname").toString()
+                    val icNumber=document.getString("ic").toString()
+                    val gender: Boolean = document.getBoolean("gender") ?: false
+                    val dob=document.getString("dob").toString()
+                    val position: Int = (document.getLong("position")?.toInt()) ?: 1
+
+                    val user = User(userId, firstname, lastname,gender,dob,icNumber,position )
+                    userList.add(user)
+                }
+
+                callback(userList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
+
+
+    fun updatePosition(
+        documentId: String,
+        data: Map<String, Any>,
+        merge: Boolean = true,
+        collectionName: String ="users") {
         val documentReference = mFirestore.collection(collectionName).document(documentId)
 
         if (merge) {

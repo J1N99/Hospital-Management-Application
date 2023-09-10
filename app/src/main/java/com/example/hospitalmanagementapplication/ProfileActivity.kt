@@ -2,10 +2,14 @@ package com.example.hospitalmanagementapplication
 
 
 import android.app.DatePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityProfileBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
@@ -142,6 +146,7 @@ class ProfileActivity:AppCompatActivity() {
             }
             else if(binding.button.text=="Save Edit")
             {
+
                 val lastname = binding.lastNameET.text.toString()
                 val firstname = binding.firstNameEt.text.toString()
                 val dob = binding.ageET.text.toString()
@@ -151,11 +156,41 @@ class ProfileActivity:AppCompatActivity() {
                 val dataToUpdate=mapOf("lastname" to lastname,"firstname" to firstname,"dob" to dob, "gender" to gender, "ic" to icNumber)
 
                 firestore().updateDocument("users",documentID,dataToUpdate)
+                showDialogSuccessUpdate()
+
             }
         }
 
 
     }
+
+    private fun showDialogSuccessUpdate() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
+
+        val textViewMessage = dialogView.findViewById<TextView>(R.id.textViewMessage)
+        textViewMessage.text ="The information have updated!"
+        builder.setView(dialogView)
+        val dialog = builder.create()
+
+        val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        buttonDismiss.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Add a listener to handle the user's action when dismissing the dialog
+        dialog.setOnDismissListener(DialogInterface.OnDismissListener {
+            // You can take further action here if needed
+            Toast.makeText(this, "Dialog dismissed", Toast.LENGTH_SHORT).show()
+        })
+
+        dialog.show()
+    }
+
+
     override fun onBackPressed() {
         // Create an Intent to navigate to TargetActivity
         val intent = Intent(this, ForgetPasswordActivity::class.java)

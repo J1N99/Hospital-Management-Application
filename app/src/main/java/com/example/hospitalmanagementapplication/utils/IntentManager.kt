@@ -6,6 +6,7 @@ import android.content.Intent
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.ProfileActivity
 import com.example.hospitalmanagementapplication.R
+import com.example.hospitalmanagementapplication.AllUserActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class IntentManager(
@@ -22,6 +23,10 @@ class IntentManager(
                 }
                 R.id.profile -> {
                     startActivity(activity, ProfileActivity::class.java)
+                    true
+                }
+                R.id.settings->{
+                    startActivity(activity,AllUserActivity::class.java)
                     true
                 }
                 // Add more cases for additional items
