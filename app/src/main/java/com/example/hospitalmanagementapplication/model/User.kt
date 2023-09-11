@@ -7,5 +7,5 @@ data class User(
     val gender:Boolean=false,
     val dob:String="",
     val ic:String="",
-    val position:Int=1
+    val position:Int=5
 )

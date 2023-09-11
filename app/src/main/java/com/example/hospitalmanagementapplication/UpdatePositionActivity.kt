@@ -32,20 +32,41 @@ class UpdatePositionActivity: AppCompatActivity() {
         bottomNavigationView.setSelectedItemId(com.example.hospitalmanagementapplication.R.id.settings);
         IntentManager(this, bottomNavigationView)
 
+        val spinner: Spinner = findViewById(com.example.hospitalmanagementapplication.R.id.spinner)
         var updateID=firebaseAuth.currentUser?.uid
         userId = intent.getStringExtra("userId") ?: ""
         var documentID=""
+        var dbposition=0
 
-        firestore().getUserDetails(this) { user ->
+        firestore().getOtherUserDetails(this,userId) { user ->
 
             if (user != null) {
                 documentID=userId
+                Log.v("User Position", "${user.position}")
+                dbposition=user.position
                 binding.NameEt.setText(user.firstname+" "+ user.lastname)
                 binding.icnumberET.setText(user.ic)
                 binding.NameEt.isEnabled=false
                 binding.icnumberET.isEnabled=false
                 binding.NameEt.setBackgroundResource(android.R.color.darker_gray)
                 binding.icnumberET.setBackgroundResource(android.R.color.darker_gray)
+
+                // Define an array of items to display in the Spinner
+                val positions = arrayOf("Please select position", "Doctor", "Nurse", "Clerk","Patient")
+
+                // Create an ArrayAdapter using the defined items and a default layout
+                val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, positions)
+
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+                // Set the ArrayAdapter to the Spinner
+                spinner.adapter = adapter
+                Log.v("Dbposition", "$dbposition")
+                // Set default selection
+                val defaultSelection = dbposition-1
+                Log.v("Default Selection", "$defaultSelection")
+                spinner.setSelection(defaultSelection)
             } else {
                 Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
             }
@@ -53,18 +74,7 @@ class UpdatePositionActivity: AppCompatActivity() {
 
 
 
-        val spinner: Spinner = findViewById(com.example.hospitalmanagementapplication.R.id.spinner)
-        // Define an array of items to display in the Spinner
-        val positions = arrayOf("Please select position", "Doctor", "Nurse", "Clerk")
 
-        // Create an ArrayAdapter using the defined items and a default layout
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, positions)
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        // Set the ArrayAdapter to the Spinner
-        spinner.adapter = adapter
 
         binding.button.setOnClickListener{
             val selectedPosition = spinner.selectedItem.toString()
@@ -74,6 +84,7 @@ class UpdatePositionActivity: AppCompatActivity() {
                 "Doctor"->"2"
                 "Nurse" ->  "3"
                 "Clerk" -> "4"
+                "Patient"->"5"
                 else -> "Unknown position"
             }
             Log.d(" Position",position)

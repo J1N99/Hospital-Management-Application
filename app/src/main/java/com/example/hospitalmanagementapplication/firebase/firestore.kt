@@ -63,7 +63,26 @@ class firestore {
                 callback(null) // Notify callback of the error
             }
     }
+    fun getOtherUserDetails(activity: Activity, userId:String,callback: (User?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("users")
+            // Get documentation id from the field of users
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
 
+                // Received the document ID and convert it into the User Data model object
+                val user = document.toObject(User::class.java)
+
+                // Pass the user object to the callback
+                callback(user)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+                callback(null) // Notify callback of the error
+            }
+    }
     fun updateDocument(collectionName: String, documentId: String, data: Map<String, Any>, merge: Boolean = true) {
         val documentReference = mFirestore.collection(collectionName).document(documentId)
 
