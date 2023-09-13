@@ -3,10 +3,7 @@ package com.example.hospitalmanagementapplication.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.example.hospitalmanagementapplication.HomeActivity
-import com.example.hospitalmanagementapplication.ProfileActivity
-import com.example.hospitalmanagementapplication.R
-import com.example.hospitalmanagementapplication.AllUserActivity
+import com.example.hospitalmanagementapplication.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class IntentManager(
@@ -25,7 +22,7 @@ class IntentManager(
                     startActivity(activity, ProfileActivity::class.java)
                     true
                 }
-                R.id.settings->{
+                R.id.others->{
                     startActivity(activity,AllUserActivity::class.java)
                     true
                 }

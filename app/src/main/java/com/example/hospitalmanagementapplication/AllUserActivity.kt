@@ -21,7 +21,7 @@ class AllUserActivity: AppCompatActivity() {
         binding = ActivityAlluserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(R.id.settings);
+        bottomNavigationView.setSelectedItemId(R.id.others);
         IntentManager(this, bottomNavigationView)
         firebaseAuth = FirebaseAuth.getInstance()
         firestore().getAllUsers { userList ->

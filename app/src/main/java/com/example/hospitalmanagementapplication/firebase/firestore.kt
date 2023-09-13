@@ -63,6 +63,25 @@ class firestore {
                 callback(null) // Notify callback of the error
             }
     }
+
+
+    fun getUserPosition(activity: Activity, callback: (Int?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("users")
+            // Get document id from the field of users
+            .document(getCurrentUserID())
+            .get()
+            .addOnSuccessListener { document ->
+                val position = document.getLong("position")?.toInt()
+                callback(position)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user position: $e")
+                callback(null)
+            }
+    }
+
+
     fun getOtherUserDetails(activity: Activity, userId:String,callback: (User?) -> Unit) {
         // Get user in collection
         mFirestore.collection("users")

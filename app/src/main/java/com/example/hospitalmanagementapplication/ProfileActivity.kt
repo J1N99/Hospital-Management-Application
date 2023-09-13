@@ -193,7 +193,7 @@ class ProfileActivity:AppCompatActivity() {
 
     override fun onBackPressed() {
         // Create an Intent to navigate to TargetActivity
-        val intent = Intent(this, ForgetPasswordActivity::class.java)
+        val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
 
         // Optionally, finish the current activity to remove it from the back stack

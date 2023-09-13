@@ -29,7 +29,7 @@ class UpdatePositionActivity: AppCompatActivity() {
         setContentView(binding.root)
         firebaseAuth = FirebaseAuth.getInstance()
         bottomNavigationView = findViewById(com.example.hospitalmanagementapplication.R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(com.example.hospitalmanagementapplication.R.id.settings);
+        bottomNavigationView.setSelectedItemId(com.example.hospitalmanagementapplication.R.id.others);
         IntentManager(this, bottomNavigationView)
 
         val spinner: Spinner = findViewById(com.example.hospitalmanagementapplication.R.id.spinner)

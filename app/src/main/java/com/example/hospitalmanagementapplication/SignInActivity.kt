@@ -1,5 +1,7 @@
 package com.example.hospitalmanagementapplication
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +11,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
+import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
+import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -109,9 +113,25 @@ class SignInActivity : AppCompatActivity() {
     }
 
         private fun successLoginAndGotDetails() {
-        Log.v("Test", "test")
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
+            firestore().getUserPosition(this) { position ->
+                if (position != null) {
+                    if(position==1)
+                    {
+                        val intent = Intent(this, HomeActivity::class.java)
+                        startActivity(intent)
+                    }
+                    else if(position==2)
+                    {
+                        val intent = Intent(this, DoctorHomeActivity::class.java)
+                        startActivity(intent)
+                    }
+                } else {
+                    // Handle the case where there was an error or the position is not available.
+                }
+            }
+
+
+
     }
 
     private fun goRegisterUserDetails() {
@@ -149,5 +169,20 @@ class SignInActivity : AppCompatActivity() {
         })
 
         dialog.show()
+    }
+
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setMessage("Are you sure you want to exit the app?")
+            .setPositiveButton("Yes") { _, _ ->
+                // Call the system method to close the app
+                val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                activityManager.appTasks.forEach { taskInfo ->
+                    taskInfo.finishAndRemoveTask()
+                }
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 }
