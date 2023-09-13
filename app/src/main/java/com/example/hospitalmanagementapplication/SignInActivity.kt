@@ -144,8 +144,21 @@ class SignInActivity : AppCompatActivity() {
         super.onStart()
 
         if (firebaseAuth.currentUser != null) {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+
+            firestore().getUserPosition(this) { position ->
+                if (position != null) {
+                if (position == 2) {
+                        val intent = Intent(this, DoctorHomeActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+                else
+                {
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+
         }
     }
 

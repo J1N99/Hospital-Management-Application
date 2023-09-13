@@ -49,6 +49,9 @@
         <activity android:name=".ClerkDashboardActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".doctor.DoctorAvailableAppoinmentActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

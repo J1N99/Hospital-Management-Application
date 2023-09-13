@@ -6,14 +6,21 @@ import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.example.hospitalmanagementapplication.HomeActivity
+import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppoinmentActivity
+import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
+import com.example.hospitalmanagementapplication.model.AppointmentAvailable
 import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.userDetailsActivity
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 
 class firestore {
     private val mFirestore = FirebaseFirestore.getInstance()
+
 
     fun registerUserDetails(activity: userDetailsActivity, user: User) {
 
@@ -187,5 +194,43 @@ class firestore {
                 }
         }
     }
+    fun createAvailableAppointment(activity: DoctorAvailableAppoinmentActivity, appointmentAvailable: AppointmentAvailable) {
+        mFirestore.collection("appointmentAvailable")
+            .document()
+            .set(appointmentAvailable, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+                val intent = Intent(activity, DoctorHomeActivity::class.java)
+                activity.startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+    fun getAppointmentAvailable(activity: Activity, callback: (String?,AppointmentAvailable?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("appointmentAvailable")
+            // Get documentation id from the field of users
+            .whereEqualTo("userId",getCurrentUserID())
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+                // Assuming there is only one matching document, you can retrieve the first one
+                val document = document.documents[0]
+                // Get the document ID
+                val documentId = document.id
+                // Received the document ID and convert it into the User Data model object
+                val appointmentAvailable = document.toObject(AppointmentAvailable::class.java)
+
+                // Pass the user object to the callback
+                callback(documentId,appointmentAvailable)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+                callback(null,null) // Notify callback of the error
+            }
+    }
+
 
 }
