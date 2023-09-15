@@ -49,6 +49,11 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        binding.userEmail.setOnClickListener{
+            val intent = Intent(this, BookingActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
 
 
