@@ -3,8 +3,10 @@ package com.example.hospitalmanagementapplication
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -150,22 +152,17 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
     private fun generateButtonsBetweenTimes(startTime: String, endTime: String) {
         var intStartTime = startTime.toInt()
-        var intEndTime = endTime.toInt()
+        val intEndTime = endTime.toInt()
         val timeInterval = 20 // Assuming the interval is 20 minutes
 
+        // Find the existing GridLayout from the XML layout
+        val gridLayout = findViewById<GridLayout>(R.id.LayoutButton)
 
-
-        // Create a LinearLayout or any other layout to add buttons programmatically
-        val layout = findViewById<LinearLayout>(R.id.LayoutButton)
-
-
-
-        Log.d("Start", "$intStartTime")
-        Log.d("End", "$intEndTime")
+        // Set the number of buttons to display per row
+        val buttonsPerRow = 3
+        gridLayout.columnCount = buttonsPerRow
 
         while (intStartTime < intEndTime) {
-            Log.d("StartLoop", "$intStartTime")
-            Log.d("EndLoop", "$intEndTime")
             val button = Button(this)
             val hours = intStartTime / 100
             val minutes = intStartTime % 100
@@ -175,23 +172,18 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
             firestore().getAppointment(doctorID, dateAppointment, formattedTime) { appointmentExists ->
                 if (appointmentExists) {
-                   button.isEnabled=false
+                    button.isEnabled = false
                 }
             }
 
             button.setOnClickListener {
-
-
                 // Handle button click for the specific time
-                showConfirmationDialog(dateAppointment,formattedTime) { confirmed ->
+                showConfirmationDialog(dateAppointment, formattedTime) { confirmed ->
                     if (confirmed) {
                         // Store the selected time in Firestore
                         val selectedTime = formattedTime
                         val currentUser = firebaseAuth.currentUser
                         val userId = currentUser?.uid.toString()
-
-
-
 
                         firestore().makeAppointment(
                             doctorID,
@@ -199,7 +191,7 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                             dateAppointment,
                             selectedTime,
                             {
-                                //Once success refresh the page
+                                // Once success, refresh the page
                                 refreshActivity()
                             },
                             { errorMessage ->
@@ -207,31 +199,35 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                                 Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
                             }
                         )
-
-
                     }
                 }
             }
 
-
-            // Set layout parameters for the button (width and height)
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+            // Add layout parameters for the button (width and height)
+            val buttonParams = GridLayout.LayoutParams()
+            buttonParams.width = 0 // Set width to 0 to evenly distribute buttons
+            buttonParams.height = GridLayout.LayoutParams.WRAP_CONTENT
+            buttonParams.columnSpec = GridLayout.spec(
+                GridLayout.UNDEFINED, // Let the GridLayout handle the column placement
+                GridLayout.FILL,
+                1f // Set column weight to evenly distribute buttons
             )
 
-            // Add margins between buttons (optional)
-            layoutParams.setMargins(16, 0, 16, 0)
+            button.layoutParams = buttonParams
 
-            // Add the button to the layout with layout parameters
-            layout.addView(button, layoutParams)
+            // Add the button to the GridLayout
+            gridLayout.addView(button)
 
-            // Increment currentTime by the time interval, considering rollover at 60 minutes
+            // Increment intStartTime by the time interval, considering rollover at 60 minutes
             val newMinutes = (minutes + timeInterval) % 60
             val hourAdjustment = (minutes + timeInterval) / 60
             intStartTime = (hours + hourAdjustment) * 100 + newMinutes
-                }
-            }
+        }
+    }
+
+
+
+
 
 
 

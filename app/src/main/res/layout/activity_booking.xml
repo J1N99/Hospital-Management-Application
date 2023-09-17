@@ -28,6 +28,8 @@
         android:textSize="18sp"
         android:layout_marginHorizontal="16dp"/>
 
+
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/bookingAppointmentLayout"
         style="@style/LoginTextInputOuterFieldStyle"
@@ -57,16 +59,19 @@
 
 
 
-
-    <LinearLayout
-        android:id="@+id/LayoutButton"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal"
-        app:layout_constraintTop_toBottomOf="@id/bookingAppointmentET">
-    </LinearLayout>
-
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bookingAppointmentLayout">
+        <GridLayout
+            android:id="@+id/LayoutButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            app:layout_constraintTop_toBottomOf="@id/bookingAppointmentET">
+        </GridLayout>
+    </ScrollView>
 </LinearLayout>
 
 
