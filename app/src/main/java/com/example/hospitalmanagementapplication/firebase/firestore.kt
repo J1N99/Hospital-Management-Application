@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppoinmentActivity
@@ -254,6 +255,24 @@ class firestore {
                 callback(null,null) // Notify callback of the error
             }
     }
+    fun getAppointment(doctorId: String, dateAppointment: String, formattedTime: String, callback: (Boolean) -> Unit) {
+        // Create a Firestore query to check if an appointment exists
+        val query = mFirestore.collection("appointments")
+            .whereEqualTo("doctorId", doctorId)
+            .whereEqualTo("dateAppointment", dateAppointment)
+            .whereEqualTo("time", formattedTime)
+
+        query.get()
+            .addOnSuccessListener { documents ->
+                val appointmentExists = !documents.isEmpty
+                callback(appointmentExists) // Call the callback with the result
+            }
+            .addOnFailureListener { e ->
+                // Handle the query failure if needed
+                // You can add logging or error handling here
+                callback(false) // Call the callback with false in case of failure
+            }
+    }
 
     //select doctor
     fun getAllDoctor(callback: (List<User>) -> Unit) {
@@ -282,4 +301,18 @@ class firestore {
             }
     }
 
+
+    fun makeAppointment(doctorId: String, userId: String,dateAppointment:String,time: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val appointment = hashMapOf(
+            "doctorId" to doctorId,
+            "userId" to userId,
+            "dateAppointment" to dateAppointment,
+            "time" to time
+        )
+
+        mFirestore.collection("appointments")
+            .add(appointment)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure("Failed to store: $e") }
+    }
 }

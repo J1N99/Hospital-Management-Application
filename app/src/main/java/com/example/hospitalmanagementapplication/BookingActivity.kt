@@ -1,11 +1,14 @@
 package com.example.hospitalmanagementapplication
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityBookingBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
@@ -23,9 +26,11 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
 
-   // private val availableDay = arrayOf(Calendar.TUESDAY, Calendar.FRIDAY)
+    // private val availableDay = arrayOf(Calendar.TUESDAY, Calendar.FRIDAY)
     private val availableDays = mutableListOf<Int>()
-
+    private var appointmentAvailableStartTime = ""
+    private var appointmentAvailableEndTime = ""
+    private var doctorID=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBookingBinding.inflate(layoutInflater)
@@ -36,8 +41,9 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
         bottomNavigationView.setSelectedItemId(R.id.home)
         IntentManager(this, bottomNavigationView)
 
-        var doctorID = intent.getStringExtra("doctorID") ?: ""
+        doctorID= intent.getStringExtra("doctorID") ?: ""
         firebaseAuth = FirebaseAuth.getInstance()
+
 
         firestore().getOtherUserDetails(this, doctorID) { user ->
             if (user != null) {
@@ -48,6 +54,9 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
         }
 
         firestore().getDoctorAppointmentAvailable(this, doctorID) { _, appointmentAvailable ->
+
+            appointmentAvailableStartTime = appointmentAvailable?.appointmentStartTime ?: ""
+            appointmentAvailableEndTime = appointmentAvailable?.appointmentEndTime ?: ""
             if (appointmentAvailable != null) {
                 val daysOfWeek = arrayOf(
                     Calendar.MONDAY,
@@ -135,6 +144,122 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
         // Set the formatted date in the EditText
         binding.bookingAppointmentET.setText(formattedDate)
+        destroyAllButtons()
+        generateButtonsBetweenTimes(appointmentAvailableStartTime, appointmentAvailableEndTime)
     }
 
+    private fun generateButtonsBetweenTimes(startTime: String, endTime: String) {
+        var intStartTime = startTime.toInt()
+        var intEndTime = endTime.toInt()
+        val timeInterval = 20 // Assuming the interval is 20 minutes
+
+
+
+        // Create a LinearLayout or any other layout to add buttons programmatically
+        val layout = findViewById<LinearLayout>(R.id.LayoutButton)
+
+
+
+        Log.d("Start", "$intStartTime")
+        Log.d("End", "$intEndTime")
+
+        while (intStartTime < intEndTime) {
+            Log.d("StartLoop", "$intStartTime")
+            Log.d("EndLoop", "$intEndTime")
+            val button = Button(this)
+            val hours = intStartTime / 100
+            val minutes = intStartTime % 100
+            val formattedTime = String.format("%02d:%02d", hours, minutes)
+            val dateAppointment = binding.bookingAppointmentET.text.toString()
+            button.text = formattedTime
+
+            firestore().getAppointment(doctorID, dateAppointment, formattedTime) { appointmentExists ->
+                if (appointmentExists) {
+                   button.isEnabled=false
+                }
+            }
+
+            button.setOnClickListener {
+
+
+                // Handle button click for the specific time
+                showConfirmationDialog(dateAppointment,formattedTime) { confirmed ->
+                    if (confirmed) {
+                        // Store the selected time in Firestore
+                        val selectedTime = formattedTime
+                        val currentUser = firebaseAuth.currentUser
+                        val userId = currentUser?.uid.toString()
+
+
+
+
+                        firestore().makeAppointment(
+                            doctorID,
+                            userId,
+                            dateAppointment,
+                            selectedTime,
+                            {
+                                //Once success refresh the page
+                                refreshActivity()
+                            },
+                            { errorMessage ->
+                                // Handle the error while storing in Firestore
+                                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+
+
+                    }
+                }
+            }
+
+
+            // Set layout parameters for the button (width and height)
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+
+            // Add margins between buttons (optional)
+            layoutParams.setMargins(16, 0, 16, 0)
+
+            // Add the button to the layout with layout parameters
+            layout.addView(button, layoutParams)
+
+            // Increment currentTime by the time interval, considering rollover at 60 minutes
+            val newMinutes = (minutes + timeInterval) % 60
+            val hourAdjustment = (minutes + timeInterval) / 60
+            intStartTime = (hours + hourAdjustment) * 100 + newMinutes
+                }
+            }
+
+
+
+    private fun showConfirmationDialog(dateAppointment:String,time: String, callback: (Boolean) -> Unit) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Confirm Appointment")
+        builder.setMessage("Do you want to book the appointment at $dateAppointment $time?")
+
+        builder.setPositiveButton("Yes") { _, _ ->
+            callback(true)
+        }
+
+        builder.setNegativeButton("No") { _, _ ->
+            callback(false)
+        }
+
+        builder.setCancelable(false)
+        builder.show()
+    }
+
+    private fun refreshActivity() {
+        val intent = intent
+        finish()
+        startActivity(intent)
+    }
+
+    private fun destroyAllButtons() {
+        binding.LayoutButton.removeAllViews() // This will remove all child views (buttons) from the LinearLayout
+    }
 }
+
