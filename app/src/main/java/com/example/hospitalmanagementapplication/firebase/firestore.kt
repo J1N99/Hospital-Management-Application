@@ -231,6 +231,55 @@ class firestore {
                 callback(null,null) // Notify callback of the error
             }
     }
+    fun getDoctorAppointmentAvailable(activity: Activity,doctorID:String, callback: (String?,AppointmentAvailable?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("appointmentAvailable")
+            // Get documentation id from the field of users
+            .whereEqualTo("userId",doctorID)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+                // Assuming there is only one matching document, you can retrieve the first one
+                val document = document.documents[0]
+                // Get the document ID
+                val documentId = document.id
+                // Received the document ID and convert it into the User Data model object
+                val appointmentAvailable = document.toObject(AppointmentAvailable::class.java)
 
+                // Pass the user object to the callback
+                callback(documentId,appointmentAvailable)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+                callback(null,null) // Notify callback of the error
+            }
+    }
+
+    //select doctor
+    fun getAllDoctor(callback: (List<User>) -> Unit) {
+        val usersCollection = mFirestore.collection("users")
+        val query: Query = usersCollection.whereEqualTo("position", 2)
+
+        query.get()
+            .addOnSuccessListener { result ->
+                val doctorList = mutableListOf<User>()
+
+                for (document in result) {
+                    val userId = document.id
+                    val firstname = document.getString("firstname").toString()
+                    val lastname = document.getString("lastname").toString()
+
+
+                    val user = User(userId, firstname, lastname )
+                    doctorList.add(user)
+                }
+
+                callback(doctorList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
 
 }
