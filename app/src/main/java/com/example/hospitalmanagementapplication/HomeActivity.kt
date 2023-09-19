@@ -47,6 +47,11 @@ class HomeActivity : AppCompatActivity() {
             val intent = Intent(this, SelectDoctorActivity::class.java)
             startActivity(intent)
         }
+        binding.viewAppointment.setOnClickListener{
+            val intent = Intent(this, ViewAppointmentActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
         binding.logoutButton.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, SignInActivity::class.java)

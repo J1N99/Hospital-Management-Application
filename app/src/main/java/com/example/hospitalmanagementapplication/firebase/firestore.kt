@@ -8,6 +8,7 @@ import android.util.Log
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppoinmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
+import com.example.hospitalmanagementapplication.model.Appointment
 import com.example.hospitalmanagementapplication.model.AppointmentAvailable
 import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.userDetailsActivity
@@ -396,4 +397,51 @@ class firestore {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure("Failed to store: $e") }
     }
+
+    fun getAndDisplayAppointments(callback: (List<Appointment>) -> Unit) {
+        mFirestore.collection("appointments").whereEqualTo("userId", getCurrentUserID())
+            .get()
+            .addOnSuccessListener { documents ->
+                val appointmentsList = mutableListOf<Appointment>()
+
+                for (document in documents) {
+                    val dateAppointment = document.getString("dateAppointment")
+                    val doctorId = document.getString("doctorId")
+                    val time = document.getString("time")
+                    val documentID=document.id
+                    // Create a data class for Appointment
+                    val appointment = Appointment(documentID,dateAppointment, doctorId, time)
+                    appointmentsList.add(appointment)
+                }
+
+                // Pass the list of appointments to the callback function
+                callback(appointmentsList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle any errors that occurred during the query
+                Log.w("Firestore", "Error getting documents: ", exception)
+            }
+    }
+
+
+
+
+
+        fun deleteDocument(documentId: String, collectionName: String,onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+            val collectionReference = mFirestore.collection(collectionName)
+            val documentReference = collectionReference.document(documentId)
+
+            documentReference
+                .delete()
+                .addOnSuccessListener {
+                    // Document successfully deleted
+                    onSuccess()
+                }
+                .addOnFailureListener { e ->
+                    // Handle errors here
+                    onFailure(e)
+                }
+
+    }
+
 }
