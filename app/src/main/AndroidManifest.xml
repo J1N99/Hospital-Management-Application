@@ -58,6 +58,9 @@
         <activity android:name=".SelectDoctorActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".resetPasswordActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

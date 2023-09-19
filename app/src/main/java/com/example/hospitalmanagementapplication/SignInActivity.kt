@@ -57,7 +57,7 @@ class SignInActivity : AppCompatActivity() {
 
                                 val userId = currentUser.uid
                                 val usersRef = firestore.collection("users")
-                                Log.d("Firestore", "${userId}")
+
 
                                 usersRef.document(userId).get().addOnCompleteListener { innerTask ->
                                     progressDialog.dismiss()
@@ -65,16 +65,23 @@ class SignInActivity : AppCompatActivity() {
                                     if (innerTask.isSuccessful) {
                                         val document: DocumentSnapshot? = innerTask.result
                                         if (document != null && document.exists()) {
-                                            Log.d(
-                                                "Firestore",
-                                                "Document exists. Going to HomeActivity."
-                                            )
-                                            successLoginAndGotDetails()
+                                            firestore().getUserDetails(this) { user ->
+                                                if (user != null) {
+                                                   if(user.resetPassword)
+                                                   {
+                                                       resetPassword()
+                                                   }
+                                                    else
+                                                   {
+                                                       successLoginAndGotDetails()
+                                                   }
+
+                                                } else {
+                                                    Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+
                                         } else {
-                                            Log.d(
-                                                "Firestore",
-                                                "Document does not exist. Going to userDetailsActivity."
-                                            )
                                             goRegisterUserDetails()
                                         }
                                     } else {
@@ -135,8 +142,13 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun goRegisterUserDetails() {
-        Log.v("No", "No")
         val intent = Intent(this, userDetailsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun resetPassword() {
+        val intent = Intent(this, resetPasswordActivity::class.java)
+        intent.putExtra("resetPassword", true)
         startActivity(intent)
     }
 

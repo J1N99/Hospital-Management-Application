@@ -94,7 +94,7 @@ class UpdatePositionActivity: AppCompatActivity() {
             {
                 Toast.makeText(
                     this,
-                    "Please select postion",
+                    "Please select position",
                     Toast.LENGTH_LONG
                 ).show()
             }

@@ -18,6 +18,7 @@ class userDetailsActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUserdetailsBinding.inflate(layoutInflater)
@@ -80,6 +81,8 @@ class userDetailsActivity : AppCompatActivity() {
         val userId = currentUser?.uid
         Log.d("userId","$userId")
         if (userId != null) {
+
+            val email=currentUser?.email?:""
             val lastname = binding.lastNameET.text.toString()
             val firstname = binding.firstNameEt.text.toString()
             val dob = binding.ageET.text.toString()
@@ -88,7 +91,7 @@ class userDetailsActivity : AppCompatActivity() {
             val position=1
 
 
-            val user = User(userId, lastname, firstname, gender,dob,icNumber,position)
+            val user = User(userId,email, lastname, firstname, gender,dob,icNumber,position)
             firestore().registerUserDetails(this,user)
 
         }

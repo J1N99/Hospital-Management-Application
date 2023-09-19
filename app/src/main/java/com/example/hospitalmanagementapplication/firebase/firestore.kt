@@ -1,27 +1,32 @@
 package com.example.hospitalmanagementapplication.firebase
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppoinmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.model.AppointmentAvailable
 import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.userDetailsActivity
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 
+
 class firestore {
     private val mFirestore = FirebaseFirestore.getInstance()
-
+    private val mFirebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     fun registerUserDetails(activity: userDetailsActivity, user: User) {
 
@@ -73,6 +78,41 @@ class firestore {
     }
 
 
+    fun changePasswordWithReauthentication(
+        activity: Activity,
+        oldPassword: String,
+        newPassword: String,
+        onCompleteListener: OnCompleteListener<Void>
+    ) {
+        val user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+
+        // Create a credential with the user's email and old password
+        val credential: AuthCredential = EmailAuthProvider.getCredential(user?.email ?: "", oldPassword)
+
+        // Re-authenticate the user with the provided credential
+        user?.reauthenticate(credential)
+            ?.addOnCompleteListener { reauthTask: Task<Void> ->
+                if (reauthTask.isSuccessful) {
+                    // Re-authentication successful, change the password
+                    user.updatePassword(newPassword)
+                        .addOnCompleteListener { passwordUpdateTask: Task<Void> ->
+                            onCompleteListener.onComplete(passwordUpdateTask)
+                        }
+                } else {
+
+                    // Re-authentication failed. Show an alert to the user.
+                    val alertDialog = AlertDialog.Builder(activity)
+                        .setTitle("Authentication Failed")
+                        .setMessage("The old password you entered is incorrect.")
+                        .setPositiveButton("OK", null)
+                        .create()
+
+                    alertDialog.show()
+
+                }
+            }
+    }
+
     fun getUserPosition(activity: Activity, callback: (Int?) -> Unit) {
         // Get user in collection
         mFirestore.collection("users")
@@ -88,7 +128,47 @@ class firestore {
                 callback(null)
             }
     }
+    fun getUserByIC(ic: String): Task<QuerySnapshot> {
+        val usersCollection = mFirestore.collection("users")
+        return usersCollection.whereEqualTo("ic", ic).get()
+    }
 
+    fun getEmailFromIC(ic: String, onComplete: (User?) -> Unit, onError: (Exception) -> Unit) {
+        getUserByIC(ic)
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0] // Get the first matching document
+                    val userId = document.getString("id") ?: ""
+                    val userIC = document.getString("ic") ?: ""
+                    onComplete(User(userId, userIC))
+                } else {
+                    onComplete(null) // No matching document found
+                }
+            }
+            .addOnFailureListener { e ->
+                onError(e)
+            }
+    }
+
+    fun getUserByEmail(uid: String): Task<DocumentSnapshot> {
+        val usersCollection = mFirestore.collection("users")
+        return usersCollection.document(uid).get()
+    }
+
+    fun getEmailByUID(uid: String, onComplete: (String?) -> Unit, onError: (Exception) -> Unit) {
+        getUserByEmail(uid)
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val email = documentSnapshot.getString("email")
+                    onComplete(email)
+                } else {
+                    onComplete(null) // No document found with the specified UID
+                }
+            }
+            .addOnFailureListener { e ->
+                onError(e)
+            }
+    }
 
     fun getOtherUserDetails(activity: Activity, userId:String,callback: (User?) -> Unit) {
         // Get user in collection
@@ -146,6 +226,7 @@ class firestore {
 
                 for (document in result) {
                     val userId = document.id
+                    val email=document.getString("email").toString()
                     val firstname = document.getString("firstname").toString()
                     val lastname = document.getString("lastname").toString()
                     val icNumber=document.getString("ic").toString()
@@ -153,7 +234,7 @@ class firestore {
                     val dob=document.getString("dob").toString()
                     val position: Int = (document.getLong("position")?.toInt()) ?: 1
 
-                    val user = User(userId, firstname, lastname,gender,dob,icNumber,position )
+                    val user = User(userId,email ,firstname, lastname,gender,dob,icNumber,position )
                     userList.add(user)
                 }
 
