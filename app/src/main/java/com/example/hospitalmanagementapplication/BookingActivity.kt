@@ -107,7 +107,7 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
         // Calculate the maximum date (3 months from now)
         val maxDate = Calendar.getInstance()
         maxDate.add(Calendar.MONTH, 3)
-
+        currentDate.add(Calendar.DAY_OF_MONTH, 1)
         // Set the minimum and maximum date for the date picker
         datePickerDialog.minDate = currentDate
         datePickerDialog.maxDate = maxDate
