@@ -50,5 +50,10 @@ class DoctorHomeActivity  : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        binding.viewAppointment.setOnClickListener{
+            val intent = Intent(this, DoctorViewAppointment::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

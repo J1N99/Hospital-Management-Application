@@ -409,8 +409,9 @@ class firestore {
                     val doctorId = document.getString("doctorId")
                     val time = document.getString("time")
                     val documentID=document.id
+                    val userID=getCurrentUserID()
                     // Create a data class for Appointment
-                    val appointment = Appointment(documentID,dateAppointment, doctorId, time)
+                    val appointment = Appointment(documentID,dateAppointment, doctorId, time,userID)
                     appointmentsList.add(appointment)
                 }
 
@@ -424,7 +425,36 @@ class firestore {
     }
 
 
+    fun doctorGetAndDisplayAppointments(formattedDate: String,callback: (List<Appointment>) -> Unit) {
+        mFirestore.collection("appointments")
+            .whereEqualTo("doctorId", getCurrentUserID())
+            .whereEqualTo("dateAppointment",formattedDate)
+            .get()
+            .addOnSuccessListener { documents ->
+                val appointmentsList = mutableListOf<Appointment>()
 
+                for (document in documents) {
+                    Log.e("RUN","FUCKERs")
+                    val dateAppointment = document.getString("dateAppointment")
+                    val doctorId = document.getString("doctorId")
+                    val time = document.getString("time")
+                    val documentID=document.id
+                    val userID=document.getString("userId")
+                    // Create a data class for Appointment
+                    val appointment = Appointment(documentID,dateAppointment, doctorId, time,userID)
+                    appointmentsList.add(appointment)
+                    Log.e("WHY",dateAppointment?:"")
+
+                }
+
+                // Pass the list of appointments to the callback function
+                callback(appointmentsList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle any errors that occurred during the query
+                Log.w("Firestore", "Error getting documents: ", exception)
+            }
+    }
 
 
         fun deleteDocument(documentId: String, collectionName: String,onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {

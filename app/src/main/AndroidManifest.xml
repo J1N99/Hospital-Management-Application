@@ -64,6 +64,9 @@
         <activity android:name=".ViewAppointmentActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".doctor.DoctorViewAppointment"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>
