@@ -49,7 +49,8 @@ class ForgetPasswordActivity : AppCompatActivity(){
                                           firestore().updatePosition(userID,dataToUpdate)
                                           sendEmailtoResetTempPassword(forgetPasswordEmail)
                                       } else {
-                                          println("No user found with the specified UID.")
+                                          progressDialog.dismiss()
+                                          Toast.makeText(this,"No user found with the specified UID.",Toast.LENGTH_SHORT).show()
                                       }
                                   },
                                   onError = { e ->
