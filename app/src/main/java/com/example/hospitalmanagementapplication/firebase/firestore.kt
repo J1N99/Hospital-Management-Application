@@ -10,6 +10,7 @@ import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppoinmen
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.model.Appointment
 import com.example.hospitalmanagementapplication.model.AppointmentAvailable
+import com.example.hospitalmanagementapplication.model.DisableAppointment
 import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.userDetailsActivity
 import com.google.android.gms.tasks.OnCompleteListener
@@ -434,7 +435,7 @@ class firestore {
                 val appointmentsList = mutableListOf<Appointment>()
 
                 for (document in documents) {
-                    Log.e("RUN","FUCKERs")
+
                     val dateAppointment = document.getString("dateAppointment")
                     val doctorId = document.getString("doctorId")
                     val time = document.getString("time")
@@ -472,6 +473,52 @@ class firestore {
                     onFailure(e)
                 }
 
+    }
+
+
+    fun disableAppointment(dateAppointment:String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val disableAppointmentDate = hashMapOf(
+            "doctorId" to getCurrentUserID(),
+            "dateAppointment" to dateAppointment,
+
+        )
+
+        mFirestore.collection("disableAppointmentDate")
+            .add(disableAppointmentDate)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure("Failed to store: $e") }
+    }
+
+    fun disableAppointment(doctorID:String,callback: (List<DisableAppointment>) -> Unit) {
+        // Create a Firestore query to check if an appointment exists
+        val query = mFirestore.collection("disableAppointmentDate")
+            .whereEqualTo("doctorId", doctorID)
+
+
+        query.get()
+            .addOnSuccessListener { documents ->
+
+                val disableAppointmentsList = mutableListOf<DisableAppointment>()
+
+                for (document in documents) {
+                    val documentID=document.id
+                    val dateAppointment = document.getString("dateAppointment")
+                    val doctorId=doctorID
+                    // Create a data class for Appointment
+                    val disableAppointment = DisableAppointment(documentID,dateAppointment, doctorId)
+                    disableAppointmentsList.add(disableAppointment)
+
+
+                }
+
+                // Pass the list of appointments to the callback function
+                callback(disableAppointmentsList)
+            }
+            .addOnFailureListener { e ->
+                // Handle the query failure if needed
+                // You can add logging or error handling here
+                Log.w("Firestore", "Error getting documents: ", e)
+            }
     }
 
 }
