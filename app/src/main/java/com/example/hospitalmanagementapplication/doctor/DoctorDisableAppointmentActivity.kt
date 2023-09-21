@@ -1,13 +1,16 @@
 package com.example.hospitalmanagementapplication.doctor
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.GridLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.R
+import com.example.hospitalmanagementapplication.UpdatePositionActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityBookingBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityDoctordisableappointmentdateBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
@@ -43,6 +46,24 @@ class DoctorDisableAppointmentActivity : AppCompatActivity(), DatePickerDialog.O
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser= firebaseAuth.currentUser
         userID=currentUser?.uid?:""
+
+        firestore().getAllDisableAppointment (userID){ DisableAppointment ->
+            // Once you have the user data, you can populate it into the ListView
+            val disableAppointment = ArrayAdapter(this, android.R.layout.simple_list_item_1, DisableAppointment.map { it.dateAppointment })
+            binding.disableAppointmentList.adapter = disableAppointment
+        }
+
+        binding.disableAppointmentList.setOnItemClickListener { parent, view, position, documentID ->
+            firestore().getAllDisableAppointment (userID){ DisableAppointment ->
+                val selectedDocumentId = DisableAppointment[position].documentID
+                val selectedDate = DisableAppointment[position].dateAppointment
+
+                showConfirmationDialog(selectedDocumentId?:"", selectedDate?:"")
+            }
+
+
+        }
+
 
 
         firestore().getOtherUserDetails(this, userID?:"") { user ->
@@ -231,4 +252,27 @@ class DoctorDisableAppointmentActivity : AppCompatActivity(), DatePickerDialog.O
         builder.setCancelable(false)
         builder.show()
     }
+
+    private fun showConfirmationDialog(disabelAppointmentDateId: String, selectedDate: String) {
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setTitle("Confirm Deletion")
+        alertDialogBuilder.setMessage("Are you sure you want to delete the appointment on $selectedDate?")
+        alertDialogBuilder.setPositiveButton("Yes") { dialog, which ->
+            firestore().deleteDocument(disabelAppointmentDateId,"disableAppointmentDate",
+                onSuccess = {
+                    // Create an Intent to restart the current activity
+                    val intent = intent
+                    finish() // Finish the current activity
+                    startActivity(intent) // Start a new instance of the current activity
+                },
+                onFailure = { e ->
+                    Log.w("ERROR", "Error deleting document", e)
+                })
+        }
+        alertDialogBuilder.setNegativeButton("No") { dialog, which ->
+            // User canceled, do nothing or handle it accordingly
+        }
+        alertDialogBuilder.show()
+    }
+
 }

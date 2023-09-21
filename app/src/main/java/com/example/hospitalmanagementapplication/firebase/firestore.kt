@@ -521,4 +521,32 @@ class firestore {
             }
     }
 
+
+    fun getAllDisableAppointment(doctorID: String,callback: (List<DisableAppointment>) -> Unit) {
+        val disableAppointmentCollection = mFirestore.collection("disableAppointmentDate")
+        val query: Query = disableAppointmentCollection.whereEqualTo("doctorId", doctorID)
+
+        query.get()
+            .addOnSuccessListener { result ->
+                val disableAppointmentDateList = mutableListOf<DisableAppointment>()
+
+                for (document in result) {
+                    val documentID = document.id
+                    val disableAppointmentDate = document.getString("dateAppointment").toString()
+
+
+                    val disableAppointment = DisableAppointment(documentID, disableAppointmentDate, doctorID )
+                    disableAppointmentDateList.add(disableAppointment)
+                }
+
+                callback(disableAppointmentDateList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
+
+
+
 }

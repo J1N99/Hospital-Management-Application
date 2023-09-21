@@ -69,8 +69,13 @@
             app:layout_constraintTop_toBottomOf="@id/bookingAppointmentLayout"
             />
 
+        <ListView
+            android:id="@+id/disableAppointmentList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
+
 
 
     <include layout="@layout/activity_footer" />
