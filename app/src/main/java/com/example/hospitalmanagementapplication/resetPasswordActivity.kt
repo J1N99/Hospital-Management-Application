@@ -92,6 +92,8 @@ class resetPasswordActivity:AppCompatActivity() {
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        val buttonEmail=dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility=View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, SignInActivity::class.java)
