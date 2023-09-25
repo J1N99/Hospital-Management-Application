@@ -130,13 +130,12 @@ class firestore {
                 callback(null)
             }
     }
-    fun getUserByIC(ic: String): Task<QuerySnapshot> {
-        val usersCollection = mFirestore.collection("users")
-        return usersCollection.whereEqualTo("ic", ic).get()
-    }
 
-    fun getEmailFromIC(ic: String, onComplete: (User?) -> Unit, onError: (Exception) -> Unit) {
-        getUserByIC(ic)
+    fun getEmailFromIC(ic: String,email:String, onComplete: (User?) -> Unit, onError: (Exception) -> Unit) {
+        mFirestore.collection("users")
+            .whereEqualTo("ic",ic)
+            .whereEqualTo("email",email)
+            .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
                     val document = querySnapshot.documents[0] // Get the first matching document

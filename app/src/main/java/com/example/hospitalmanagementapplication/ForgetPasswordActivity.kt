@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -30,11 +31,12 @@ class ForgetPasswordActivity : AppCompatActivity(){
         firebaseAuth = FirebaseAuth.getInstance()
         binding.button.setOnClickListener {
               val ICNumber = binding.ICEt.text.toString().trim()
-              if (ICNumber.isNotEmpty()) {
+              val email=binding.emailEt.text.toString().trim()
+              if (ICNumber.isNotEmpty()&& email.isNotEmpty()) {
                   progressDialog = Loader(this)
                   progressDialog.show()
 
-                  firestore().getEmailFromIC(ICNumber,
+                  firestore().getEmailFromIC(ICNumber,email,
                       onComplete = { user ->
                           if (user != null) {
                               userID=user.id
@@ -59,7 +61,8 @@ class ForgetPasswordActivity : AppCompatActivity(){
                               )
 
                           } else {
-                             Toast.makeText(this,"No account found with this IC",Toast.LENGTH_SHORT).show()
+                              progressDialog.dismiss()
+                             Toast.makeText(this,"No account match with this IC and email",Toast.LENGTH_SHORT).show()
                           }
                       },
                       onError = { e ->
@@ -103,6 +106,8 @@ class ForgetPasswordActivity : AppCompatActivity(){
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        val buttonEmail= dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility= View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, SignInActivity::class.java)
