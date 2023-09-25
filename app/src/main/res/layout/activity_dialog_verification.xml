@@ -14,10 +14,23 @@
         android:textSize="16sp"
         android:layout_marginBottom="16dp"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonDismiss"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dismiss"
+        android:background="@drawable/green_rounded_button"
+        android:textColor="@color/white"
+        android:text="Closed Dialog"
+        android:layout_marginBottom="10dp"
         android:textSize="18sp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonResentVerification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/red_rounded_button"
+            android:text="Resend verification "
+            android:textColor="@color/white"
+            android:textSize="18sp"
+    />
 </LinearLayout>

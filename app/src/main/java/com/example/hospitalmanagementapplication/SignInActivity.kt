@@ -98,9 +98,10 @@ class SignInActivity : AppCompatActivity() {
                                 }
                             }
                             else{
-                                FirebaseAuth.getInstance().signOut()
+
                                 progressDialog.dismiss()
                                 showVerificationDialog()
+
                             }
                         } else {
                             progressDialog.dismiss()
@@ -183,6 +184,27 @@ class SignInActivity : AppCompatActivity() {
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        val buttonResendVerificationCode=dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonResendVerificationCode.setOnClickListener {
+            progressDialog = Loader(this)
+            progressDialog.show()
+            firebaseAuth.currentUser?.sendEmailVerification()
+                ?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, "Verification email sent successfully.", Toast.LENGTH_SHORT).show()
+                        FirebaseAuth.getInstance().signOut()
+                        dialog.dismiss()
+                        progressDialog.dismiss()
+                    } else {
+                        Toast.makeText(this, "Error sending verification email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        FirebaseAuth.getInstance().signOut()
+                        dialog.dismiss()
+                        progressDialog.dismiss()
+
+                    }
+                }
+        }
+
         buttonDismiss.setOnClickListener {
                 dialog.dismiss()
         }
