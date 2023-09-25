@@ -8,78 +8,75 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.hospitalmanagementapplication.databinding.ActivitySignupBinding
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.example.hospitalmanagementapplication.utils.PasswordValidation
 import com.google.firebase.auth.FirebaseAuth
 
+class SignUpActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySignupBinding
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var progressDialog: Loader
 
-class SignUpActivity:AppCompatActivity() {
-    private lateinit var binding:ActivitySignupBinding
-    private lateinit var firebaseAuth:FirebaseAuth
-    override fun onCreate(saveInstanceState:Bundle?)
-    {
-            //TODO all process add on spinner loader
-            super.onCreate(saveInstanceState)
-            binding= ActivitySignupBinding.inflate(layoutInflater)
-            setContentView(binding.root)
-            firebaseAuth=FirebaseAuth.getInstance()
-            binding.navigationSignIn.setOnClickListener{
-                val intent= Intent(this,SignInActivity::class.java )
-                startActivity(intent)
-            }
-            binding.signUp.setOnClickListener{
-                val email=binding.emailEt.text.toString()
-                val password= binding.passET.text.toString()
-                val confirmPassword=binding.confirmPassEt.text.toString()
-                if(email.isNotEmpty()&&password.isNotEmpty()&&confirmPassword.isNotEmpty())
-                {
-
-                     if(password==(confirmPassword))
-                     {
-                         if(!PasswordValidation.isPasswordValid(password))
-                         {
-                             Toast.makeText(this,"The password length should One upper and lower cast ,digit and special Char".toString(),Toast.LENGTH_LONG).show()
-                         }
-                         else {
-                             firebaseAuth.createUserWithEmailAndPassword(email, password)
-                                 .addOnCompleteListener {
-
-                                     if (it.isSuccessful) {
-                                          val user= firebaseAuth.currentUser
-                                         user?.sendEmailVerification()
-                                             ?.addOnCompleteListener { verificationTask ->
-                                                 if (verificationTask.isSuccessful) {
-                                                  showVerificationDialog()
-                                                 }
-                                                 else
-                                                 {
-                                                     val errorMessage = verificationTask.exception?.message
-                                                     if (errorMessage != null) {
-                                                         Toast.makeText(this, "Failed to send verification email: $errorMessage", Toast.LENGTH_LONG).show()
-                                                     }
-                                                 }
-                                             }
-
-                                     } else {
-
-                                         //this is create the exception if error
-                                         Toast.makeText(
-                                             this,
-                                             it.exception.toString(),
-                                             Toast.LENGTH_LONG
-                                         ).show()
-                                     }
-                                 }
-                         }
-                     }else
-                     {
-                         Toast.makeText(this,"Password and confirm password is not same",Toast.LENGTH_LONG).show()
-                     }
+    override fun onCreate(saveInstanceState: Bundle?) {
+        super.onCreate(saveInstanceState)
+        binding = ActivitySignupBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        firebaseAuth = FirebaseAuth.getInstance()
+        binding.navigationSignIn.setOnClickListener {
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
+        }
+        binding.signUp.setOnClickListener {
+            val email = binding.emailEt.text.toString()
+            val password = binding.passET.text.toString()
+            val confirmPassword = binding.confirmPassEt.text.toString()
+            if (email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
+                progressDialog = Loader(this)
+                progressDialog.show()
+                if (password == confirmPassword) {
+                    if (!PasswordValidation.isPasswordValid(password)) {
+                        progressDialog.dismiss()
+                        Toast.makeText(
+                            this,
+                            "The password length should include one upper and lower case letter, digit, and special character.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        firebaseAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val user = firebaseAuth.currentUser
+                                    user?.sendEmailVerification()
+                                        ?.addOnCompleteListener { verificationTask ->
+                                            progressDialog.dismiss() // Dismiss the progressDialog here
+                                            if (verificationTask.isSuccessful) {
+                                                showVerificationDialog()
+                                            } else {
+                                                val errorMessage = verificationTask.exception?.message
+                                                if (errorMessage != null) {
+                                                    Toast.makeText(
+                                                        this,
+                                                        "Failed to send verification email: $errorMessage",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
+                                            }
+                                        }
+                                } else {
+                                    progressDialog.dismiss() // Dismiss the progressDialog here
+                                    Toast.makeText(this, task.exception.toString(), Toast.LENGTH_LONG).show()
+                                }
+                            }
+                    }
+                } else {
+                    progressDialog.dismiss()
+                    Toast.makeText(this, "Password and confirm password do not match", Toast.LENGTH_LONG).show()
                 }
-                else
-                {
-                    Toast.makeText(this,"Please fill in all the required field",Toast.LENGTH_LONG).show()
-                }
+            } else {
+                progressDialog.dismiss()
+                Toast.makeText(this, "Please fill in all the required fields", Toast.LENGTH_LONG).show()
             }
+        }
     }
 
     fun showVerificationDialog() {
