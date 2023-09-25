@@ -44,6 +44,8 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
         IntentManager(this, bottomNavigationView)
 
         doctorID= intent.getStringExtra("doctorID") ?: ""
+
+        Log.e(doctorID,doctorID)
         firebaseAuth = FirebaseAuth.getInstance()
 
 

@@ -34,7 +34,7 @@ class SelectDoctorActivity :AppCompatActivity() {
         }
 
         binding.doctorListview.setOnItemClickListener { parent, view, position, id ->
-            firestore().getAllUsers { userList ->
+            firestore().getAllDoctor { userList ->
 
                 val selectedDoctorId = userList[position].id
                 val intent = Intent(this, BookingActivity::class.java)

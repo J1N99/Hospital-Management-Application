@@ -46,7 +46,7 @@ class DoctorHomeActivity  : AppCompatActivity() {
             finish()
         }
         binding.userEmail.setOnClickListener{
-            val intent = Intent(this, DoctorAvailableAppoinmentActivity::class.java)
+            val intent = Intent(this, DoctorAvailableAppointmentActivity::class.java)
             startActivity(intent)
             finish()
         }

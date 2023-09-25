@@ -51,7 +51,7 @@
         <activity android:name=".ClerkDashboardActivity"
             android:exported="false">
         </activity>
-        <activity android:name=".doctor.DoctorAvailableAppoinmentActivity"
+        <activity android:name=".doctor.DoctorAvailableAppointmentActivity"
             android:exported="false">
         </activity>
         <activity android:name=".BookingActivity"

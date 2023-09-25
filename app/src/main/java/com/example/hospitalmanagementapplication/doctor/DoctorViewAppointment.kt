@@ -52,7 +52,7 @@ class DoctorViewAppointment : AppCompatActivity() {
                         // Check if the number of events matches the number of appointments
                         if (events.size == appointments.size) {
                             // All data has been added, you can now dismiss the progress dialog
-                            progressDialog.dismiss()
+
 
                             // Initialize the RecyclerView and adapter
                             recyclerView = findViewById(R.id.recyclerView)
@@ -61,8 +61,10 @@ class DoctorViewAppointment : AppCompatActivity() {
                             recyclerView.adapter = adapter
                         }
                     }
+
                 }
             }
+            progressDialog.dismiss()
         }
 
         // Calculate the minimum date (e.g., one month ago from the current date)
@@ -79,12 +81,18 @@ class DoctorViewAppointment : AppCompatActivity() {
 
             progressDialog = Loader(this)
             progressDialog.show()
-            // Clear the timeSlots and events lists
-            timeSlots.clear()
-            events.clear()
 
-            // Notify the RecyclerView adapter that the data has changed (if you're using a RecyclerView)
-            adapter.notifyDataSetChanged()
+
+
+            if(timeSlots.isNotEmpty())
+            {
+                // Clear the timeSlots and events lists
+                timeSlots.clear()
+                events.clear()
+                // Notify the RecyclerView adapter that the data has changed (if you're using a RecyclerView)
+                adapter.notifyDataSetChanged()
+            }
+
 
             val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
 

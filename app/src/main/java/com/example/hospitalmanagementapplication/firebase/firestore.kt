@@ -6,7 +6,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.util.Log
 import com.example.hospitalmanagementapplication.HomeActivity
-import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppoinmentActivity
+import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.model.Appointment
 import com.example.hospitalmanagementapplication.model.AppointmentAvailable
@@ -278,7 +278,7 @@ class firestore {
                 }
         }
     }
-    fun createAvailableAppointment(activity: DoctorAvailableAppoinmentActivity, appointmentAvailable: AppointmentAvailable) {
+    fun createAvailableAppointment(activity: DoctorAvailableAppointmentActivity, appointmentAvailable: AppointmentAvailable) {
         mFirestore.collection("appointmentAvailable")
             .document()
             .set(appointmentAvailable, SetOptions.merge())
@@ -292,29 +292,34 @@ class firestore {
             }
     }
 
-    fun getAppointmentAvailable(activity: Activity, callback: (String?,AppointmentAvailable?) -> Unit) {
+    fun getAppointmentAvailable(activity: Activity, callback: (String?, AppointmentAvailable?) -> Unit) {
         // Get user in collection
         mFirestore.collection("appointmentAvailable")
             // Get documentation id from the field of users
-            .whereEqualTo("userId",getCurrentUserID())
+            .whereEqualTo("userId", getCurrentUserID())
             .get()
-            .addOnSuccessListener { document ->
-                Log.d(activity.javaClass.simpleName, document.toString())
-                // Assuming there is only one matching document, you can retrieve the first one
-                val document = document.documents[0]
-                // Get the document ID
-                val documentId = document.id
-                // Received the document ID and convert it into the User Data model object
-                val appointmentAvailable = document.toObject(AppointmentAvailable::class.java)
+            .addOnSuccessListener { documentSnapshot ->
+                if (!documentSnapshot.isEmpty) {
+                    // Assuming there is only one matching document, you can retrieve the first one
+                    val document = documentSnapshot.documents[0]
+                    // Get the document ID
+                    val documentId = document.id
+                    // Received the document ID and convert it into the User Data model object
+                    val appointmentAvailable = document.toObject(AppointmentAvailable::class.java)
 
-                // Pass the user object to the callback
-                callback(documentId,appointmentAvailable)
+                    // Pass the user object to the callback
+                    callback(documentId, appointmentAvailable)
+                } else {
+                    // No documents found, notify callback with null values
+                    callback(null, null)
+                }
             }
             .addOnFailureListener { e ->
                 Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
-                callback(null,null) // Notify callback of the error
+                callback(null, null) // Notify callback of the error
             }
     }
+
     fun getDoctorAppointmentAvailable(activity: Activity,doctorID:String, callback: (String?,AppointmentAvailable?) -> Unit) {
         // Get user in collection
         mFirestore.collection("appointmentAvailable")
@@ -322,6 +327,7 @@ class firestore {
             .whereEqualTo("userId",doctorID)
             .get()
             .addOnSuccessListener { document ->
+                if (!document.isEmpty) {
                 Log.d(activity.javaClass.simpleName, document.toString())
                 // Assuming there is only one matching document, you can retrieve the first one
                 val document = document.documents[0]
@@ -332,6 +338,11 @@ class firestore {
 
                 // Pass the user object to the callback
                 callback(documentId,appointmentAvailable)
+                }
+                else {
+                    // No documents found, notify callback with null values
+                    callback(null, null)
+                }
             }
             .addOnFailureListener { e ->
                 Log.e(activity.javaClass.simpleName, "Error getting user details: $e")

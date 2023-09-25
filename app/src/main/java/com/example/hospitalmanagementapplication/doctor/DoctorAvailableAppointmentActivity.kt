@@ -1,7 +1,5 @@
 package com.example.hospitalmanagementapplication.doctor
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -14,21 +12,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.R
-import com.example.hospitalmanagementapplication.SignInActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityDoctoravailableappointmentBinding
-import com.example.hospitalmanagementapplication.databinding.ActivityDoctorhomeBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.model.AppointmentAvailable
-import com.example.hospitalmanagementapplication.model.User
-import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
-class DoctorAvailableAppoinmentActivity : AppCompatActivity() {
+class DoctorAvailableAppointmentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDoctoravailableappointmentBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
