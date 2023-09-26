@@ -4,26 +4,28 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
-import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
+import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
-class HomeActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+class RedesignActivity: AppCompatActivity() {
+    private lateinit var binding: ActivityRedesignBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        //TODO Fix all the warning
+
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityRedesignBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
@@ -34,39 +36,14 @@ class HomeActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser: FirebaseUser? = firebaseAuth.currentUser
 
-        if (currentUser != null) {
-            binding.userEmail.text = currentUser.email
-        }
-        else
-        {
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
-        }
-        binding.bookingAppointment.setOnClickListener{
-            finish()
-            val intent = Intent(this, SelectDoctorActivity::class.java)
-            startActivity(intent)
-        }
-        binding.viewAppointment.setOnClickListener{
-            val intent = Intent(this, ViewAppointmentActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-        binding.logoutButton.setOnClickListener{
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-        binding.userEmail.setOnClickListener{
-            val intent = Intent(this, RedesignActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
+        binding.titleAnnouncement.text = "Announcement For All the User" //todo make the annocument flexible
+        binding.descriptionAnnouncement.text = "influenza  A,B and Kawasaki are high rised in Penang. Please take care of it"
 
 
     }
+
+
+
 
     override fun onBackPressed() {
         AlertDialog.Builder(this)

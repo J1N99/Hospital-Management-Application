@@ -1,0 +1,51 @@
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@drawable/green_rounded_button">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/doctorimage"
+            android:scaleType="centerCrop" />
+        <TextView
+            android:id="@+id/titleAnnouncement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/imageView"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/white"
+            android:text="Announcement"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/descriptionAnnouncement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/titleAnnouncement"
+            android:layout_toRightOf="@id/imageView"
+            android:layout_marginStart="16dp"
+            android:text="Announcement"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+
+
+
+
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

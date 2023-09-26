@@ -72,6 +72,9 @@
         <activity android:name=".doctor.DoctorDisableAppointmentActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".RedesignActivity"
+            android:exported="false">
+        </activity>
 
 
     </application>
