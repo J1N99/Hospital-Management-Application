@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
+import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -34,8 +35,17 @@ class HomeActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser: FirebaseUser? = firebaseAuth.currentUser
 
+        binding.titleAnnouncement.text = "Announcement For All the User" //todo make the annocument flexible
+        binding.descriptionAnnouncement.text = "influenza  A,B and Kawasaki are high rised in Penang. Please take care of it"
+
         if (currentUser != null) {
-            binding.userEmail.text = currentUser.email
+            firestore().getUserDetails(this) { user ->
+                if (user != null) {
+                    binding.welcomeText.text ="Hi"+ user.firstname+" "+user.lastname
+                } else {
+                    Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         else
         {
@@ -58,14 +68,6 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-        binding.userEmail.setOnClickListener{
-            val intent = Intent(this, RedesignActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-
-
     }
 
     override fun onBackPressed() {
