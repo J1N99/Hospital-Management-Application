@@ -28,16 +28,6 @@ class RedesignActivity: AppCompatActivity() {
         binding = ActivityRedesignBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        // Set Home selected
-        bottomNavigationView.setSelectedItemId(R.id.home);
-        IntentManager(this, bottomNavigationView)
-
-        firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser: FirebaseUser? = firebaseAuth.currentUser
-
-        binding.titleAnnouncement.text = "Announcement For All the User" //todo make the annocument flexible
-        binding.descriptionAnnouncement.text = "influenza  A,B and Kawasaki are high rised in Penang. Please take care of it"
 
 
     }

@@ -41,7 +41,7 @@ class HomeActivity : AppCompatActivity() {
         if (currentUser != null) {
             firestore().getUserDetails(this) { user ->
                 if (user != null) {
-                    binding.welcomeText.text ="Hi"+ user.firstname+" "+user.lastname
+                    binding.welcomeText.text ="Hi "+ user.firstname+" "+user.lastname
                 } else {
                     Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
                 }
