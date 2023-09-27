@@ -81,7 +81,11 @@ class ProfileActivity:AppCompatActivity() {
                 Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
             }
         }
+        binding.navigationResetPassword.setOnClickListener{
+            val intent = Intent(this, resetPasswordActivity::class.java)
+            startActivity(intent)
 
+        }
         binding.button.setOnClickListener {
             if (binding.button.text == "Edit") {
                 binding.firstNameEt.isEnabled = true
