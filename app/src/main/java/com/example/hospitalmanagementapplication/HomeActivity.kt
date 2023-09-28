@@ -68,6 +68,12 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+
+        binding.previewDesign.setOnClickListener{
+            val intent = Intent(this, RedesignActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onBackPressed() {
