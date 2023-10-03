@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -15,6 +16,10 @@ import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.type.DateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class ViewAppointmentActivity: AppCompatActivity() {
     private lateinit var binding: ActivityViewappointmentBinding
@@ -60,6 +65,20 @@ class ViewAppointmentActivity: AppCompatActivity() {
         val doctorTextView = cardView.findViewById<TextView>(R.id.doctorTextView)
         val timeTextView = cardView.findViewById<TextView>(R.id.timeTextView)
         val cancelAppointment=cardView.findViewById<TextView>(R.id.cancelAppointment)
+
+        val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Define the format of your date string
+        val dateString = date
+
+        val currentDate = LocalDate.now()
+        val date = LocalDate.parse(dateString, dateFormat)
+
+        val daysUntilDate = ChronoUnit.DAYS.between(currentDate, date)
+
+        if (daysUntilDate < 0) {
+            cancelAppointment.visibility= View.GONE
+        }
+
+
 
         var doctorName=""
         var doctorID=doctorId?:""

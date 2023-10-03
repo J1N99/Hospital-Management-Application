@@ -125,6 +125,7 @@ class SignInActivity : AppCompatActivity() {
                 if (position != null) {
                     if(position==1)
                     {
+
                         val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
                     }

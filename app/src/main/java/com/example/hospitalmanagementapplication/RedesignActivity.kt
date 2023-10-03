@@ -66,26 +66,34 @@ class RedesignActivity : AppCompatActivity() {
                 headerTable.setWidths(floatArrayOf(3f, 1f))
 
                 val headerCell1 = PdfPCell()
-                headerCell1.backgroundColor = BaseColor(12, 173, 128)
+                //headerCell1.backgroundColor = BaseColor(12, 173, 128)
                 headerCell1.horizontalAlignment = Element.ALIGN_LEFT
                 headerCell1.verticalAlignment = Element.ALIGN_MIDDLE
                 headerCell1.setPadding(10f)
+                headerCell1.borderWidthRight = 0f // Remove left border
 
-                val headerText = Paragraph("Appointment Report", Font(Font.FontFamily.HELVETICA, 20f, Font.BOLD, BaseColor.WHITE))
+                val headerText = Paragraph("Appointment Report", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK))
                 headerText.add(Chunk.NEWLINE)
-                headerText.add("Vantist")
+                headerText.add(Phrase("Vantist", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
                 headerText.add(Chunk.NEWLINE)
-                headerText.add("No 25,Lorong Tanjung Aman 12, Taman Tanjung Aman")
+                headerText.add(Phrase("No 25,Lorong Tanjung Aman 12, Taman Tanjung Aman", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
                 headerText.add(Chunk.NEWLINE)
-                headerText.add("12300 Butterworth, Pulau Pinang")
+                headerText.add(Phrase("12300 Butterworth, Pulau Pinang", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
                 headerText.add(Chunk.NEWLINE)
-                headerText.add(Phrase("Dr Ang Wei Jin", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.WHITE)))
+                headerText.add(Phrase("Dr Ang Wei Jin", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
                 headerText.add(Chunk.NEWLINE)
-                headerText.add(Phrase("01112896803", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.WHITE)))
+                headerText.add(Phrase("01112896803", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
                 headerCell1.addElement(headerText)
 
                 val headerCell2 = PdfPCell()
-                // Load the image from drawable resources
+                headerCell2.horizontalAlignment = Element.ALIGN_LEFT
+                headerCell2.verticalAlignment = Element.ALIGN_MIDDLE
+                headerCell2.setPadding(10f)
+                headerCell2.borderWidthLeft = 0f // Remove left border
+                //headerCell2.backgroundColor = BaseColor(12, 173, 128) // Background color same as headerCell1
+
+
+// Load the image from drawable resources
                 val imageBitmap: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
 
 // Convert the Bitmap to a byte array
@@ -102,6 +110,7 @@ class RedesignActivity : AppCompatActivity() {
 
                 headerTable.addCell(headerCell1)
                 headerTable.addCell(headerCell2)
+
 
                 // Add the header table to the document
                 document.add(headerTable)
