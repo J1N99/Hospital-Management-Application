@@ -13,7 +13,7 @@
         android:padding="8dp"
         android:text="Time Slot"
         android:textColor="@color/black"
-        android:textStyle="bold" />
+    />
 
     <TextView
         android:id="@+id/eventTextView"
@@ -24,6 +24,6 @@
         android:padding="8dp"
         android:text="Event"
         android:textColor="@color/black"
-        android:textStyle="bold" />
+        />
 
 </LinearLayout>

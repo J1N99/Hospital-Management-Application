@@ -83,8 +83,6 @@ class ViewAppointmentActivity: AppCompatActivity() {
         var doctorName=""
         var doctorID=doctorId?:""
         var StringDocumentID=documentID?:""
-        Log.d("1","$doctorID")
-        Log.d("2","$doctorId")
         firestore().getOtherUserDetails(this, doctorID) { user ->
             if (user != null) {
                 doctorName="DR "+user.firstname +" "+ user.lastname
