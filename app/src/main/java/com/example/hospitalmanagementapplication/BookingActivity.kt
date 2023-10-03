@@ -51,7 +51,7 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
         firestore().getOtherUserDetails(this, doctorID) { user ->
             if (user != null) {
-                binding.doctorNameTextView.text = "DR" + user.lastname + " " + user.firstname
+                binding.doctorNameTextView.text = "DR " + user.lastname + " " + user.firstname
             } else {
                 Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
             }

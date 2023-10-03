@@ -6,19 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".SignInActivity">
 
+    <TextView
+        android:id="@+id/appointmentDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Appointment Date"
+        android:textAllCaps="true"
+        android:textColor="#FF018786"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/shiftStartLayout"
         style="@style/LoginTextInputOuterFieldStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="20dp"
         app:boxStrokeColor="@color/black"
         app:hintTextColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/appointmentDate">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/shiftET"
@@ -27,7 +40,7 @@
             android:layout_height="wrap_content"
             android:hint="Appointment start Time (24hours)"
             android:inputType="number"
-            android:maxLength="4"/>
+            android:maxLength="4" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -52,6 +65,7 @@
             android:hint="Appointment End Time (24hours)"
             android:inputType="number"
             android:maxLength="4"/>
+
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -156,13 +170,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:background="@color/yellow"
+        android:background="@drawable/green_rounded_button"
         android:text="Submit"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearTwo" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

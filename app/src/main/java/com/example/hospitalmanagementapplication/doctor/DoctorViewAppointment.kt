@@ -1,5 +1,4 @@
 package com.example.hospitalmanagementapplication.doctor
-
 import android.os.Bundle
 import android.util.Log
 import android.widget.CalendarView
@@ -10,9 +9,7 @@ import com.example.hospitalmanagementapplication.R
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.Loader
 import java.text.SimpleDateFormat
-import java.util.Calendar
-
-
+import java.util.*
 
 class DoctorViewAppointment : AppCompatActivity() {
 
@@ -34,7 +31,6 @@ class DoctorViewAppointment : AppCompatActivity() {
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         // Format the date as "YYYY/MM/DD"
         val formattedDate = sdf.format(calendar.time)
-        Log.d("Date", formattedDate ?: "")
 
         progressDialog = Loader(this)
         progressDialog.show()
@@ -46,13 +42,14 @@ class DoctorViewAppointment : AppCompatActivity() {
 
                 firestore().getOtherUserDetails(this, userID ?: "") { user ->
                     if (user != null) {
-                        events.add("Appointment with " + user.firstname + " " + user.lastname)
+                        events.add("Appointment with ${user.firstname} ${user.lastname}")
                         timeSlots.add(time ?: "")
+                        Log.e(timeSlots.toString(), timeSlots.toString())
+                        Log.e(events.toString(), events.toString())
 
                         // Check if the number of events matches the number of appointments
                         if (events.size == appointments.size) {
                             // All data has been added, you can now dismiss the progress dialog
-
 
                             // Initialize the RecyclerView and adapter
                             recyclerView = findViewById(R.id.recyclerView)
@@ -61,7 +58,6 @@ class DoctorViewAppointment : AppCompatActivity() {
                             recyclerView.adapter = adapter
                         }
                     }
-
                 }
             }
             progressDialog.dismiss()
@@ -82,17 +78,15 @@ class DoctorViewAppointment : AppCompatActivity() {
             progressDialog = Loader(this)
             progressDialog.show()
 
+            if (timeSlots.isNotEmpty()) {
+                Log.e("Empty?", "XIXI")
 
-
-            if(timeSlots.isNotEmpty())
-            {
                 // Clear the timeSlots and events lists
                 timeSlots.clear()
                 events.clear()
                 // Notify the RecyclerView adapter that the data has changed (if you're using a RecyclerView)
                 adapter.notifyDataSetChanged()
             }
-
 
             val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
 
@@ -103,13 +97,13 @@ class DoctorViewAppointment : AppCompatActivity() {
 
                     firestore().getOtherUserDetails(this, userID ?: "") { user ->
                         if (user != null) {
-                            events.add("Appointment with " + user.firstname + " " + user.lastname)
+                            events.add("Appointment with ${user.firstname} ${user.lastname}")
                             timeSlots.add(time ?: "")
 
                             // Check if the number of events matches the number of appointments
                             if (events.size == appointments.size) {
-                                // All data has been added, you can now dismiss the progress dialog
 
+                                // All data has been added, you can now dismiss the progress dialog
 
                                 // Initialize the RecyclerView and adapter
                                 recyclerView = findViewById(R.id.recyclerView)
