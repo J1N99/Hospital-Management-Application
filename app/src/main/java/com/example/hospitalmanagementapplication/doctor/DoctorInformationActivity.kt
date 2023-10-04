@@ -1,34 +1,30 @@
-package com.example.hospitalmanagementapplication
+package com.example.hospitalmanagementapplication.doctor
 
 import android.app.Activity
-import android.content.ContentResolver.MimeTypeInfo
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.webkit.MimeTypeMap
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
+import com.example.hospitalmanagementapplication.databinding.ActivityCreatedoctorinformationBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
-import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.model.doctorInformation
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class RedesignActivity : AppCompatActivity() {
+class DoctorInformationActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityRedesignBinding
+    private lateinit var binding: ActivityCreatedoctorinformationBinding
     private val storageReference: StorageReference = FirebaseStorage.getInstance().reference
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private lateinit var firebaseAuth: FirebaseAuth
@@ -42,7 +38,7 @@ class RedesignActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRedesignBinding.inflate(layoutInflater)
+        binding = ActivityCreatedoctorinformationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Initialize Firebase

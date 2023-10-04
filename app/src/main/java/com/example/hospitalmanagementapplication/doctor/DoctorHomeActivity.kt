@@ -2,6 +2,7 @@ package com.example.hospitalmanagementapplication.doctor
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.R
@@ -11,6 +12,7 @@ import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseUser
 
 class DoctorHomeActivity  : AppCompatActivity() {
@@ -31,6 +33,30 @@ class DoctorHomeActivity  : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser: FirebaseUser? = firebaseAuth.currentUser
+        val userId=currentUser?.uid
+
+
+        if (userId != null) {
+            val db = FirebaseFirestore.getInstance()
+            val doctorInfoRef = db.collection("users").document(userId).collection("doctorInformation").document("yourDocumentID")
+
+            doctorInfoRef.get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val document = task.result
+                    if (document.exists()) {
+                        //do nothing here
+                    } else {
+                        startActivity(Intent(this, DoctorInformationActivity::class.java))
+                        finish() // Optionally, finish the current activity to prevent going back.
+                    }
+                } else {
+                    // Handle errors in accessing Firestore here
+                    Log.e("error","firestore error here")
+                }
+            }
+        }
+
+
 
         binding.titleAnnouncement.text = "Announcement For All the User" //todo make the annocument flexible
         binding.descriptionAnnouncement.text = "influenza  A,B and Kawasaki are high rised in Penang. Please take care of it"

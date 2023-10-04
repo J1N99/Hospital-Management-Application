@@ -8,10 +8,7 @@ import android.util.Log
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
-import com.example.hospitalmanagementapplication.model.Appointment
-import com.example.hospitalmanagementapplication.model.AppointmentAvailable
-import com.example.hospitalmanagementapplication.model.DisableAppointment
-import com.example.hospitalmanagementapplication.model.User
+import com.example.hospitalmanagementapplication.model.*
 import com.example.hospitalmanagementapplication.userDetailsActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
@@ -557,6 +554,25 @@ class firestore {
             }
     }
 
+    fun createDoctorInformation(activity: Activity, doctorInfo: doctorInformation) {
 
+        //create collection names, is exist just use
+        mFirestore.collection("doctorInformation")
+            //create document id
+            .document(doctorInfo.userID?:"")
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
+            .set(doctorInfo, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+
+                // Create an Intent to start the HomeActivity
+                val intent = Intent(activity, HomeActivity::class.java)
+                // Start the HomeActivity using the intent
+                activity.startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
 
 }

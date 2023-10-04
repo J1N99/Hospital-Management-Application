@@ -19,7 +19,6 @@ class userDetailsActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
 
-//todo validation of ic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUserdetailsBinding.inflate(layoutInflater)
