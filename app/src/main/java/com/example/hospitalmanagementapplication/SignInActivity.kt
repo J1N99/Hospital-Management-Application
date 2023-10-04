@@ -36,7 +36,7 @@ class SignInActivity : AppCompatActivity() {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
-        binding.navigationForgetPassword.setOnClickListener{
+        binding.navigationForgetPassword.setOnClickListener {
             val intent = Intent(this, ForgetPasswordActivity::class.java)
             startActivity(intent)
         }
@@ -53,7 +53,7 @@ class SignInActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val currentUser = firebaseAuth.currentUser
                         if (currentUser != null) {
-                            if(currentUser.isEmailVerified) {
+                            if (currentUser.isEmailVerified) {
 
                                 val userId = currentUser.uid
                                 val usersRef = firestore.collection("users")
@@ -67,17 +67,18 @@ class SignInActivity : AppCompatActivity() {
                                         if (document != null && document.exists()) {
                                             firestore().getUserDetails(this) { user ->
                                                 if (user != null) {
-                                                   if(user.resetPassword)
-                                                   {
-                                                       resetPassword()
-                                                   }
-                                                    else
-                                                   {
-                                                       successLoginAndGotDetails()
-                                                   }
+                                                    if (user.resetPassword) {
+                                                        resetPassword()
+                                                    } else {
+                                                        successLoginAndGotDetails()
+                                                    }
 
                                                 } else {
-                                                    Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(
+                                                        this,
+                                                        "User is null",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
                                                 }
                                             }
 
@@ -96,8 +97,7 @@ class SignInActivity : AppCompatActivity() {
                                         ).show()
                                     }
                                 }
-                            }
-                            else{
+                            } else {
 
                                 progressDialog.dismiss()
                                 showVerificationDialog()
@@ -106,38 +106,49 @@ class SignInActivity : AppCompatActivity() {
                         } else {
                             progressDialog.dismiss()
                             Log.e("FirebaseAuth", "Current user is null.")
-                            Toast.makeText(this@SignInActivity, "Authentication Error", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@SignInActivity,
+                                "Authentication Error",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     } else {
                         progressDialog.dismiss()
-                        Toast.makeText(this@SignInActivity, task.exception?.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@SignInActivity,
+                            task.exception?.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             } else {
-                Toast.makeText(this@SignInActivity, "Please enter all the required fields!!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@SignInActivity,
+                    "Please enter all the required fields!!",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
     }
 
-        private fun successLoginAndGotDetails() {
-            firestore().getUserPosition(this) { position ->
-                if (position != null) {
-                    if(position==1)
-                    {
-                        val intent = Intent(this, HomeActivity::class.java)
-                        startActivity(intent)
-                    }
-                    else if(position==2)
-                    {
-                        val intent = Intent(this, DoctorHomeActivity::class.java)
-                        startActivity(intent)
-                    }
-                } else {
-                    // Handle the case where there was an error or the position is not available.
+    private fun successLoginAndGotDetails() {
+        firestore().getUserPosition(this) { position ->
+            Log.e("position", position.toString())
+            if (position != null) {
+                if (position == 1) {
+                    Log.e("KENAPA", "KENAPA")
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                } else if (position == 2) {
+                    Log.e("this work", "this work")
+                    val intent = Intent(this, DoctorHomeActivity::class.java)
+                    startActivity(intent)
                 }
+            } else {
+                Log.e("Position","Position is null")
             }
-
+        }
 
 
     }
@@ -160,13 +171,17 @@ class SignInActivity : AppCompatActivity() {
 
             firestore().getUserPosition(this) { position ->
                 if (position != null) {
-                if (position == 2) {
+                    if (position == 1) {
+                        val intent = Intent(this, HomeActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    if (position == 2) {
                         val intent = Intent(this, DoctorHomeActivity::class.java)
                         startActivity(intent)
+                        finish()
                     }
-                }
-                else
-                {
+                } else {
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                 }
@@ -184,19 +199,28 @@ class SignInActivity : AppCompatActivity() {
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
-        val buttonResendVerificationCode=dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        val buttonResendVerificationCode =
+            dialogView.findViewById<Button>(R.id.buttonResentVerification)
         buttonResendVerificationCode.setOnClickListener {
             progressDialog = Loader(this)
             progressDialog.show()
             firebaseAuth.currentUser?.sendEmailVerification()
                 ?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Verification email sent successfully.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Verification email sent successfully.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         FirebaseAuth.getInstance().signOut()
                         dialog.dismiss()
                         progressDialog.dismiss()
                     } else {
-                        Toast.makeText(this, "Error sending verification email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Error sending verification email: ${task.exception?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         FirebaseAuth.getInstance().signOut()
                         dialog.dismiss()
                         progressDialog.dismiss()
@@ -206,7 +230,7 @@ class SignInActivity : AppCompatActivity() {
         }
 
         buttonDismiss.setOnClickListener {
-                dialog.dismiss()
+            dialog.dismiss()
         }
 
         // Add a listener to handle the user's action when dismissing the dialog

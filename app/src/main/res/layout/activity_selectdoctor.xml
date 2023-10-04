@@ -22,7 +22,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:hint="Search user name or IC"
+            android:hint="Search doctor name"
             android:imeOptions="actionSearch"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"
@@ -37,16 +37,21 @@
 
     </LinearLayout>
 
-
-    <ListView
-        android:id="@+id/doctorListview"
-        android:layout_width="411dp"
-        android:layout_height="814dp"
+    <LinearLayout
+        android:id="@+id/cardContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBar" />
+        app:layout_constraintTop_toBottomOf="@+id/searchBar"></LinearLayout>
+
+
     <include layout="@layout/activity_footer" />
 </androidx.constraintlayout.widget.ConstraintLayout>

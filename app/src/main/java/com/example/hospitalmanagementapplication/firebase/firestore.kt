@@ -596,5 +596,32 @@ class firestore {
                 callback(null) // Notify callback of the error
             }
     }
+    fun getAllDoctorFromDoctorInfo(callback: (List<doctorInformation>) -> Unit) {
+        mFirestore.collection("doctorInformation")
+            .get()
+            .addOnSuccessListener { documents ->
+                Log.e("WHY","KENAPA")
+                val doctorList = mutableListOf<doctorInformation>()
+
+                for (document in documents) {
+                    Log.e("got mah","got")
+                    val doctorId = document.getString("userID")?:""
+                    val department = document.getString("department")?:""
+                    val hospital = document.getString("hospital")?:""
+                    val profileImageUri= document.getString("profileImageUri")?:""
+                    val quanlification= document.getString("quanlification")?:""
+                    // Create a data class for Appointment
+                    val doctorInfo = doctorInformation(doctorId,department, quanlification, profileImageUri,hospital)
+                    doctorList.add(doctorInfo)
+                }
+
+                // Pass the list of appointments to the callback function
+                callback(doctorList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle any errors that occurred during the query
+                Log.w("Firestore", "Error getting documents: ", exception)
+            }
+    }
 
 }
