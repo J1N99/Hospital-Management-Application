@@ -575,4 +575,26 @@ class firestore {
             }
     }
 
+
+    fun getDoctorInfo(activity: Activity, callback: (doctorInformation?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("doctorInformation")
+            // Get documentation id from the field of users
+            .document(getCurrentUserID())
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+
+                // Received the document ID and convert it into the User Data model object
+                val doctorInfo = document.toObject(doctorInformation::class.java)
+
+                // Pass the user object to the callback
+                callback(doctorInfo)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+                callback(null) // Notify callback of the error
+            }
+    }
+
 }

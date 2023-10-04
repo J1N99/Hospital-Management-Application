@@ -38,7 +38,7 @@ class DoctorHomeActivity  : AppCompatActivity() {
 
         if (userId != null) {
             val db = FirebaseFirestore.getInstance()
-            val doctorInfoRef = db.collection("users").document(userId).collection("doctorInformation").document("yourDocumentID")
+            val doctorInfoRef = db.collection("doctorInformation").document(userId)
 
             doctorInfoRef.get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {

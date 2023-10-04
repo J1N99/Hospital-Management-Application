@@ -125,8 +125,9 @@ class RedesignActivity : AppCompatActivity() {
                             val department = binding.departmentET.text.toString()
                             val quanlification = binding.qualificationET.text.toString()
                             val filename = imageFileName
+                            val hospital=""
                             val doctorInfo =
-                                doctorInformation(userId, department, quanlification, filename, hospital = null)
+                                doctorInformation(userId, department, quanlification, filename, hospital)
                             firestore().createDoctorInformation(this, doctorInfo)
                         }
                     }.addOnFailureListener { e ->

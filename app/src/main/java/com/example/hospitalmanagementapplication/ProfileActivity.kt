@@ -13,11 +13,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityProfileBinding
+import com.example.hospitalmanagementapplication.doctor.DoctorInformationActivity
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.auth.User
+
+
 
 
 class ProfileActivity:AppCompatActivity() {
@@ -76,10 +78,18 @@ class ProfileActivity:AppCompatActivity() {
                 if (user.gender) binding.radioMale.isChecked =
                     true else binding.radioFemale.isChecked = true
 
-
+                if(user.position==2)
+                {
+                    binding.editDoctorInfo.visibility=View.VISIBLE
+                }
             } else {
                 Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
             }
+        }
+        binding.editDoctorInfo.setOnClickListener{
+            val intent = Intent(this, DoctorInformationActivity::class.java)
+            startActivity(intent)
+
         }
         binding.navigationResetPassword.setOnClickListener{
             val intent = Intent(this, resetPasswordActivity::class.java)
