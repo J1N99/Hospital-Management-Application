@@ -60,7 +60,7 @@
         <activity android:name=".doctor.DoctorHomeActivity"
             android:exported="false">
         </activity>
-        <activity android:name=".ClerkDashboardActivity"
+        <activity android:name=".clerk.ClerkDashboardActivity"
             android:exported="false">
         </activity>
         <activity android:name=".doctor.DoctorAvailableAppointmentActivity"

@@ -624,4 +624,25 @@ class firestore {
             }
     }
 
+
+    fun createHospital(activity: Activity, hospitalInfo: Hospital) {
+
+        //create collection names, is exist just use
+        mFirestore.collection("hospital")
+            //create document id
+            .document()
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
+            .set(hospitalInfo, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+
+                // Create an Intent to start the HomeActivity
+                val intent = Intent(activity, HomeActivity::class.java)
+                // Start the HomeActivity using the intent
+                activity.startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
 }
