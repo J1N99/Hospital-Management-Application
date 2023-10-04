@@ -60,8 +60,8 @@ class DoctorInformationActivity : AppCompatActivity() {
         imageView = binding.profileImageView
         selectImageButton = binding.selectImagebtn
         uploadButton = binding.uploadimagebtn
-
-        firestore().getDoctorInfo(this) {doctorInfo ->
+        val userId = getCurrentUserId()
+        firestore().getDoctorInfo(this,userId) {doctorInfo ->
             if (doctorInfo != null) {
                 binding.uploadimagebtn.text = "Edit information"
                 binding.departmentET.setText( doctorInfo.department)

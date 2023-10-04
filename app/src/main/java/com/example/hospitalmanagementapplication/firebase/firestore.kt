@@ -576,11 +576,11 @@ class firestore {
     }
 
 
-    fun getDoctorInfo(activity: Activity, callback: (doctorInformation?) -> Unit) {
+    fun getDoctorInfo(activity: Activity, doctorID:String, callback: (doctorInformation?) -> Unit) {
         // Get user in collection
         mFirestore.collection("doctorInformation")
             // Get documentation id from the field of users
-            .document(getCurrentUserID())
+            .document(doctorID)
             .get()
             .addOnSuccessListener { document ->
                 Log.d(activity.javaClass.simpleName, document.toString())
