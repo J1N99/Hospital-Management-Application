@@ -87,6 +87,12 @@
         <activity android:name=".doctor.DoctorInformationActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".addHospitalActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".allHospitalActivity"
+            android:exported="false">
+        </activity>
         <activity android:name=".RedesignActivity"
             android:exported="false">
         </activity>

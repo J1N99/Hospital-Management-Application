@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.firebase.firestore
@@ -145,6 +146,11 @@ class SignInActivity : AppCompatActivity() {
                     val intent = Intent(this, DoctorHomeActivity::class.java)
                     startActivity(intent)
                 }
+                else if (position == 3) {
+                    Log.e("this work", "this work")
+                    val intent = Intent(this, ClerkDashboardActivity::class.java)
+                    startActivity(intent)
+                }
             } else {
                 Log.e("Position","Position is null")
             }
@@ -180,6 +186,11 @@ class SignInActivity : AppCompatActivity() {
                         val intent = Intent(this, DoctorHomeActivity::class.java)
                         startActivity(intent)
                         finish()
+                    }
+                    else if (position == 3) {
+                        Log.e("this work", "this work")
+                        val intent = Intent(this, ClerkDashboardActivity::class.java)
+                        startActivity(intent)
                     }
                 } else {
                     val intent = Intent(this, HomeActivity::class.java)

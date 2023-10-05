@@ -52,7 +52,7 @@ class UpdatePositionActivity: AppCompatActivity() {
                 binding.icnumberET.setBackgroundResource(android.R.color.darker_gray)
 
                 // Define an array of items to display in the Spinner
-                val positions = arrayOf("Please select position", "Doctor", "Nurse", "Clerk","Patient")
+                val positions = arrayOf("Please select position", "Patient","Doctor", "Clerk",)
 
                 // Create an ArrayAdapter using the defined items and a default layout
                 val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, positions)
@@ -64,7 +64,7 @@ class UpdatePositionActivity: AppCompatActivity() {
                 spinner.adapter = adapter
                 Log.v("Dbposition", "$dbposition")
                 // Set default selection
-                val defaultSelection = dbposition-1
+                val defaultSelection = dbposition
                 Log.v("Default Selection", "$defaultSelection")
                 spinner.setSelection(defaultSelection)
             } else {
@@ -81,10 +81,9 @@ class UpdatePositionActivity: AppCompatActivity() {
             Log.d("Selected Position",selectedPosition)
             var position = when (selectedPosition) {
                 "Please select position"->   "0"
+                "Patient"->"1"
                 "Doctor"->"2"
-                "Nurse" ->  "3"
-                "Clerk" -> "4"
-                "Patient"->"5"
+                "Clerk" -> "3"
                 else -> "Unknown position"
             }
             Log.d(" Position",position)

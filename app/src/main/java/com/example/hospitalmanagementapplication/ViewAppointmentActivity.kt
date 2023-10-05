@@ -24,6 +24,7 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.core.view.marginTop
 import com.bumptech.glide.Glide
 
 
@@ -66,6 +67,15 @@ class ViewAppointmentActivity: AppCompatActivity() {
 
         // Inflate your card view layout here (e.g., from XML)
         val cardView = LayoutInflater.from(this).inflate(R.layout.appointment_card_view, null)
+
+        // Set margins for the card view to create spacing between them
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.setMargins(0, 0, 0, resources.getDimensionPixelSize(R.dimen.card_margin)) // Adjust the margin as needed
+        cardView.layoutParams = layoutParams
+
 
         // Bind data to card view elements (TextViews, etc.)
         val dateTextView = cardView.findViewById<TextView>(R.id.dateTextView)

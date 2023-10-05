@@ -645,4 +645,51 @@ class firestore {
                 Log.w(ContentValues.TAG, "Error adding document", e)
             }
     }
+
+
+
+    fun getAllHospital(callback: (List<Hospital>) -> Unit) {
+
+        mFirestore.collection("hospital").get()
+            .addOnSuccessListener { result ->
+                val hospitalList = mutableListOf<Hospital>()
+
+                for (document in result) {
+                    val documentId = document.id
+                    val hospital = document.getString("hospital").toString()
+
+
+                    val hospitals = Hospital("",hospital,"",documentId )
+                    hospitalList.add(hospitals)
+                }
+
+                callback(hospitalList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
+
+
+    fun getHospitalDetails(activity: Activity, hospitalId:String,callback: (Hospital?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("hospital")
+            // Get documentation id from the field of users
+            .document(hospitalId)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+
+                // Received the document ID and convert it into the User Data model object
+                val hospital = document.toObject(Hospital::class.java)
+
+                // Pass the user object to the callback
+                callback(hospital)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+                callback(null) // Notify callback of the error
+            }
+    }
 }
