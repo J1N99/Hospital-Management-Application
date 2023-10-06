@@ -37,11 +37,13 @@ import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBin
 import com.example.hospitalmanagementapplication.model.Hospital
 import com.example.hospitalmanagementapplication.model.doctorInformation
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import androidx.appcompat.app.AlertDialog
 import java.io.IOException
 import java.util.Locale
 class RedesignActivity : AppCompatActivity() {
@@ -152,12 +154,34 @@ class RedesignActivity : AppCompatActivity() {
         val nameOfHospital = cardView.findViewById<TextView>(R.id.nameOfHospital)
         val addressDetails = cardView.findViewById<TextView>(R.id.addressDetail)
         val totalkm = cardView.findViewById<TextView>(R.id.totalKM)
+        val wazeAndGoogleMap=cardView.findViewById<ImageView>(R.id.iconImageView)
 
         // Display distance in the card view
         totalkm.text = "${distance} KM"
         typeOfModel.text = privateGovernment
         nameOfHospital.text = hospital
         addressDetails.text = address
+
+        wazeAndGoogleMap.setOnClickListener {
+            // Build an AlertDialog to let the user choose between Waze and Google Maps
+            val dialogBuilder = AlertDialog.Builder(this)
+            dialogBuilder.setTitle("Select Navigation App")
+            dialogBuilder.setMessage("Choose a navigation app:")
+            dialogBuilder.setPositiveButton("Waze") { dialog, which ->
+                openWazeNavigation(address?:"")
+            }
+            dialogBuilder.setNegativeButton("Google Maps") { dialog, which ->
+                openGoogleMapsNavigation(address?:"")
+            }
+            dialogBuilder.setNeutralButton("Cancel") { dialog, which ->
+                dialog.dismiss()
+            }
+
+            // Show the AlertDialog
+            val dialog = dialogBuilder.create()
+            dialog.show()
+        }
+
 
         // Add the card view to the LinearLayout
         cardContainer.addView(cardView)
@@ -245,5 +269,40 @@ class RedesignActivity : AppCompatActivity() {
 
         // Parse the formatted distance back to a float
         return formattedDistance.toFloat()
+    }
+
+    private fun openWazeNavigation(address: String) {
+        val wazePackage = "com.waze"
+        val wazeIntent = Intent(Intent.ACTION_VIEW, Uri.parse("waze://?q=$address&navigate=yes"))
+        wazeIntent.setPackage(wazePackage)
+
+        val packageManager = packageManager // Assuming you have access to the PackageManager
+
+        try {
+            startActivity(wazeIntent)
+        } catch (e: ActivityNotFoundException) {
+            // Waze is not installed, you can redirect the user to download it from the Play Store
+            val playStoreUri = Uri.parse("market://details?id=$wazePackage")
+            val intent = Intent(Intent.ACTION_VIEW, playStoreUri)
+            startActivity(intent)
+        }
+    }
+
+
+
+
+    private fun openGoogleMapsNavigation(address: String) {
+        val uri = "http://maps.google.com/maps?q=$address"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+        startActivity(intent)
+    }
+
+    private fun isAppInstalled(packageName: String, packageManager: PackageManager): Boolean {
+        try {
+            packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+            return true
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false
+        }
     }
 }
