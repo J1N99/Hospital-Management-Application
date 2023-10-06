@@ -52,19 +52,19 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/bookingAppointment"
+            android:id="@+id/addressDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/address"
             android:layout_marginStart="16dp"
-            android:text="Adress Detail"
+            android:text="Address Detail"
             android:textSize="14sp" />
 
         <View
             android:id="@+id/horizontalLine"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@id/bookingAppointment"
+            android:layout_below="@id/addressDetail"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
             android:background="@android:color/black" />

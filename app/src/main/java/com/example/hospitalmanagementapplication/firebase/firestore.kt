@@ -657,9 +657,10 @@ class firestore {
                 for (document in result) {
                     val documentId = document.id
                     val hospital = document.getString("hospital").toString()
+                    val address = document.getString("address").toString()
+                    val privateGovernment = document.getString("privateGovernment").toString()
 
-
-                    val hospitals = Hospital("",hospital,"",documentId )
+                    val hospitals = Hospital(privateGovernment,hospital,address,documentId )
                     hospitalList.add(hospitals)
                 }
 
