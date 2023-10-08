@@ -13,7 +13,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,33 +24,34 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityViewhospitalBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityViewillnessBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
+import com.example.hospitalmanagementapplication.model.Illness
 import java.io.IOException
 import java.util.*
 
-class ViewIllnessActivity: AppCompatActivity() {
+class ViewIllnessActivity : AppCompatActivity() {
     private lateinit var binding: ActivityViewillnessBinding
+    private val illnessList = mutableListOf<Illness>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewillnessBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        firestore().getAllIllness { allIllness ->
-            // Here, you have access to the list of appointments retrieved from Firestore
-            // You can use this list to create card views or update your UI
-            for (illness in allIllness) {
-                // Create card views or update UI elements with appointment data
-                val documentID=illness.documentID
-                val illnessName = illness.illnessName
-                val actionTaken = illness.actionTaken
-                val description = illness.description
+        val recyclerView = binding.recyclerView
+        val adapter = IllnessAdapter(this, illnessList)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-                // Create card view or update UI here
-                createCardView(documentID,illnessName, actionTaken, description)
-            }
+        firestore().getAllIllness { allIllness ->
+            illnessList.clear()
+            illnessList.addAll(allIllness)
+            adapter.notifyDataSetChanged()
         }
 
         binding.searchBarText.addTextChangedListener(object : TextWatcher {
@@ -62,69 +65,54 @@ class ViewIllnessActivity: AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString()
-                filterIllnessCards(query)
+                adapter.filter(query)
             }
         })
     }
+}
 
-    fun createCardView(
-        documentID: String?,
-        illnessName: String?,
-        actionTaken: String?,
-        description: String?
-    ) {
-        // Find the LinearLayout within the ConstraintLayout
-        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
+class IllnessAdapter(private val context: Context, private val illnessList: MutableList<Illness>) :
+    RecyclerView.Adapter<IllnessAdapter.ViewHolder>() {
 
-        // Inflate your card view layout here (e.g., from XML)
-        val cardView = layoutInflater.inflate(R.layout.illness_card, null)
-
-        // Set margins for the card view to create spacing between them
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(
-            0,
-            0,
-            0,
-            resources.getDimensionPixelSize(R.dimen.card_margin)
-        ) // Adjust the margin as needed
-        cardView.layoutParams = layoutParams
-
-        val nameOfIllness = cardView.findViewById<TextView>(R.id.nameOfIllness)
-        val descriptionID = cardView.findViewById<TextView>(R.id.description)
-        val actionTakenID = cardView.findViewById<TextView>(R.id.actionTaken)
-
-
-        // Display distance in the card view
-        nameOfIllness.text =illnessName
-        descriptionID.text =description
-        actionTakenID.text =actionTaken
-
-        // Add the card view to the LinearLayout
-        cardContainer.addView(cardView)
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val nameOfIllness: TextView = itemView.findViewById(R.id.nameOfIllness)
+        val description: TextView = itemView.findViewById(R.id.description)
+        val actionTaken: TextView = itemView.findViewById(R.id.actionTaken)
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.illness_card, parent, false)
+        return ViewHolder(view)
+    }
 
-    fun filterIllnessCards(query: String) {
-        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val illness = illnessList[position]
+        holder.nameOfIllness.text = illness.illnessName
+        holder.description.text = illness.description
+        holder.actionTaken.text = illness.actionTaken
+    }
 
-        for (i in 0 until cardContainer.childCount) {
-            val cardView = cardContainer.getChildAt(i)
-            val nameOfIllness = cardView.findViewById<TextView>(R.id.nameOfIllness)
-            val descriptionID = cardView.findViewById<TextView>(R.id.description)
-            val actionTakenID = cardView.findViewById<TextView>(R.id.actionTaken)
+    override fun getItemCount(): Int {
+        return illnessList.size
+    }
 
-            val illnessName = nameOfIllness.text.toString()
+    fun addAll(illnesses: List<Illness>) {
+        illnessList.addAll(illnesses)
+    }
 
-            if (illnessName.contains(query, ignoreCase = true)) {
-                cardView.visibility = View.VISIBLE
-            } else {
-                cardView.visibility = View.GONE
+    fun filter(query: String) {
+        val filteredList = mutableListOf<Illness>()
+        for (item in illnessList) {
+            if (item.illnessName.contains(query, ignoreCase = true)) {
+                filteredList.add(item)
             }
         }
+        illnessList.clear()
+        illnessList.addAll(filteredList)
+        notifyDataSetChanged()
     }
-
-
 }
+
+
+
