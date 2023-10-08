@@ -13,7 +13,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,16 +24,21 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityViewhospitalBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import java.io.IOException
 import java.util.*
 
-class ViewHospitalActivity : AppCompatActivity() {
+class ViewHospitalActivity :AppCompatActivity() {
     private lateinit var binding: ActivityViewhospitalBinding
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var currentAddress = ""
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: HospitalAdapter
+    private var sortedHospitalList: List<Hospital> = emptyList()
 
     data class Hospital(
         val documentID: String?,
@@ -45,6 +52,9 @@ class ViewHospitalActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewhospitalBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Check for location permission and get the current address
         if (ContextCompat.checkSelfPermission(
@@ -64,7 +74,7 @@ class ViewHospitalActivity : AppCompatActivity() {
 
         // Fetch hospitals from Firestore and calculate distances
         firestore().getAllHospital { allHospitalList ->
-            val sortedHospitalList = allHospitalList.mapNotNull { hospitalInfo ->
+            sortedHospitalList = allHospitalList.mapNotNull { hospitalInfo ->
                 val documentID = hospitalInfo.documentId
                 val address = hospitalInfo.address
                 val hospital = hospitalInfo.hospital
@@ -92,19 +102,9 @@ class ViewHospitalActivity : AppCompatActivity() {
                 }
             }.sortedBy { it.distance }
 
-            // Create card views based on sorted hospital list
-            sortedHospitalList.forEach { hospitalInfo ->
-                createCardView(
-                    hospitalInfo.documentID,
-                    hospitalInfo.address,
-                    hospitalInfo.hospital,
-                    hospitalInfo.privateGovernment,
-                    hospitalInfo.distance
-                )
-            }
+            adapter = HospitalAdapter(sortedHospitalList)
+            recyclerView.adapter = adapter
         }
-
-
 
         binding.searchBarText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -122,71 +122,7 @@ class ViewHospitalActivity : AppCompatActivity() {
         })
     }
 
-    fun createCardView(
-        documentID: String?,
-        address: String?,
-        hospital: String?,
-        privateGovernment: String?,
-        distance: Float
-    ) {
-        // Find the LinearLayout within the ConstraintLayout
-        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
-
-        // Inflate your card view layout here (e.g., from XML)
-        val cardView = layoutInflater.inflate(R.layout.hospital_card_view, null)
-
-        // Set margins for the card view to create spacing between them
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(
-            0,
-            0,
-            0,
-            resources.getDimensionPixelSize(R.dimen.card_margin)
-        ) // Adjust the margin as needed
-        cardView.layoutParams = layoutParams
-
-        // Bind data to card view elements (TextViews, etc.)
-        val typeOfModel = cardView.findViewById<TextView>(R.id.typeOfModel)
-        val nameOfHospital = cardView.findViewById<TextView>(R.id.nameOfHospital)
-        val addressDetails = cardView.findViewById<TextView>(R.id.addressDetail)
-        val totalkm = cardView.findViewById<TextView>(R.id.totalKM)
-        val wazeAndGoogleMap = cardView.findViewById<ImageView>(R.id.iconImageView)
-
-        // Display distance in the card view
-        totalkm.text = "${distance} KM"
-        typeOfModel.text = privateGovernment
-        nameOfHospital.text = hospital
-        addressDetails.text = address
-
-        wazeAndGoogleMap.setOnClickListener {
-            // Build an AlertDialog to let the user choose between Waze and Google Maps
-            val dialogBuilder = AlertDialog.Builder(this)
-            dialogBuilder.setTitle("Select Navigation App")
-            dialogBuilder.setMessage("Choose a navigation app:")
-            dialogBuilder.setPositiveButton("Waze") { dialog, which ->
-                openWazeNavigation(address ?: "")
-            }
-            dialogBuilder.setNegativeButton("Google Maps") { dialog, which ->
-                openGoogleMapsNavigation(address ?: "")
-            }
-            dialogBuilder.setNeutralButton("Cancel") { dialog, which ->
-                dialog.dismiss()
-            }
-
-            // Show the AlertDialog
-            val dialog = dialogBuilder.create()
-            dialog.show()
-        }
-
-
-        // Add the card view to the LinearLayout
-        cardContainer.addView(cardView)
-    }
-
-    private fun getCurrentAddress(): String? {
+    fun getCurrentAddress(): String? {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (ContextCompat.checkSelfPermission(
@@ -287,7 +223,6 @@ class ViewHospitalActivity : AppCompatActivity() {
         }
     }
 
-
     private fun openGoogleMapsNavigation(address: String) {
         val uri = "http://maps.google.com/maps?q=$address"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
@@ -295,19 +230,68 @@ class ViewHospitalActivity : AppCompatActivity() {
     }
 
     fun filterHospitalCard(query: String) {
-        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
+        val filteredList = sortedHospitalList.filter { hospitalInfo ->
+            hospitalInfo.hospital?.contains(query, ignoreCase = true) == true
+        }
+        adapter.updateData(filteredList)
+    }
 
-        for (i in 0 until cardContainer.childCount) {
-            val cardView = cardContainer.getChildAt(i)
-            val nameOfHospital = cardView.findViewById<TextView>(R.id.nameOfHospital)
+    inner class HospitalAdapter(private var hospitalList: List<Hospital>) :
+        RecyclerView.Adapter<HospitalAdapter.ViewHolder>() {
 
-            val nameHospital = nameOfHospital.text.toString()
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val typeOfModel: TextView = itemView.findViewById(R.id.typeOfModel)
+            val nameOfHospital: TextView = itemView.findViewById(R.id.nameOfHospital)
+            val totalKM: TextView = itemView.findViewById(R.id.totalKM)
+            val address: TextView = itemView.findViewById(R.id.address)
+            val addressDetail: TextView = itemView.findViewById(R.id.addressDetail)
+            val iconImageView: ImageView = itemView.findViewById(R.id.iconImageView)
+        }
 
-            if (nameHospital.contains(query, ignoreCase = true)) {
-                cardView.visibility = View.VISIBLE
-            } else {
-                cardView.visibility = View.GONE
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.hospital_card_view, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val hospitalInfo = hospitalList[position]
+
+            holder.typeOfModel.text = hospitalInfo.privateGovernment
+            holder.nameOfHospital.text = hospitalInfo.hospital
+            holder.totalKM.text = "${hospitalInfo.distance} KM"
+            holder.address.text = "Address:" // You can set a more descriptive label if needed
+            holder.addressDetail.text = hospitalInfo.address
+
+            // Set an onClickListener for the navigation icon
+            holder.iconImageView.setOnClickListener {
+                // Build an AlertDialog to let the user choose between Waze and Google Maps
+                val dialogBuilder = AlertDialog.Builder(this@ViewHospitalActivity)
+                dialogBuilder.setTitle("Select Navigation App")
+                dialogBuilder.setMessage("Choose a navigation app:")
+                dialogBuilder.setPositiveButton("Waze") { dialog, which ->
+                    openWazeNavigation(hospitalInfo.address ?: "")
+                }
+                dialogBuilder.setNegativeButton("Google Maps") { dialog, which ->
+                    openGoogleMapsNavigation(hospitalInfo.address ?: "")
+                }
+                dialogBuilder.setNeutralButton("Cancel") { dialog, which ->
+                    dialog.dismiss()
+                }
+
+                // Show the AlertDialog
+                val dialog = dialogBuilder.create()
+                dialog.show()
             }
+        }
+
+        override fun getItemCount(): Int {
+            return hospitalList.size
+        }
+
+        fun updateData(newHospitalList: List<Hospital>) {
+            hospitalList = newHospitalList
+            notifyDataSetChanged()
         }
     }
 }

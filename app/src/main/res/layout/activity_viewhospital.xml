@@ -65,21 +65,28 @@
     </LinearLayout>
 
 
-    <LinearLayout
-        android:id="@+id/cardContainer"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="#FFFFFF"
-        android:orientation="vertical"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchBar"
-        android:layout_marginTop="16dp"></LinearLayout>
-    <include layout="@layout/activity_footer" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/guideline" /> <!-- Set bottom constraint to the guideline -->
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9" /> <!-- Adjust the percentage as needed -->
+
+    <include
+        android:id="@+id/footer"
+        layout="@layout/activity_footer"
+        app:layout_constraintTop_toBottomOf="@+id/guideline" /> <!-- Set top constraint to the guideline -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
