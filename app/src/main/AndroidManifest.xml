@@ -108,6 +108,9 @@
         <activity android:name=".ViewIllnessActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".AddAnnouncement"
+            android:exported="false">
+        </activity>
         <activity android:name=".RedesignActivity"
             android:exported="false">
         </activity>

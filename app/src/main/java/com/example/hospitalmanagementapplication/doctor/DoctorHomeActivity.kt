@@ -58,8 +58,13 @@ class DoctorHomeActivity  : AppCompatActivity() {
 
 
 
-        binding.titleAnnouncement.text = "Announcement For All the User" //todo make the annocument flexible
-        binding.descriptionAnnouncement.text = "influenza  A,B and Kawasaki are high rised in Penang. Please take care of it"
+        firestore().getAnnouncement { announcementData ->
+            if (announcementData != null) {
+                // Handle the announcement data here
+                binding.titleAnnouncement.text= announcementData["announcementTitle"].toString()
+                binding.descriptionAnnouncement.text=announcementData["announcement"].toString()
+            }
+        }
 
         if (currentUser != null) {
             firestore().getUserDetails(this) { user ->

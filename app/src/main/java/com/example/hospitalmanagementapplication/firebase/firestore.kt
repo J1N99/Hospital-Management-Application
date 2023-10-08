@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.util.Log
+import com.example.hospitalmanagementapplication.AddAnnouncement
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
@@ -762,6 +763,42 @@ class firestore {
                 callback(emptyList()) // You can also return an empty list or handle errors differently
             }
     }
+
+    fun createOrUpdateAnnouncement(announcementTitle:String, announcement: String):Task<Void>{
+      val documentPath="announcements/3kRiDZZwywBhqcnwi9DC"
+        // Create a map to hold the title and content
+        val announcementData = hashMapOf(
+            "announcementTitle" to announcementTitle,
+            "announcement" to announcement
+        )
+
+        // Use set with merge option to create or update the document
+        return mFirestore.document(documentPath)
+            .set(announcementData, SetOptions.merge())
+    }
+
+    fun getAnnouncement(callback: (Map<String, Any>?) -> Unit){
+        mFirestore.collection("announcements")
+            .document("3kRiDZZwywBhqcnwi9DC")
+            .get()
+            .addOnSuccessListener { documentSnapshot  ->
+
+                if (documentSnapshot.exists()) {
+                    val announcementData = documentSnapshot.data
+                    callback(announcementData)
+                } else {
+                    // Document does not exist
+                    callback(null)
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                // Handle any errors that occurred during the query
+                Log.e("Firestore", "Error getting document: $exception")
+                callback(null)
+            }
+    }
+
 
 
 }

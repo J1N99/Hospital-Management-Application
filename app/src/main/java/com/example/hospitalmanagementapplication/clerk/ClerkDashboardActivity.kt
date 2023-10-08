@@ -33,9 +33,14 @@ class ClerkDashboardActivity:AppCompatActivity() {
         val currentUser: FirebaseUser? = firebaseAuth.currentUser
 
 
+        firestore().getAnnouncement { announcementData ->
+            if (announcementData != null) {
+                // Handle the announcement data here
+                binding.titleAnnouncement.text= announcementData["announcementTitle"].toString()
+                binding.descriptionAnnouncement.text=announcementData["announcement"].toString()
+            }
+        }
 
-        binding.titleAnnouncement.text = "Announcement For All the User" //todo make the annocument flexible
-        binding.descriptionAnnouncement.text = "influenza  A,B and Kawasaki are high rised in Penang. Please take care of it"
 
         if (currentUser != null) {
             firestore().getUserDetails(this) { user ->
@@ -69,6 +74,12 @@ class ClerkDashboardActivity:AppCompatActivity() {
         binding.addIllness.setOnClickListener{
 
             val intent = Intent(this, AllIllnessActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.addAnnouncement.setOnClickListener{
+
+            val intent = Intent(this, AddAnnouncement::class.java)
             startActivity(intent)
             finish()
         }
