@@ -4,12 +4,10 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
-import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -71,6 +69,11 @@ class HomeActivity : AppCompatActivity() {
 
         binding.previewDesign.setOnClickListener{
             val intent = Intent(this, RedesignActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.viewHospital.setOnClickListener {
+            val intent=Intent(this,ViewHospitalActivity::class.java)
             startActivity(intent)
             finish()
         }
