@@ -21,11 +21,15 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import android.net.Uri
+import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.core.view.marginTop
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.hospitalmanagementapplication.model.Appointment
 
 
 class ViewAppointmentActivity: AppCompatActivity() {
@@ -33,6 +37,8 @@ class ViewAppointmentActivity: AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var imageView: ImageView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var appointmentAdapter: AppointmentAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewappointmentBinding.inflate(layoutInflater)
@@ -43,123 +49,116 @@ class ViewAppointmentActivity: AppCompatActivity() {
         IntentManager(this, bottomNavigationView)
         firebaseAuth = FirebaseAuth.getInstance()
 
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        appointmentAdapter = AppointmentAdapter()
+        recyclerView.adapter = appointmentAdapter
+
         firestore().getAndDisplayAppointments { appointments ->
-            // Here, you have access to the list of appointments retrieved from Firestore
-            // You can use this list to create card views or update your UI
-            for (appointment in appointments) {
-                // Create card views or update UI elements with appointment data
-                val documentID=appointment.documentID
-                val dateAppointment = appointment.dateAppointment
-                val doctorId = appointment.doctorId
-                val time = appointment.time
-
-                // Create card view or update UI here
-                createCardView(documentID,dateAppointment, doctorId, time)
-            }
+            appointmentAdapter.setAppointments(appointments)
         }
 
 
     }
+    // Define your ViewHolder class for the RecyclerView
+    private inner class AppointmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Initialize your views here (e.g., TextViews, ImageView)
+        val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
+        val doctorTextView: TextView = itemView.findViewById(R.id.doctorTextView)
+        val timeTextView: TextView = itemView.findViewById(R.id.timeTextView)
+        val imageView:ImageView=itemView.findViewById(R.id.imageView)
+        val cancelAppointment:TextView=itemView.findViewById(R.id.cancelAppointment)
+    }
 
-    fun createCardView(documentID: String?, date: String?, doctorId: String?, time: String?) {
-        // Find the LinearLayout within the ConstraintLayout
-        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
+    // Define your Adapter class for the RecyclerView
+    private inner class AppointmentAdapter : RecyclerView.Adapter<AppointmentViewHolder>() {
+        private var appointments: List<Appointment> = emptyList()
 
-        // Inflate your card view layout here (e.g., from XML)
-        val cardView = LayoutInflater.from(this).inflate(R.layout.appointment_card_view, null)
+        fun setAppointments(appointments: List<Appointment>) {
+            this.appointments = appointments
+            notifyDataSetChanged()
+        }
 
-        // Set margins for the card view to create spacing between them
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(0, 0, 0, resources.getDimensionPixelSize(R.dimen.card_margin)) // Adjust the margin as needed
-        cardView.layoutParams = layoutParams
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppointmentViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.appointment_card_view, parent, false)
+            return AppointmentViewHolder(view)
+        }
 
+        override fun onBindViewHolder(holder: AppointmentViewHolder, position: Int) {
+            val appointment = appointments[position]
+            // Bind data to the ViewHolder views here
+            holder.dateTextView.text = "Date: ${appointment.dateAppointment}"
+            holder.timeTextView.text = "Time: ${appointment.time}"
 
-        // Bind data to card view elements (TextViews, etc.)
-        val dateTextView = cardView.findViewById<TextView>(R.id.dateTextView)
-        val doctorTextView = cardView.findViewById<TextView>(R.id.doctorTextView)
-        val timeTextView = cardView.findViewById<TextView>(R.id.timeTextView)
-        val cancelAppointment = cardView.findViewById<TextView>(R.id.cancelAppointment)
+            val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Define the format of your date string
+            val dateString = appointment.dateAppointment
 
-        // Create a new ImageView for each card view
-        val imageView = cardView.findViewById<ImageView>(R.id.imageView)
+            val currentDate = LocalDate.now()
+            val date = LocalDate.parse(dateString, dateFormat)
 
-        firestore().getDoctorInfo(this, doctorId ?: "") { doctorInfo ->
-            if (doctorInfo != null) {
-                val imagefile = doctorInfo.profileImageUri
-                val imagePath = "doctorProfileImages/$imagefile"
-                // Initialize Firebase Storage
-                val storage = Firebase.storage
+            val daysUntilDate = ChronoUnit.DAYS.between(currentDate, date)
 
-                // Reference to the image in Firebase Storage (replace "your-image-path" with the actual path)
-                val storageRef = storage.reference.child(imagePath)
+            if (daysUntilDate < 0) {
+                holder.cancelAppointment.visibility = View.GONE
+            }
 
-                // Determine the file extension based on the MIME type
-                val fileExtension = getFileExtension(imagefile!!.toUri()) // Pass the URL of the downloaded image
-                val localFile = File.createTempFile("images", ".$fileExtension")
+            holder.cancelAppointment.setOnClickListener {
+                firestore().deleteDocument(appointment.documentID?:"", "appointments",
+                    onSuccess = {
+                        // Create an Intent to restart the current activity
+                        val intent = intent
+                        finish() // Finish the current activity
+                        startActivity(intent) // Start a new instance of the current activity
+                    },
+                    onFailure = { e ->
+                        Log.w("ERROR", "Error deleting document", e)
+                    })
+            }
 
-                storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    // Handle the successful download here
-                    // You can set the retrieved image to the specific ImageView using Glide
-                    val downloadedUri = uri.toString() // The URL to the downloaded image
-                    loadAndDisplayImage(downloadedUri, imageView)
-                }.addOnFailureListener { e ->
-                    // Handle any errors that occurred during the download
-                    // e.g., handle network errors or file not found errors
+            val doctorId = appointment.doctorId
+            firestore().getOtherUserDetails(this@ViewAppointmentActivity, appointment.doctorId?:"") { user ->
+                if (user != null) {
+                    holder.doctorTextView.text = "DR " + user.firstname + " " + user.lastname
                 }
-            } else {
-                Log.d("Fail", "Fail")
-                Toast.makeText(this, "Fail", Toast.LENGTH_SHORT)
+            }
+
+            firestore().getDoctorInfo(this@ViewAppointmentActivity, doctorId ?: "") { doctorInfo ->
+                if (doctorInfo != null) {
+
+                    val imagefile = doctorInfo.profileImageUri
+                    val imagePath = "doctorProfileImages/$imagefile"
+                    // Initialize Firebase Storage
+                    val storage = Firebase.storage
+
+                    // Reference to the image in Firebase Storage (replace "your-image-path" with the actual path)
+                    val storageRef = storage.reference.child(imagePath)
+
+                    // Determine the file extension based on the MIME type
+                    val fileExtension = getFileExtension(imagefile!!.toUri()) // Pass the URL of the downloaded image
+                    val localFile = File.createTempFile("images", ".$fileExtension")
+
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        // Handle the successful download here
+                        // You can set the retrieved image to the specific ImageView using Glide
+                        val downloadedUri = uri.toString() // The URL to the downloaded image
+                        loadAndDisplayImage(downloadedUri, holder.imageView) // Modify this line as needed
+                    }.addOnFailureListener { e ->
+                        // Handle any errors that occurred during the download
+                        // e.g., handle network errors or file not found errors
+                    }
+                } else {
+                    Log.d("Fail", "Fail")
+                    Toast.makeText(this@ViewAppointmentActivity, "Fail", Toast.LENGTH_SHORT)
+                }
             }
         }
 
-        val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Define the format of your date string
-        val dateString = date
-
-        val currentDate = LocalDate.now()
-        val date = LocalDate.parse(dateString, dateFormat)
-
-        val daysUntilDate = ChronoUnit.DAYS.between(currentDate, date)
-
-        if (daysUntilDate < 0) {
-            cancelAppointment.visibility = View.GONE
+        override fun getItemCount(): Int {
+            return appointments.size
         }
-
-        var doctorName = ""
-        var doctorID = doctorId ?: ""
-        var StringDocumentID = documentID ?: ""
-        firestore().getOtherUserDetails(this, doctorID) { user ->
-            if (user != null) {
-                doctorName = "DR " + user.firstname + " " + user.lastname
-                Log.d("3", "$doctorName")
-                doctorTextView.text = "Doctor: $doctorName"
-            }
-        }
-
-        // Set the appointment data to the TextViews
-        dateTextView.text = "Date: $date"
-
-        Log.d("4", "$doctorName")
-        timeTextView.text = "Time: $time"
-
-        cancelAppointment.setOnClickListener {
-            firestore().deleteDocument(StringDocumentID, "appointments",
-                onSuccess = {
-                    // Create an Intent to restart the current activity
-                    val intent = intent
-                    finish() // Finish the current activity
-                    startActivity(intent) // Start a new instance of the current activity
-                },
-                onFailure = { e ->
-                    Log.w("ERROR", "Error deleting document", e)
-                })
-        }
-        // Add the card view to the LinearLayout
-        cardContainer.addView(cardView)
     }
-
 
     private fun getFileExtension(uri: Uri): String? {
         val contentResolver = contentResolver

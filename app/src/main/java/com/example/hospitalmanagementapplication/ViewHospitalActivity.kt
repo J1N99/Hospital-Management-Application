@@ -29,6 +29,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityViewhospitalBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
+import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.util.*
 
@@ -39,6 +41,7 @@ class ViewHospitalActivity :AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HospitalAdapter
     private var sortedHospitalList: List<Hospital> = emptyList()
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     data class Hospital(
         val documentID: String?,
@@ -55,6 +58,11 @@ class ViewHospitalActivity :AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView.setSelectedItemId(R.id.others);
+        IntentManager(this, bottomNavigationView)
 
         // Check for location permission and get the current address
         if (ContextCompat.checkSelfPermission(

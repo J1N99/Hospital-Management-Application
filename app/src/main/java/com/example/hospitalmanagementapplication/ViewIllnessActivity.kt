@@ -31,12 +31,15 @@ import com.example.hospitalmanagementapplication.databinding.ActivityViewhospita
 import com.example.hospitalmanagementapplication.databinding.ActivityViewillnessBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.model.Illness
+import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.util.*
 
 class ViewIllnessActivity : AppCompatActivity() {
     private lateinit var binding: ActivityViewillnessBinding
     private val illnessList = mutableListOf<Illness>()
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +56,9 @@ class ViewIllnessActivity : AppCompatActivity() {
             illnessList.addAll(allIllness)
             adapter.notifyDataSetChanged()
         }
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView.setSelectedItemId(R.id.others);
+        IntentManager(this, bottomNavigationView)
 
         binding.searchBarText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
