@@ -66,7 +66,12 @@ class ClerkDashboardActivity:AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        binding.addIllness.setOnClickListener{
 
+            val intent = Intent(this, AllIllnessActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
 
     }

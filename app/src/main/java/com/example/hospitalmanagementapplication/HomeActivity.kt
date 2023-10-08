@@ -77,6 +77,11 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        binding.viewIllness.setOnClickListener {
+            val intent=Intent(this,ViewIllnessActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onBackPressed() {

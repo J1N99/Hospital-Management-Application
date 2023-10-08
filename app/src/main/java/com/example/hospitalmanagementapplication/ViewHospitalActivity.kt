@@ -11,6 +11,9 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -25,7 +28,7 @@ import com.example.hospitalmanagementapplication.firebase.firestore
 import java.io.IOException
 import java.util.*
 
-class ViewHospitalActivity: AppCompatActivity() {
+class ViewHospitalActivity : AppCompatActivity() {
     private lateinit var binding: ActivityViewhospitalBinding
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private var currentAddress = ""
@@ -100,6 +103,23 @@ class ViewHospitalActivity: AppCompatActivity() {
                 )
             }
         }
+
+
+
+        binding.searchBarText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                // Do nothing
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString()
+                filterHospitalCard(query)
+            }
+        })
     }
 
     fun createCardView(
@@ -133,7 +153,7 @@ class ViewHospitalActivity: AppCompatActivity() {
         val nameOfHospital = cardView.findViewById<TextView>(R.id.nameOfHospital)
         val addressDetails = cardView.findViewById<TextView>(R.id.addressDetail)
         val totalkm = cardView.findViewById<TextView>(R.id.totalKM)
-        val wazeAndGoogleMap=cardView.findViewById<ImageView>(R.id.iconImageView)
+        val wazeAndGoogleMap = cardView.findViewById<ImageView>(R.id.iconImageView)
 
         // Display distance in the card view
         totalkm.text = "${distance} KM"
@@ -147,10 +167,10 @@ class ViewHospitalActivity: AppCompatActivity() {
             dialogBuilder.setTitle("Select Navigation App")
             dialogBuilder.setMessage("Choose a navigation app:")
             dialogBuilder.setPositiveButton("Waze") { dialog, which ->
-                openWazeNavigation(address?:"")
+                openWazeNavigation(address ?: "")
             }
             dialogBuilder.setNegativeButton("Google Maps") { dialog, which ->
-                openGoogleMapsNavigation(address?:"")
+                openGoogleMapsNavigation(address ?: "")
             }
             dialogBuilder.setNeutralButton("Cancel") { dialog, which ->
                 dialog.dismiss()
@@ -268,12 +288,26 @@ class ViewHospitalActivity: AppCompatActivity() {
     }
 
 
-
-
     private fun openGoogleMapsNavigation(address: String) {
         val uri = "http://maps.google.com/maps?q=$address"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         startActivity(intent)
     }
 
+    fun filterHospitalCard(query: String) {
+        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
+
+        for (i in 0 until cardContainer.childCount) {
+            val cardView = cardContainer.getChildAt(i)
+            val nameOfHospital = cardView.findViewById<TextView>(R.id.nameOfHospital)
+
+            val nameHospital = nameOfHospital.text.toString()
+
+            if (nameHospital.contains(query, ignoreCase = true)) {
+                cardView.visibility = View.VISIBLE
+            } else {
+                cardView.visibility = View.GONE
+            }
+        }
+    }
 }

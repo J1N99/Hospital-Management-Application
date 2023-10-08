@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.util.Log
 import com.example.hospitalmanagementapplication.HomeActivity
+import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.model.*
@@ -693,4 +694,74 @@ class firestore {
                 callback(null) // Notify callback of the error
             }
     }
+
+
+    fun getIllnessActivity(activity: Activity, illnessID:String,callback: (Illness?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("illness")
+            // Get documentation id from the field of users
+            .document(illnessID)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+
+                // Received the document ID and convert it into the User Data model object
+                val illness = document.toObject(Illness::class.java)
+
+                // Pass the user object to the callback
+                callback(illness)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting illness details: $e")
+                callback(null) // Notify callback of the error
+            }
+    }
+
+    fun createIllness(activity: Activity, illnessInfo: Illness) {
+
+        //create collection names, is exist just use
+        mFirestore.collection("illness")
+            //create document id
+            .document()
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
+            .set(illnessInfo, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+
+                // Create an Intent to start the HomeActivity
+                val intent = Intent(activity, ClerkDashboardActivity::class.java)
+                // Start the HomeActivity using the intent
+                activity.startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+
+    fun getAllIllness(callback: (List<Illness>) -> Unit) {
+
+        mFirestore.collection("illness").get()
+            .addOnSuccessListener { result ->
+                val illnessList = mutableListOf<Illness>()
+
+                for (document in result) {
+                    val documentId = document.id
+                    val nameOfIllness= document.getString("illnessName").toString()
+                    val description= document.getString("description").toString()
+                    val actionTaken= document.getString("actionTaken").toString()
+                    Log.e(nameOfIllness,nameOfIllness)
+                    val illness = Illness(documentId,nameOfIllness,description,actionTaken )
+                    illnessList.add(illness)
+                }
+
+                callback(illnessList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
+
+
 }

@@ -96,6 +96,18 @@
         <activity android:name=".allHospitalActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".ViewHospitalActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".AllIllnessActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".AddIllnessActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".ViewIllnessActivity"
+            android:exported="false">
+        </activity>
         <activity android:name=".RedesignActivity"
             android:exported="false">
         </activity>
