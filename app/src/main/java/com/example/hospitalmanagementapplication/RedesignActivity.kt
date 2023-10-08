@@ -1,308 +1,221 @@
 package com.example.hospitalmanagementapplication
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
+import android.os.Environment
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
-import com.example.hospitalmanagementapplication.databinding.ActivityViewappointmentBinding
-import com.example.hospitalmanagementapplication.firebase.firestore
-import com.example.hospitalmanagementapplication.utils.IntentManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import java.io.File
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import android.net.Uri
-import android.webkit.MimeTypeMap
-import android.widget.Adapter
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
-import com.bumptech.glide.Glide
-import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
-import com.example.hospitalmanagementapplication.model.Hospital
-import com.example.hospitalmanagementapplication.model.doctorInformation
-import android.Manifest
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
-import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
+import com.itextpdf.text.BaseColor
+import com.itextpdf.text.Document
+import com.itextpdf.text.Element
+import com.itextpdf.text.Image
+import com.itextpdf.text.PageSize
+import com.itextpdf.text.Paragraph
+import com.itextpdf.text.pdf.PdfPCell
+import com.itextpdf.text.pdf.PdfPTable
+import com.itextpdf.text.pdf.PdfWriter
+import java.io.File
+import java.io.FileOutputStream
+import com.itextpdf.text.*
+import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.util.Locale
-class RedesignActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityRedesignBinding
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
-    private var currentAddress = ""
 
-    data class Hospital(
-        val documentID: String?,
-        val hospital: String?,
-        val address: String?,
-        val privateGovernment: String?,
-        val distance: Float
-    )
+class RedesignActivity : AppCompatActivity() {
+
+    private val pdfFileName = "appointment_report.pdf"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRedesignBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_redesign)
 
-        // Check for location permission and get the current address
+        // Request storage permission if not granted
         if (ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
             )
+        }
+    }
+
+    fun createPdf(view: View) {
+        if (isExternalStorageWritable()) {
+            val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
+
+            try {
+                val document = Document(PageSize.A4)
+                val pdfWriter = PdfWriter.getInstance(document, FileOutputStream(pdfFile))
+                document.open()
+
+                // Create a table for the header
+                val headerTable = PdfPTable(2)
+                headerTable.widthPercentage = 100f
+                headerTable.setWidths(floatArrayOf(3f, 1f))
+
+                val headerCell1 = PdfPCell()
+                //headerCell1.backgroundColor = BaseColor(12, 173, 128)
+                headerCell1.horizontalAlignment = Element.ALIGN_LEFT
+                headerCell1.verticalAlignment = Element.ALIGN_MIDDLE
+                headerCell1.setPadding(10f)
+                headerCell1.borderWidthRight = 0f // Remove left border
+
+                val headerText = Paragraph("Appointment Report", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK))
+                headerText.add(Chunk.NEWLINE)
+
+                headerText.add(Phrase("Vantist", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
+                headerText.add(Chunk.NEWLINE)
+                headerText.add(Phrase("No 25,Lorong Tanjung Aman 12, Taman Tanjung Aman", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
+                headerText.add(Chunk.NEWLINE)
+                headerText.add(Phrase("12300 Butterworth, Pulau Pinang", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
+                headerText.add(Chunk.NEWLINE)
+
+                headerText.add(Phrase("Dr Ang Wei Jin", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
+                headerText.add(Chunk.NEWLINE)
+                headerText.add(Phrase("01112896803", Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)))
+                headerCell1.addElement(headerText)
+
+                val headerCell2 = PdfPCell()
+                headerCell2.horizontalAlignment = Element.ALIGN_LEFT
+                headerCell2.verticalAlignment = Element.ALIGN_MIDDLE
+                headerCell2.setPadding(10f)
+                headerCell2.borderWidthLeft = 0f // Remove left border
+                //headerCell2.backgroundColor = BaseColor(12, 173, 128) // Background color same as headerCell1
+
+
+// Load the image from drawable resources
+                val imageBitmap: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
+
+// Convert the Bitmap to a byte array
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                val imageByteArray: ByteArray = byteArrayOutputStream.toByteArray()
+
+// Create an iText Image instance from the byte array
+                val image = Image.getInstance(imageByteArray)
+
+// Scale the image if needed
+                image.scaleToFit(120f, 120f)
+                headerCell2.addElement(image)
+
+                headerTable.addCell(headerCell1)
+                headerTable.addCell(headerCell2)
+
+
+                // Add the header table to the document
+                document.add(headerTable)
+
+                // Create a table for the content
+                val contentTable = PdfPTable(1)
+                contentTable.widthPercentage = 100f
+
+                val contentCell = PdfPCell(Paragraph("Patient Name\n" +
+                        "Chooi Chee Kean\n" +
+                        "No IC: 991125075103\n" +
+                        "Gender: Male"))
+                contentCell.setPadding(10f)
+
+                contentTable.addCell(contentCell)
+
+                // Add the content table to the document
+                document.add(contentTable)
+
+                // Create a table for the item list
+                val itemListTable = PdfPTable(4)
+                itemListTable.widthPercentage = 100f
+                itemListTable.setWidths(floatArrayOf(3f, 1f, 1f, 1f))
+
+                // Add table headers
+                itemListTable.addCell(Phrase("Item name", FontFactory.getFont(FontFactory.HELVETICA_BOLD)))
+                itemListTable.addCell(Phrase("Price", FontFactory.getFont(FontFactory.HELVETICA_BOLD)))
+                itemListTable.addCell(Phrase("Quantity", FontFactory.getFont(FontFactory.HELVETICA_BOLD)))
+                itemListTable.addCell(Phrase("Total", FontFactory.getFont(FontFactory.HELVETICA_BOLD)))
+
+                // Add item rows (You will need to loop through your data here)
+                // Example:
+                // itemListTable.addCell("Item 1")
+                // itemListTable.addCell("RM50.00")
+                // itemListTable.addCell("2")
+                // itemListTable.addCell("RM100.00")
+
+                // Add the grand total row and the thank you message
+                val grandTotalCell = PdfPCell(Phrase("Grand total: RM200.00"))
+                grandTotalCell.colspan = 4
+                itemListTable.addCell(grandTotalCell)
+
+                val thankYouCell = PdfPCell(Phrase("Thank you for your appointment.", FontFactory.getFont(FontFactory.HELVETICA_BOLD)))
+                thankYouCell.colspan = 4
+                itemListTable.addCell(thankYouCell)
+
+                val termsCell = PdfPCell(Phrase("Terms and conditions: This is an automated generated PDF; signature is not needed.", FontFactory.getFont(FontFactory.HELVETICA_BOLD)))
+                termsCell.colspan = 4
+                itemListTable.addCell(termsCell)
+
+                // Add the item list table to the document
+                document.add(itemListTable)
+
+                // Close the document
+                document.close()
+
+                Toast.makeText(this, "PDF created successfully", Toast.LENGTH_SHORT).show()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Error creating PDF", Toast.LENGTH_SHORT).show()
+            }
+
         } else {
-            currentAddress = getCurrentAddress() ?: ""
-            binding.currentAddress.text = "Current Address: $currentAddress"
+            Toast.makeText(this, "External storage not writable", Toast.LENGTH_SHORT).show()
         }
+    }
 
-        // Fetch hospitals from Firestore and calculate distances
-        firestore().getAllHospital { allHospitalList ->
-            val sortedHospitalList = allHospitalList.mapNotNull { hospitalInfo ->
-                val documentID = hospitalInfo.documentId
-                val address = hospitalInfo.address
-                val hospital = hospitalInfo.hospital
-                val privateGovernment = hospitalInfo.privateGovernment
-                val latLng = getLatLngFromAddress(this, address ?: "")
+    fun openPdf(view: View) {
+        val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
 
-                if (latLng != null) {
-                    val currentLatLong = getLatLngFromAddress(this, currentAddress ?: "")
-                    val cardLatLong = latLng
-                    if (currentLatLong != null) {
-                        val (currentLat, currentLong) = currentLatLong.split(",")
-                        val (cardLat, cardLong) = cardLatLong.split(",")
-                        val distance = calculateDistance(
-                            currentLat.toDoubleOrNull() ?: 0.0,
-                            currentLong.toDoubleOrNull() ?: 0.0,
-                            cardLat.toDoubleOrNull() ?: 0.0,
-                            cardLong.toDoubleOrNull() ?: 0.0
-                        )
-                        Hospital(documentID, hospital, address, privateGovernment, distance)
-                    } else {
-                        null
-                    }
-                } else {
-                    null
-                }
-            }.sortedBy { it.distance }
-
-            // Create card views based on sorted hospital list
-            sortedHospitalList.forEach { hospitalInfo ->
-                createCardView(
-                    hospitalInfo.documentID,
-                    hospitalInfo.address,
-                    hospitalInfo.hospital,
-                    hospitalInfo.privateGovernment,
-                    hospitalInfo.distance
+        if (pdfFile.exists()) {
+            try {
+                val pdfUri = FileProvider.getUriForFile(
+                    this,
+                    "com.example.hospitalmanagementapplication.fileprovider",
+                    pdfFile
                 )
-            }
-        }
-    }
 
-    fun createCardView(
-        documentID: String?,
-        address: String?,
-        hospital: String?,
-        privateGovernment: String?,
-        distance: Float
-    ) {
-        // Find the LinearLayout within the ConstraintLayout
-        val cardContainer = findViewById<LinearLayout>(R.id.cardContainer)
+                // Create an intent to open the PDF file
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(pdfUri, "application/pdf")
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-        // Inflate your card view layout here (e.g., from XML)
-        val cardView = layoutInflater.inflate(R.layout.hospital_card_view, null)
+                // Check if there is a PDF viewer app installed
+                val packageManager = packageManager
+                val activities = packageManager.queryIntentActivities(intent, 0)
 
-        // Set margins for the card view to create spacing between them
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(
-            0,
-            0,
-            0,
-            resources.getDimensionPixelSize(R.dimen.card_margin)
-        ) // Adjust the margin as needed
-        cardView.layoutParams = layoutParams
-
-        // Bind data to card view elements (TextViews, etc.)
-        val typeOfModel = cardView.findViewById<TextView>(R.id.typeOfModel)
-        val nameOfHospital = cardView.findViewById<TextView>(R.id.nameOfHospital)
-        val addressDetails = cardView.findViewById<TextView>(R.id.addressDetail)
-        val totalkm = cardView.findViewById<TextView>(R.id.totalKM)
-        val wazeAndGoogleMap=cardView.findViewById<ImageView>(R.id.iconImageView)
-
-        // Display distance in the card view
-        totalkm.text = "${distance} KM"
-        typeOfModel.text = privateGovernment
-        nameOfHospital.text = hospital
-        addressDetails.text = address
-
-        wazeAndGoogleMap.setOnClickListener {
-            // Build an AlertDialog to let the user choose between Waze and Google Maps
-            val dialogBuilder = AlertDialog.Builder(this)
-            dialogBuilder.setTitle("Select Navigation App")
-            dialogBuilder.setMessage("Choose a navigation app:")
-            dialogBuilder.setPositiveButton("Waze") { dialog, which ->
-                openWazeNavigation(address?:"")
-            }
-            dialogBuilder.setNegativeButton("Google Maps") { dialog, which ->
-                openGoogleMapsNavigation(address?:"")
-            }
-            dialogBuilder.setNeutralButton("Cancel") { dialog, which ->
-                dialog.dismiss()
-            }
-
-            // Show the AlertDialog
-            val dialog = dialogBuilder.create()
-            dialog.show()
-        }
-
-
-        // Add the card view to the LinearLayout
-        cardContainer.addView(cardView)
-    }
-
-    private fun getCurrentAddress(): String? {
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-
-            if (location != null) {
-                // You have the location, now you can get the address
-                val geocoder = Geocoder(this, Locale.getDefault())
-                val addresses: List<Address>? =
-                    geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                if (addresses != null && addresses.isNotEmpty()) {
-                    return addresses[0].getAddressLine(0)
+                if (activities.isNotEmpty()) {
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "No PDF viewer app found", Toast.LENGTH_SHORT).show()
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        }
-        return null // Return null if unable to get the address
-    }
-
-    fun getLatLngFromAddress(context: Context, addressStr: String): String? {
-        val geocoder = Geocoder(context)
-        try {
-            val addresses: List<Address>? = geocoder.getFromLocationName(addressStr, 1)
-            if (addresses != null && addresses.isNotEmpty()) {
-                val latitude = addresses[0].latitude
-                val longitude = addresses[0].longitude
-                return "$latitude, $longitude"
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return null
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, get current location
-                val address = getCurrentAddress()
-                binding.currentAddress.text = "Current Address: $address"
-            } else {
-                // Permission denied, handle the case (e.g., show a message)
-                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
-            }
+        } else {
+            Toast.makeText(this, "PDF file not found", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun calculateDistance(
-        currentLatitude: Double,
-        currentLongitude: Double,
-        cardLatitude: Double,
-        cardLongitude: Double
-    ): Float {
-        val currentLocation = Location("currentLocation")
-        currentLocation.latitude = currentLatitude
-        currentLocation.longitude = currentLongitude
-
-        val cardLocation = Location("cardLocation")
-        cardLocation.latitude = cardLatitude
-        cardLocation.longitude = cardLongitude
-
-        // Calculate the distance in meters
-        val distanceInMeters = currentLocation.distanceTo(cardLocation)
-
-        // Convert meters to kilometers with one decimal place
-        val distanceInKilometers = distanceInMeters / 1000.0
-
-        // Format the result to have one decimal place
-        val formattedDistance = String.format("%.1f", distanceInKilometers)
-
-        // Parse the formatted distance back to a float
-        return formattedDistance.toFloat()
-    }
-
-    private fun openWazeNavigation(address: String) {
-        val wazePackage = "com.waze"
-        val wazeIntent = Intent(Intent.ACTION_VIEW, Uri.parse("waze://?q=$address&navigate=yes"))
-        wazeIntent.setPackage(wazePackage)
-
-        val packageManager = packageManager // Assuming you have access to the PackageManager
-
-        try {
-            startActivity(wazeIntent)
-        } catch (e: ActivityNotFoundException) {
-            // Waze is not installed, you can redirect the user to download it from the Play Store
-            val playStoreUri = Uri.parse("market://details?id=$wazePackage")
-            val intent = Intent(Intent.ACTION_VIEW, playStoreUri)
-            startActivity(intent)
-        }
-    }
-
-
-
-
-    private fun openGoogleMapsNavigation(address: String) {
-        val uri = "http://maps.google.com/maps?q=$address"
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-        startActivity(intent)
-    }
-
-    private fun isAppInstalled(packageName: String, packageManager: PackageManager): Boolean {
-        try {
-            packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-            return true
-        } catch (e: PackageManager.NameNotFoundException) {
-            return false
-        }
+    private fun isExternalStorageWritable(): Boolean {
+        val state = Environment.getExternalStorageState()
+        return Environment.MEDIA_MOUNTED == state
     }
 }

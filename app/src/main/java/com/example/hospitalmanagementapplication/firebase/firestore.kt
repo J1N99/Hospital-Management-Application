@@ -7,6 +7,7 @@ import android.content.Intent
 import android.util.Log
 import com.example.hospitalmanagementapplication.AddAnnouncement
 import com.example.hospitalmanagementapplication.HomeActivity
+import com.example.hospitalmanagementapplication.RedesignActivity
 import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
@@ -33,7 +34,7 @@ class firestore {
 
         //create collection names, is exist just use
         mFirestore.collection("users")
-                //create document id
+            //create document id
             .document(user.id)
             // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
             .set(user, SetOptions.merge())
@@ -49,6 +50,7 @@ class firestore {
                 Log.w(ContentValues.TAG, "Error adding document", e)
             }
     }
+
     private fun getCurrentUserID(): String {
         val currentUser = FirebaseAuth.getInstance().currentUser
         var currentUserID = ""
@@ -57,6 +59,7 @@ class firestore {
         }
         return currentUserID
     }
+
     fun getUserDetails(activity: Activity, callback: (User?) -> Unit) {
         // Get user in collection
         mFirestore.collection("users")
@@ -88,7 +91,8 @@ class firestore {
         val user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
         // Create a credential with the user's email and old password
-        val credential: AuthCredential = EmailAuthProvider.getCredential(user?.email ?: "", oldPassword)
+        val credential: AuthCredential =
+            EmailAuthProvider.getCredential(user?.email ?: "", oldPassword)
 
         // Re-authenticate the user with the provided credential
         user?.reauthenticate(credential)
@@ -130,10 +134,15 @@ class firestore {
             }
     }
 
-    fun getEmailFromIC(ic: String,email:String, onComplete: (User?) -> Unit, onError: (Exception) -> Unit) {
+    fun getEmailFromIC(
+        ic: String,
+        email: String,
+        onComplete: (User?) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         mFirestore.collection("users")
-            .whereEqualTo("ic",ic)
-            .whereEqualTo("email",email)
+            .whereEqualTo("ic", ic)
+            .whereEqualTo("email", email)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
@@ -170,7 +179,7 @@ class firestore {
             }
     }
 
-    fun getOtherUserDetails(activity: Activity, userId:String,callback: (User?) -> Unit) {
+    fun getOtherUserDetails(activity: Activity, userId: String, callback: (User?) -> Unit) {
         // Get user in collection
         mFirestore.collection("users")
             // Get documentation id from the field of users
@@ -190,7 +199,13 @@ class firestore {
                 callback(null) // Notify callback of the error
             }
     }
-    fun updateDocument(collectionName: String, documentId: String, data: Map<String, Any>, merge: Boolean = true) {
+
+    fun updateDocument(
+        collectionName: String,
+        documentId: String,
+        data: Map<String, Any>,
+        merge: Boolean = true
+    ) {
         val documentReference = mFirestore.collection(collectionName).document(documentId)
 
         if (merge) {
@@ -226,15 +241,16 @@ class firestore {
 
                 for (document in result) {
                     val userId = document.id
-                    val email=document.getString("email").toString()
+                    val email = document.getString("email").toString()
                     val firstname = document.getString("firstname").toString()
                     val lastname = document.getString("lastname").toString()
-                    val icNumber=document.getString("ic").toString()
+                    val icNumber = document.getString("ic").toString()
                     val gender: Boolean = document.getBoolean("gender") ?: false
-                    val dob=document.getString("dob").toString()
+                    val dob = document.getString("dob").toString()
                     val position: Int = (document.getLong("position")?.toInt()) ?: 1
 
-                    val user = User(userId,email ,firstname, lastname,gender,dob,icNumber,position )
+                    val user =
+                        User(userId, email, firstname, lastname, gender, dob, icNumber, position)
                     userList.add(user)
                 }
 
@@ -251,7 +267,8 @@ class firestore {
         documentId: String,
         data: Map<String, Any>,
         merge: Boolean = true,
-        collectionName: String ="users") {
+        collectionName: String = "users"
+    ) {
         val documentReference = mFirestore.collection(collectionName).document(documentId)
 
         if (merge) {
@@ -276,7 +293,11 @@ class firestore {
                 }
         }
     }
-    fun createAvailableAppointment(activity: DoctorAvailableAppointmentActivity, appointmentAvailable: AppointmentAvailable) {
+
+    fun createAvailableAppointment(
+        activity: DoctorAvailableAppointmentActivity,
+        appointmentAvailable: AppointmentAvailable
+    ) {
         mFirestore.collection("appointmentAvailable")
             .document()
             .set(appointmentAvailable, SetOptions.merge())
@@ -290,7 +311,10 @@ class firestore {
             }
     }
 
-    fun getAppointmentAvailable(activity: Activity, callback: (String?, AppointmentAvailable?) -> Unit) {
+    fun getAppointmentAvailable(
+        activity: Activity,
+        callback: (String?, AppointmentAvailable?) -> Unit
+    ) {
         // Get user in collection
         mFirestore.collection("appointmentAvailable")
             // Get documentation id from the field of users
@@ -318,36 +342,45 @@ class firestore {
             }
     }
 
-    fun getDoctorAppointmentAvailable(activity: Activity,doctorID:String, callback: (String?,AppointmentAvailable?) -> Unit) {
+    fun getDoctorAppointmentAvailable(
+        activity: Activity,
+        doctorID: String,
+        callback: (String?, AppointmentAvailable?) -> Unit
+    ) {
         // Get user in collection
         mFirestore.collection("appointmentAvailable")
             // Get documentation id from the field of users
-            .whereEqualTo("userId",doctorID)
+            .whereEqualTo("userId", doctorID)
             .get()
             .addOnSuccessListener { document ->
                 if (!document.isEmpty) {
-                Log.d(activity.javaClass.simpleName, document.toString())
-                // Assuming there is only one matching document, you can retrieve the first one
-                val document = document.documents[0]
-                // Get the document ID
-                val documentId = document.id
-                // Received the document ID and convert it into the User Data model object
-                val appointmentAvailable = document.toObject(AppointmentAvailable::class.java)
+                    Log.d(activity.javaClass.simpleName, document.toString())
+                    // Assuming there is only one matching document, you can retrieve the first one
+                    val document = document.documents[0]
+                    // Get the document ID
+                    val documentId = document.id
+                    // Received the document ID and convert it into the User Data model object
+                    val appointmentAvailable = document.toObject(AppointmentAvailable::class.java)
 
-                // Pass the user object to the callback
-                callback(documentId,appointmentAvailable)
-                }
-                else {
+                    // Pass the user object to the callback
+                    callback(documentId, appointmentAvailable)
+                } else {
                     // No documents found, notify callback with null values
                     callback(null, null)
                 }
             }
             .addOnFailureListener { e ->
                 Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
-                callback(null,null) // Notify callback of the error
+                callback(null, null) // Notify callback of the error
             }
     }
-    fun getAppointment(doctorId: String, dateAppointment: String, formattedTime: String, callback: (Boolean) -> Unit) {
+
+    fun getAppointment(
+        doctorId: String,
+        dateAppointment: String,
+        formattedTime: String,
+        callback: (Boolean) -> Unit
+    ) {
         // Create a Firestore query to check if an appointment exists
         val query = mFirestore.collection("appointments")
             .whereEqualTo("doctorId", doctorId)
@@ -381,7 +414,7 @@ class firestore {
                     val lastname = document.getString("lastname").toString()
 
 
-                    val user = User(userId, firstname, lastname )
+                    val user = User(userId, firstname, lastname)
                     doctorList.add(user)
                 }
 
@@ -394,7 +427,14 @@ class firestore {
     }
 
 
-    fun makeAppointment(doctorId: String, userId: String,dateAppointment:String,time: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun makeAppointment(
+        doctorId: String,
+        userId: String,
+        dateAppointment: String,
+        time: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         val appointment = hashMapOf(
             "doctorId" to doctorId,
             "userId" to userId,
@@ -418,10 +458,11 @@ class firestore {
                     val dateAppointment = document.getString("dateAppointment")
                     val doctorId = document.getString("doctorId")
                     val time = document.getString("time")
-                    val documentID=document.id
-                    val userID=getCurrentUserID()
+                    val documentID = document.id
+                    val userID = getCurrentUserID()
                     // Create a data class for Appointment
-                    val appointment = Appointment(documentID,dateAppointment, doctorId, time,userID)
+                    val appointment =
+                        Appointment(documentID, dateAppointment, doctorId, time, userID)
                     appointmentsList.add(appointment)
                 }
 
@@ -435,10 +476,13 @@ class firestore {
     }
 
 
-    fun doctorGetAndDisplayAppointments(formattedDate: String,callback: (List<Appointment>) -> Unit) {
+    fun doctorGetAndDisplayAppointments(
+        formattedDate: String,
+        callback: (List<Appointment>) -> Unit
+    ) {
         mFirestore.collection("appointments")
             .whereEqualTo("doctorId", getCurrentUserID())
-            .whereEqualTo("dateAppointment",formattedDate)
+            .whereEqualTo("dateAppointment", formattedDate)
             .get()
             .addOnSuccessListener { documents ->
                 val appointmentsList = mutableListOf<Appointment>()
@@ -448,12 +492,13 @@ class firestore {
                     val dateAppointment = document.getString("dateAppointment")
                     val doctorId = document.getString("doctorId")
                     val time = document.getString("time")
-                    val documentID=document.id
-                    val userID=document.getString("userId")
+                    val documentID = document.id
+                    val userID = document.getString("userId")
                     // Create a data class for Appointment
-                    val appointment = Appointment(documentID,dateAppointment, doctorId, time,userID)
+                    val appointment =
+                        Appointment(documentID, dateAppointment, doctorId, time, userID)
                     appointmentsList.add(appointment)
-                    Log.e("WHY",dateAppointment?:"")
+                    Log.e("WHY", dateAppointment ?: "")
 
                 }
 
@@ -467,30 +512,39 @@ class firestore {
     }
 
 
-        fun deleteDocument(documentId: String, collectionName: String,onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-            val collectionReference = mFirestore.collection(collectionName)
-            val documentReference = collectionReference.document(documentId)
+    fun deleteDocument(
+        documentId: String,
+        collectionName: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val collectionReference = mFirestore.collection(collectionName)
+        val documentReference = collectionReference.document(documentId)
 
-            documentReference
-                .delete()
-                .addOnSuccessListener {
-                    // Document successfully deleted
-                    onSuccess()
-                }
-                .addOnFailureListener { e ->
-                    // Handle errors here
-                    onFailure(e)
-                }
+        documentReference
+            .delete()
+            .addOnSuccessListener {
+                // Document successfully deleted
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                // Handle errors here
+                onFailure(e)
+            }
 
     }
 
 
-    fun disableAppointment(dateAppointment:String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun disableAppointment(
+        dateAppointment: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         val disableAppointmentDate = hashMapOf(
             "doctorId" to getCurrentUserID(),
             "dateAppointment" to dateAppointment,
 
-        )
+            )
 
         mFirestore.collection("disableAppointmentDate")
             .add(disableAppointmentDate)
@@ -498,7 +552,7 @@ class firestore {
             .addOnFailureListener { e -> onFailure("Failed to store: $e") }
     }
 
-    fun disableAppointment(doctorID:String,callback: (List<DisableAppointment>) -> Unit) {
+    fun disableAppointment(doctorID: String, callback: (List<DisableAppointment>) -> Unit) {
         // Create a Firestore query to check if an appointment exists
         val query = mFirestore.collection("disableAppointmentDate")
             .whereEqualTo("doctorId", doctorID)
@@ -510,11 +564,12 @@ class firestore {
                 val disableAppointmentsList = mutableListOf<DisableAppointment>()
 
                 for (document in documents) {
-                    val documentID=document.id
+                    val documentID = document.id
                     val dateAppointment = document.getString("dateAppointment")
-                    val doctorId=doctorID
+                    val doctorId = doctorID
                     // Create a data class for Appointment
-                    val disableAppointment = DisableAppointment(documentID,dateAppointment, doctorId)
+                    val disableAppointment =
+                        DisableAppointment(documentID, dateAppointment, doctorId)
                     disableAppointmentsList.add(disableAppointment)
 
 
@@ -531,7 +586,7 @@ class firestore {
     }
 
 
-    fun getAllDisableAppointment(doctorID: String,callback: (List<DisableAppointment>) -> Unit) {
+    fun getAllDisableAppointment(doctorID: String, callback: (List<DisableAppointment>) -> Unit) {
         val disableAppointmentCollection = mFirestore.collection("disableAppointmentDate")
         val query: Query = disableAppointmentCollection.whereEqualTo("doctorId", doctorID)
 
@@ -544,7 +599,8 @@ class firestore {
                     val disableAppointmentDate = document.getString("dateAppointment").toString()
 
 
-                    val disableAppointment = DisableAppointment(documentID, disableAppointmentDate, doctorID )
+                    val disableAppointment =
+                        DisableAppointment(documentID, disableAppointmentDate, doctorID)
                     disableAppointmentDateList.add(disableAppointment)
                 }
 
@@ -561,7 +617,7 @@ class firestore {
         //create collection names, is exist just use
         mFirestore.collection("doctorInformation")
             //create document id
-            .document(doctorInfo.userID?:"")
+            .document(doctorInfo.userID ?: "")
             // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
             .set(doctorInfo, SetOptions.merge())
             .addOnSuccessListener { documentReference ->
@@ -578,7 +634,11 @@ class firestore {
     }
 
 
-    fun getDoctorInfo(activity: Activity, doctorID:String, callback: (doctorInformation?) -> Unit) {
+    fun getDoctorInfo(
+        activity: Activity,
+        doctorID: String,
+        callback: (doctorInformation?) -> Unit
+    ) {
         // Get user in collection
         mFirestore.collection("doctorInformation")
             // Get documentation id from the field of users
@@ -598,22 +658,29 @@ class firestore {
                 callback(null) // Notify callback of the error
             }
     }
+
     fun getAllDoctorFromDoctorInfo(callback: (List<doctorInformation>) -> Unit) {
         mFirestore.collection("doctorInformation")
             .get()
             .addOnSuccessListener { documents ->
-                Log.e("WHY","KENAPA")
+                Log.e("WHY", "KENAPA")
                 val doctorList = mutableListOf<doctorInformation>()
 
                 for (document in documents) {
-                    Log.e("got mah","got")
-                    val doctorId = document.getString("userID")?:""
-                    val department = document.getString("department")?:""
-                    val hospital = document.getString("hospital")?:""
-                    val profileImageUri= document.getString("profileImageUri")?:""
-                    val quanlification= document.getString("quanlification")?:""
+                    Log.e("got mah", "got")
+                    val doctorId = document.getString("userID") ?: ""
+                    val department = document.getString("department") ?: ""
+                    val hospital = document.getString("hospital") ?: ""
+                    val profileImageUri = document.getString("profileImageUri") ?: ""
+                    val quanlification = document.getString("quanlification") ?: ""
                     // Create a data class for Appointment
-                    val doctorInfo = doctorInformation(doctorId,department, quanlification, profileImageUri,hospital)
+                    val doctorInfo = doctorInformation(
+                        doctorId,
+                        department,
+                        quanlification,
+                        profileImageUri,
+                        hospital
+                    )
                     doctorList.add(doctorInfo)
                 }
 
@@ -649,7 +716,6 @@ class firestore {
     }
 
 
-
     fun getAllHospital(callback: (List<Hospital>) -> Unit) {
 
         mFirestore.collection("hospital").get()
@@ -662,7 +728,7 @@ class firestore {
                     val address = document.getString("address").toString()
                     val privateGovernment = document.getString("privateGovernment").toString()
 
-                    val hospitals = Hospital(privateGovernment,hospital,address,documentId )
+                    val hospitals = Hospital(privateGovernment, hospital, address, documentId)
                     hospitalList.add(hospitals)
                 }
 
@@ -675,7 +741,7 @@ class firestore {
     }
 
 
-    fun getHospitalDetails(activity: Activity, hospitalId:String,callback: (Hospital?) -> Unit) {
+    fun getHospitalDetails(activity: Activity, hospitalId: String, callback: (Hospital?) -> Unit) {
         // Get user in collection
         mFirestore.collection("hospital")
             // Get documentation id from the field of users
@@ -697,7 +763,7 @@ class firestore {
     }
 
 
-    fun getIllnessActivity(activity: Activity, illnessID:String,callback: (Illness?) -> Unit) {
+    fun getIllnessActivity(activity: Activity, illnessID: String, callback: (Illness?) -> Unit) {
         // Get user in collection
         mFirestore.collection("illness")
             // Get documentation id from the field of users
@@ -748,11 +814,11 @@ class firestore {
 
                 for (document in result) {
                     val documentId = document.id
-                    val nameOfIllness= document.getString("illnessName").toString()
-                    val description= document.getString("description").toString()
-                    val actionTaken= document.getString("actionTaken").toString()
-                    Log.e(nameOfIllness,nameOfIllness)
-                    val illness = Illness(documentId,nameOfIllness,description,actionTaken )
+                    val nameOfIllness = document.getString("illnessName").toString()
+                    val description = document.getString("description").toString()
+                    val actionTaken = document.getString("actionTaken").toString()
+                    Log.e(nameOfIllness, nameOfIllness)
+                    val illness = Illness(documentId, nameOfIllness, description, actionTaken)
                     illnessList.add(illness)
                 }
 
@@ -764,8 +830,8 @@ class firestore {
             }
     }
 
-    fun createOrUpdateAnnouncement(announcementTitle:String, announcement: String):Task<Void>{
-      val documentPath="announcements/3kRiDZZwywBhqcnwi9DC"
+    fun createOrUpdateAnnouncement(announcementTitle: String, announcement: String): Task<Void> {
+        val documentPath = "announcements/3kRiDZZwywBhqcnwi9DC"
         // Create a map to hold the title and content
         val announcementData = hashMapOf(
             "announcementTitle" to announcementTitle,
@@ -777,11 +843,11 @@ class firestore {
             .set(announcementData, SetOptions.merge())
     }
 
-    fun getAnnouncement(callback: (Map<String, Any>?) -> Unit){
+    fun getAnnouncement(callback: (Map<String, Any>?) -> Unit) {
         mFirestore.collection("announcements")
             .document("3kRiDZZwywBhqcnwi9DC")
             .get()
-            .addOnSuccessListener { documentSnapshot  ->
+            .addOnSuccessListener { documentSnapshot ->
 
                 if (documentSnapshot.exists()) {
                     val announcementData = documentSnapshot.data
@@ -799,6 +865,23 @@ class firestore {
             }
     }
 
+    fun createPDFInfo(activity: Activity, pdfInfos: PDFInfo) {
+
+        //create collection names, is exist just use
+        mFirestore.collection("pdfinfo")
+            //create document id
+            .document()
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
+            .set(pdfInfos, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+                val intent = Intent(activity, RedesignActivity::class.java)
+                activity.startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
 
 
 }
