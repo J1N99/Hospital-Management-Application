@@ -116,6 +116,7 @@ class DoctorInformationActivity : AppCompatActivity() {
         autoComplete.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 itemSelected = allHospital[position].documentId
+
             }
 
 
@@ -137,6 +138,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                     if (hospital != null) {
                         autoComplete.setText(hospital.hospital, false)
                         itemSelected = hospital.hospital
+
                     } else {
                         Toast.makeText(this, "Hospital is null", Toast.LENGTH_SHORT).show()
                     }
@@ -234,7 +236,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                             val department = binding.departmentET.text.toString()
                             val quanlification = binding.qualificationET.text.toString()
                             val hospitalID = itemSelected.toString()
-
+                            Log.e(hospitalID,hospitalID)
 
                             val dataToUpdate = mapOf(
                                 "department" to department,
