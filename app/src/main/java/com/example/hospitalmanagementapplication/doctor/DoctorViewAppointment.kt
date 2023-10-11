@@ -1,10 +1,14 @@
 package com.example.hospitalmanagementapplication.doctor
+
+
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.CalendarView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hospitalmanagementapplication.DoctorAddPDF
 import com.example.hospitalmanagementapplication.R
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.Loader
@@ -35,17 +39,18 @@ class DoctorViewAppointment : AppCompatActivity() {
         progressDialog = Loader(this)
         progressDialog.show()
 
+        // Fetch and display appointments for the current date
         firestore().doctorGetAndDisplayAppointments(formattedDate) { appointments ->
             for (appointment in appointments) {
                 val time = appointment.time
                 val userID = appointment.userID
+                // Get the appointment ID
+                val appointmentID = appointment.documentID
 
                 firestore().getOtherUserDetails(this, userID ?: "") { user ->
                     if (user != null) {
                         events.add("Appointment with ${user.firstname} ${user.lastname}")
                         timeSlots.add(time ?: "")
-                        Log.e(timeSlots.toString(), timeSlots.toString())
-                        Log.e(events.toString(), events.toString())
 
                         // Check if the number of events matches the number of appointments
                         if (events.size == appointments.size) {
@@ -54,7 +59,13 @@ class DoctorViewAppointment : AppCompatActivity() {
                             // Initialize the RecyclerView and adapter
                             recyclerView = findViewById(R.id.recyclerView)
                             recyclerView.layoutManager = LinearLayoutManager(this)
-                            adapter = AdapterTimeSlots(timeSlots, events)
+                            adapter = AdapterTimeSlots(timeSlots, events) {
+                                // Handle the button click here, e.g., navigate to another activity
+                                // and pass the appointment ID
+                                val intent = Intent(this, DoctorAddPDF::class.java)
+                                intent.putExtra("appointmentId", appointmentID)
+                                startActivity(intent)
+                            }
                             recyclerView.adapter = adapter
                         }
                     }
@@ -90,11 +101,12 @@ class DoctorViewAppointment : AppCompatActivity() {
 
             val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
 
+            // Fetch and display appointments for the selected date
             firestore().doctorGetAndDisplayAppointments(selectedDate) { appointments ->
                 for (appointment in appointments) {
                     val time = appointment.time
                     val userID = appointment.userID
-
+                    val appointmentID = appointment.documentID
                     firestore().getOtherUserDetails(this, userID ?: "") { user ->
                         if (user != null) {
                             events.add("Appointment with ${user.firstname} ${user.lastname}")
@@ -108,7 +120,13 @@ class DoctorViewAppointment : AppCompatActivity() {
                                 // Initialize the RecyclerView and adapter
                                 recyclerView = findViewById(R.id.recyclerView)
                                 recyclerView.layoutManager = LinearLayoutManager(this)
-                                adapter = AdapterTimeSlots(timeSlots, events)
+                                adapter = AdapterTimeSlots(timeSlots, events) {
+                                    // Handle the button click here, e.g., navigate to another activity
+                                    // and pass the appointment ID
+                                    val intent = Intent(this, DoctorAddPDF::class.java)
+                                    intent.putExtra("appointmentId", appointmentID)
+                                    startActivity(intent)
+                                }
                                 recyclerView.adapter = adapter
                             }
                         }

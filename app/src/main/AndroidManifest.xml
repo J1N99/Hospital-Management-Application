@@ -114,6 +114,9 @@
         <activity android:name=".RedesignActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".DoctorAddPDF"
+        android:exported="false">
+    </activity>
 
 
     </application>

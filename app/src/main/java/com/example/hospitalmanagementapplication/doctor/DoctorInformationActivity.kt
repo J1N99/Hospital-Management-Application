@@ -6,13 +6,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.webkit.MimeTypeMap
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +33,8 @@ import java.io.File
 import com.bumptech.glide.Glide
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.R
+import com.example.hospitalmanagementapplication.model.Hospital
+import com.example.hospitalmanagementapplication.model.Illness
 
 class DoctorInformationActivity : AppCompatActivity() {
 
@@ -45,9 +46,9 @@ class DoctorInformationActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var selectImageButton: Button
     private lateinit var uploadButton: Button
-
+    private lateinit var itemSelected: Any
     private var selectedImageUri: Uri? = null
-    private var imageFileName=""
+    private var imageFileName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,21 +61,97 @@ class DoctorInformationActivity : AppCompatActivity() {
         imageView = binding.profileImageView
         selectImageButton = binding.selectImagebtn
         uploadButton = binding.uploadimagebtn
+
+
+        val autoComplete: AutoCompleteTextView = findViewById(R.id.autoCompleteTextView)
+        val allHospital: MutableList<Hospital> = mutableListOf()
+
+        // Initialize an empty adapter for now
+        val adapter = ArrayAdapter(this, R.layout.list_private_government, listOf<String>())
+        autoComplete.setAdapter(adapter)
+
+        firestore().getAllHospital { fetchHospital ->
+            // Populate the allIllness list with data from Firestore
+            allHospital.clear() // Clear the list to remove any existing data
+            allHospital.addAll(fetchHospital)
+
+            // Create the adapter with all illnesses
+            val initialAdapter = ArrayAdapter(
+                this,
+                R.layout.list_private_government,
+                allHospital.map { it.hospital })
+
+            // Set the adapter for the AutoCompleteTextView
+            autoComplete.setAdapter(initialAdapter)
+        }
+
+        autoComplete.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not used in this case
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Filter the list based on user input
+                val filteredIllnesses =
+                    allHospital.filter { it.hospital.contains(s.toString(), ignoreCase = true) }
+
+                if (filteredIllnesses.isEmpty()) {
+                    // No results found, clear the text
+                    autoComplete.text = null
+                }
+
+                // Update the adapter with filtered results
+                val filteredAdapter = ArrayAdapter(
+                    this@DoctorInformationActivity,
+                    R.layout.list_private_government,
+                    filteredIllnesses.map { it.hospital })
+                autoComplete.setAdapter(filteredAdapter)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Not used in this case
+            }
+        })
+
+        autoComplete.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                itemSelected = allHospital[position].documentId
+            }
+
+
         val userId = getCurrentUserId()
-        firestore().getDoctorInfo(this,userId) {doctorInfo ->
+        firestore().getDoctorInfo(this, userId) { doctorInfo ->
             if (doctorInfo != null) {
                 binding.uploadimagebtn.text = "Edit information"
-                binding.departmentET.setText( doctorInfo.department)
+                binding.departmentET.setText(doctorInfo.department)
                 binding.departmentET.isEnabled = false
 
                 binding.qualificationET.setText(doctorInfo.quanlification)
                 binding.qualificationET.isEnabled = false
 
-                binding.selectImagebtn.visibility= View.GONE
-                binding.imageInfo.visibility=View.GONE
+                binding.autoCompleteTextView.isEnabled = false
 
-                val imagefile=doctorInfo.profileImageUri
-                val imagePath="doctorProfileImages/$imagefile"
+
+
+                firestore().getHospitalDetails(this, doctorInfo.hospital) { hospital ->
+                    if (hospital != null) {
+                        autoComplete.setText(hospital.hospital, false)
+                        itemSelected = hospital.hospital
+                    } else {
+                        Toast.makeText(this, "Hospital is null", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+
+                binding.autoCompleteTextView.setText(doctorInfo.hospital)
+
+
+
+                binding.selectImagebtn.visibility = View.GONE
+                binding.imageInfo.visibility = View.GONE
+
+                val imagefile = doctorInfo.profileImageUri
+                val imagePath = "doctorProfileImages/$imagefile"
                 // Initialize Firebase Storage
                 val storage = Firebase.storage
 
@@ -82,7 +159,8 @@ class DoctorInformationActivity : AppCompatActivity() {
                 val storageRef = storage.reference.child(imagePath)
 
                 // Determine the file extension based on the MIME type
-                val fileExtension = getFileExtension(imagefile!!.toUri()) // Pass the URL of the downloaded image
+                val fileExtension =
+                    getFileExtension(imagefile!!.toUri()) // Pass the URL of the downloaded image
                 val localFile = File.createTempFile("images", ".$fileExtension")
 
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
@@ -95,10 +173,9 @@ class DoctorInformationActivity : AppCompatActivity() {
                     // e.g., handle network errors or file not found errors
                 }
 
-            }else
-            {
-                Log.d("Fail","Fail")
-                Toast.makeText(this,"Fail", Toast.LENGTH_SHORT)
+            } else {
+                Log.d("Fail", "Fail")
+                Toast.makeText(this, "Fail", Toast.LENGTH_SHORT)
             }
         }
 
@@ -111,42 +188,64 @@ class DoctorInformationActivity : AppCompatActivity() {
 
         uploadButton.setOnClickListener {
 
-            if(binding.uploadimagebtn.text=="Save Information")
-            {
+            if (binding.uploadimagebtn.text == "Save Information") {
 
-                var doctorDepartment=binding.departmentET.text.toString().trim()
-                var Quanlification=binding.qualificationET.text.toString().trim()
+                var doctorDepartment = binding.departmentET.text.toString().trim()
+                var Quanlification = binding.qualificationET.text.toString().trim()
+                var hospitalID = itemSelected
 
-
-                if (doctorDepartment.isEmpty() && Quanlification.isEmpty() &&selectedImageUri != null) {
-                    Toast.makeText(this, "Please enter all the fields or please select the image", Toast.LENGTH_SHORT).show()
-                }
-                else
-                {
+                if (doctorDepartment.isEmpty() || Quanlification.isEmpty() || selectedImageUri == null || hospitalID == null) {
+                    Toast.makeText(
+                        this,
+                        "Please enter all the fields or please select the image",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
                     uploadImageToFirestore(selectedImageUri!!)
                 }
 
-            }
-            else if(binding.uploadimagebtn.text=="Edit information")
-            {
+            } else if (binding.uploadimagebtn.text == "Edit information") {
                 binding.uploadimagebtn.text = "Save Edit"
                 binding.departmentET.isEnabled = true
-                binding.departmentLayout.boxStrokeColor= Color.BLACK
-                binding.qualificationLayout.boxStrokeColor= Color.BLACK
+                binding.departmentLayout.boxStrokeColor = Color.BLACK
+                binding.qualificationLayout.boxStrokeColor = Color.BLACK
                 binding.qualificationET.isEnabled = true
-                binding.selectImagebtn.visibility= View.VISIBLE
-                binding.imageInfo.visibility= View.VISIBLE
-            }
-            else if(binding.uploadimagebtn.text=="Save Edit")
-            {
-                var doctorDepartment=binding.departmentET.text.toString().trim()
-                var Quanlification=binding.qualificationET.text.toString().trim()
-                if (doctorDepartment.isEmpty() && Quanlification.isEmpty() &&selectedImageUri != null) {
-                    Toast.makeText(this, "Please enter all the fields or please select the image", Toast.LENGTH_SHORT).show()
-                }
-                else
-                {
-                    uploadUpdateImageToFirestore(selectedImageUri!!)
+
+                binding.autoCompleteTextView.isEnabled = true
+                binding.selectImagebtn.visibility = View.VISIBLE
+                binding.imageInfo.visibility = View.VISIBLE
+            } else if (binding.uploadimagebtn.text == "Save Edit") {
+                var doctorDepartment = binding.departmentET.text.toString().trim()
+                var Quanlification = binding.qualificationET.text.toString().trim()
+                var hospitalID = itemSelected
+                if (doctorDepartment.isEmpty() || Quanlification.isEmpty()  || hospitalID == null) {
+                    Toast.makeText(
+                        this,
+                        "Please enter all the fields or please select the image",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    if (selectedImageUri != null) {
+                        uploadUpdateImageToFirestore(selectedImageUri!!)
+                    } else {
+                        val currentUser = firebaseAuth.currentUser
+                        val userId = currentUser?.uid
+                        if (userId != null) {
+                            val department = binding.departmentET.text.toString()
+                            val quanlification = binding.qualificationET.text.toString()
+                            val hospitalID = itemSelected.toString()
+
+
+                            val dataToUpdate = mapOf(
+                                "department" to department,
+                                "quanlification" to quanlification,
+                                "hospital" to hospitalID
+                            )
+
+                            firestore().updateDocument("doctorInformation", userId, dataToUpdate)
+                            showDialogSuccessUpdate()
+                        }
+                    }
                 }
             }
 
@@ -159,11 +258,18 @@ class DoctorInformationActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 result.data?.data?.let { uri ->
                     val mimeType = contentResolver.getType(uri)
-                    if (mimeType != null && (mimeType.startsWith("image/jpeg") || mimeType.startsWith("image/png")||mimeType.startsWith("image/jpg"))) {
+                    if (mimeType != null && (mimeType.startsWith("image/jpeg") || mimeType.startsWith(
+                            "image/png"
+                        ) || mimeType.startsWith("image/jpg"))
+                    ) {
                         selectedImageUri = uri
                         imageView.setImageURI(uri)
                     } else {
-                        Toast.makeText(this, "Please select a JPG, JPEG, or PNG image", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Please select a JPG, JPEG, or PNG image",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -204,10 +310,17 @@ class DoctorInformationActivity : AppCompatActivity() {
                         if (userId != null) {
                             val department = binding.departmentET.text.toString()
                             val quanlification = binding.qualificationET.text.toString()
+                            val hospitalID = itemSelected.toString()
                             val filename = imageFileName
 
                             val doctorInfo =
-                                doctorInformation(userId, department, quanlification, filename)
+                                doctorInformation(
+                                    userId,
+                                    department,
+                                    quanlification,
+                                    filename,
+                                    hospitalID
+                                )
                             firestore().createDoctorInformation(this, doctorInfo)
                             showDialogSuccessCreate()
                         }
@@ -253,19 +366,18 @@ class DoctorInformationActivity : AppCompatActivity() {
                             val department = binding.departmentET.text.toString()
                             val quanlification = binding.qualificationET.text.toString()
                             val filename = imageFileName
+                            val hospitalID = itemSelected.toString()
 
 
+                            val dataToUpdate = mapOf(
+                                "department" to department,
+                                "quanlification" to quanlification,
+                                "profileImageUri" to filename,
+                                "hospital" to hospitalID
+                            )
 
-
-
-                                val dataToUpdate = mapOf(
-                                    "department" to department,
-                                    "quanlification" to quanlification,
-                                    "profileImageUri" to filename,
-                                )
-
-                                firestore().updateDocument("doctorInformation", userId, dataToUpdate)
-                                showDialogSuccessUpdate()
+                            firestore().updateDocument("doctorInformation", userId, dataToUpdate)
+                            showDialogSuccessUpdate()
                         }
                     }.addOnFailureListener { e ->
                         // Handle the failure
@@ -318,13 +430,13 @@ class DoctorInformationActivity : AppCompatActivity() {
         val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
 
         val textViewMessage = dialogView.findViewById<TextView>(R.id.textViewMessage)
-        textViewMessage.text ="The information have updated!"
+        textViewMessage.text = "The information have updated!"
         builder.setView(dialogView)
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
-        var buttonEmail=dialogView.findViewById<Button>(R.id.buttonResentVerification)
-        buttonEmail.visibility= View.GONE
+        var buttonEmail = dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility = View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, HomeActivity::class.java)
@@ -347,13 +459,13 @@ class DoctorInformationActivity : AppCompatActivity() {
         val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
 
         val textViewMessage = dialogView.findViewById<TextView>(R.id.textViewMessage)
-        textViewMessage.text ="The information have created!"
+        textViewMessage.text = "The information have created!"
         builder.setView(dialogView)
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
-        var buttonEmail=dialogView.findViewById<Button>(R.id.buttonResentVerification)
-        buttonEmail.visibility= View.GONE
+        var buttonEmail = dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility = View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, DoctorHomeActivity::class.java)
