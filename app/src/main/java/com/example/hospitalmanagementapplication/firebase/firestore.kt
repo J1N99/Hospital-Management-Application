@@ -51,7 +51,7 @@ class firestore {
             }
     }
 
-    private fun getCurrentUserID(): String {
+     fun getCurrentUserID(): String {
         val currentUser = FirebaseAuth.getInstance().currentUser
         var currentUserID = ""
         if (currentUser != null) {
@@ -774,7 +774,9 @@ class firestore {
 
                 // Received the document ID and convert it into the User Data model object
                 val illness = document.toObject(Illness::class.java)
-
+                if (illness != null) {
+                    Log.e("XIXI",illness.illnessName)
+                }
                 // Pass the user object to the callback
                 callback(illness)
             }
@@ -865,21 +867,80 @@ class firestore {
             }
     }
 
-    fun createPDFInfo(activity: Activity, pdfInfos: PDFInfo) {
-
-        //create collection names, is exist just use
+    fun createPDFInfo(activity: Activity, pdfInfos: PDFInfo, callback: (String?) -> Unit) {
+        // Create or update a document in the "pdfinfo" collection
         mFirestore.collection("pdfinfo")
-            //create document id
-            .document()
-            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
-            .set(pdfInfos, SetOptions.merge())
+            .add(pdfInfos) // No need to specify a document ID here
             .addOnSuccessListener { documentReference ->
-                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+                // The document has been successfully added or updated
+                val documentId = documentReference.id
+                Log.d("Tag-Document ID", "Document added with ID: $documentId")
+                callback(documentId) // Call the callback with the document ID
             }
             .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error adding document", e)
+                // Handle the error if document creation/update fails
+                Log.w("Tag-Document ID", "Error adding/updating document", e)
+                callback(null) // Call the callback with null to indicate failure
             }
     }
+
+
+    //this is for print out PDF
+    fun getPDFInfo(activity: Activity, pdfDocumentID: String, callback: (PDFInfo?) -> Unit) {
+        // Get user in the collection
+        mFirestore.collection("pdfinfo")
+            // Get document by ID
+            .document(pdfDocumentID)
+            .get()
+            .addOnSuccessListener { document ->
+                val documentId = document.id
+                val illness = document.getString("illness") ?: ""
+                val medicine = document.getString("medicine") ?: ""
+                val action = document.getString("action") ?: ""
+                val pdfInfo = PDFInfo(documentId, illness, medicine, action, "")
+                callback(pdfInfo)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting PDF info: $e")
+                callback(null)
+            }
+    }
+
+
+    //retrieve to see the data
+    fun checkPDFandDisplay(activity: Activity, appointmentID: String, callback: (List<PDFInfo>) -> Unit) {
+        // Create a Firestore query to check if an appointment exists
+        val query = mFirestore.collection("pdfinfo")
+            .whereEqualTo("appointmentID", appointmentID)
+
+        query.get()
+            .addOnSuccessListener { documents ->
+                val pdfInfoList = mutableListOf<PDFInfo>()
+
+                for (document in documents) {
+                    val documentID = document.id
+                    val action = document.getString("action") ?: ""
+                    val illness = document.getString("illness") ?: ""
+                    val medicine = document.getString("medicine") ?: ""
+                    val patientID = document.getString("patientID") ?: ""
+                    val pdfname = document.getString("pdfname") ?: ""
+
+                    val pdfinfo = PDFInfo(documentID, illness, medicine, action, patientID, appointmentID, pdfname)
+                    pdfInfoList.add(pdfinfo)
+                }
+
+                // Pass the list of PDFInfo objects to the callback function
+                callback(pdfInfoList)
+            }
+            .addOnFailureListener { e ->
+                // Handle the query failure if needed
+                // You can add logging or error handling here
+                Log.w("Firestore", "Error getting documents: ", e)
+                // Notify the callback of the failure by passing an empty list or an error indicator
+                callback(emptyList())
+            }
+    }
+
 
 
 }

@@ -35,7 +35,7 @@
         android:gravity="center"
         android:padding="8dp"
         android:text="PDF"
-        android:textColor="@color/black"
+        android:textColor="@color/teal_700"
         />
 
 </LinearLayout>

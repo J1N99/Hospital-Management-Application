@@ -72,11 +72,6 @@ class HomeActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.previewDesign.setOnClickListener{
-            val intent = Intent(this, RedesignActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
         binding.viewHospital.setOnClickListener {
             val intent=Intent(this,ViewHospitalActivity::class.java)
             startActivity(intent)

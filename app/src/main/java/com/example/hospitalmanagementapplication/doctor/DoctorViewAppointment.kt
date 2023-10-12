@@ -35,7 +35,7 @@ class DoctorViewAppointment : AppCompatActivity() {
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         // Format the date as "YYYY/MM/DD"
         val formattedDate = sdf.format(calendar.time)
-
+        val currentDoctorID=firestore().getCurrentUserID()
         progressDialog = Loader(this)
         progressDialog.show()
 
@@ -64,6 +64,8 @@ class DoctorViewAppointment : AppCompatActivity() {
                                 // and pass the appointment ID
                                 val intent = Intent(this, DoctorAddPDF::class.java)
                                 intent.putExtra("appointmentId", appointmentID)
+                                intent.putExtra("doctorId",currentDoctorID)
+                                intent.putExtra("patientID",user.id)
                                 startActivity(intent)
                             }
                             recyclerView.adapter = adapter
@@ -90,7 +92,6 @@ class DoctorViewAppointment : AppCompatActivity() {
             progressDialog.show()
 
             if (timeSlots.isNotEmpty()) {
-                Log.e("Empty?", "XIXI")
 
                 // Clear the timeSlots and events lists
                 timeSlots.clear()
@@ -125,6 +126,8 @@ class DoctorViewAppointment : AppCompatActivity() {
                                     // and pass the appointment ID
                                     val intent = Intent(this, DoctorAddPDF::class.java)
                                     intent.putExtra("appointmentId", appointmentID)
+                                    intent.putExtra("doctorId",currentDoctorID)
+                                    intent.putExtra("patientID",user.id)
                                     startActivity(intent)
                                 }
                                 recyclerView.adapter = adapter
