@@ -115,7 +115,12 @@ class SelectDoctorActivity : AppCompatActivity() {
 
             fun bind(doctor: doctorInformation) {
                 department.text = "Department: " + doctor.department
-                hospital.text = "Hospital: " + doctor.hospital
+                firestore().getHospitalDetails(this@SelectDoctorActivity, doctor.hospital) { hospitals ->
+                    if (hospitals != null) {
+                        hospital.text = "Hospital: " + hospitals.hospital
+                    }
+                }
+
                 qualification.text = "Qualification: " + doctor.quanlification
                 val userId = doctor.userID
                 firestore().getOtherUserDetails(this@SelectDoctorActivity, userId ?: "") { user ->

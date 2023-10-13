@@ -192,8 +192,6 @@ class DoctorAddPDF : AppCompatActivity() {
                                     }
                                 }
                             }
-
-
                         }
                     }
                 }
