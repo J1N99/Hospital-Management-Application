@@ -17,7 +17,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -26,7 +25,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityViewhospitalBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
@@ -60,9 +58,14 @@ class ViewHospitalActivity :AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(R.id.others);
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         // Check for location permission and get the current address
         if (ContextCompat.checkSelfPermission(

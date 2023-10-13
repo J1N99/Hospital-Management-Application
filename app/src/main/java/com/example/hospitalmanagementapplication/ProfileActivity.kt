@@ -32,9 +32,14 @@ class ProfileActivity:AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(R.id.profile);
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.profile);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
         firebaseAuth = FirebaseAuth.getInstance()
 
         var year = 0;

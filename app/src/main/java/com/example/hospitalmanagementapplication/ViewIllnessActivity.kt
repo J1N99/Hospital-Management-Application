@@ -1,40 +1,21 @@
 package com.example.hospitalmanagementapplication
 
-import android.Manifest
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hospitalmanagementapplication.databinding.ActivityRedesignBinding
-import com.example.hospitalmanagementapplication.databinding.ActivityViewhospitalBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityViewillnessBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.model.Illness
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.io.IOException
-import java.util.*
 
 class ViewIllnessActivity : AppCompatActivity() {
     private lateinit var binding: ActivityViewillnessBinding
@@ -56,9 +37,14 @@ class ViewIllnessActivity : AppCompatActivity() {
             illnessList.addAll(allIllness)
             adapter.notifyDataSetChanged()
         }
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(R.id.others);
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         binding.searchBarText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

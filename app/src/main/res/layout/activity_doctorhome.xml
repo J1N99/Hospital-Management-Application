@@ -133,7 +133,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_home_24"
+                    android:src="@drawable/baseline_book_24"
                     app:tint="@color/white" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -170,12 +170,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_home_24"
+                    android:src="@drawable/baseline_local_activity_24"
                     app:tint="@color/white" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="View Appointment"
+                    android:text="View Activity"
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:textAlignment="center"/>
@@ -185,43 +185,6 @@
         <!-- Third Grid Cell -->
         <androidx.cardview.widget.CardView
             android:id="@+id/logoutButton"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_row="0"
-            android:layout_column="2"
-            android:layout_gravity="fill"
-            android:layout_rowWeight="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="8dp"
-            app:cardBackgroundColor="@color/teal_700"
-            android:background="@color/black"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            android:layout_columnSpan="1">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_gravity="center_vertical|center_horizontal">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_home_24"
-                    app:tint="@color/white" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Log out"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:textAlignment="center"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Third Grid Cell -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/disableAppointment"
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_row="1"
@@ -244,7 +207,44 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_home_24"
+                    android:src="@drawable/baseline_logout_24"
+                    app:tint="@color/white" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Log out"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Third Grid Cell -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/disableAppointment"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_gravity="fill"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardBackgroundColor="@color/teal_700"
+            android:background="@color/black"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            android:layout_columnSpan="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_gravity="center_vertical|center_horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_desktop_access_disabled_24"
                     app:tint="@color/white" />
                 <TextView
                     android:layout_width="wrap_content"

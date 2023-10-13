@@ -40,9 +40,14 @@ class SelectDoctorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySelectdoctorBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(R.id.others)
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
         firebaseAuth = FirebaseAuth.getInstance()
 
         recyclerView = findViewById(R.id.recyclerView)

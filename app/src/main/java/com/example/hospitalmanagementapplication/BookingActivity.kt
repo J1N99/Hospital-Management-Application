@@ -1,24 +1,17 @@
 package com.example.hospitalmanagementapplication
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.GridLayout
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityBookingBinding
-import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,10 +31,14 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
         binding = ActivityBookingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        // Set Home selected
-        bottomNavigationView.setSelectedItemId(R.id.home)
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         doctorID= intent.getStringExtra("doctorID") ?: ""
 

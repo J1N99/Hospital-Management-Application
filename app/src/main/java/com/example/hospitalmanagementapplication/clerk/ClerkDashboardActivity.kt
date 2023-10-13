@@ -24,10 +24,14 @@ class ClerkDashboardActivity:AppCompatActivity() {
         binding = ActivityClerkdashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        // Set Home selected
-        bottomNavigationView.setSelectedItemId(R.id.others);
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.home);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser: FirebaseUser? = firebaseAuth.currentUser

@@ -1,17 +1,12 @@
 package com.example.hospitalmanagementapplication.doctor
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.GridLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.R
-import com.example.hospitalmanagementapplication.UpdatePositionActivity
-import com.example.hospitalmanagementapplication.databinding.ActivityBookingBinding
 import com.example.hospitalmanagementapplication.databinding.ActivityDoctordisableappointmentdateBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
@@ -37,10 +32,13 @@ class DoctorDisableAppointmentActivity : AppCompatActivity(), DatePickerDialog.O
         binding = ActivityDoctordisableappointmentdateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        // Set Home selected
-        bottomNavigationView.setSelectedItemId(R.id.home)
-        IntentManager(this, bottomNavigationView)
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
 
         firebaseAuth = FirebaseAuth.getInstance()

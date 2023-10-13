@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,8 +28,6 @@ import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
-import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -73,9 +70,14 @@ class ViewAppointmentActivity : AppCompatActivity() {
         binding = ActivityViewappointmentBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(R.id.others);
-        IntentManager(this, bottomNavigationView)
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
+
         firebaseAuth = FirebaseAuth.getInstance()
 
 

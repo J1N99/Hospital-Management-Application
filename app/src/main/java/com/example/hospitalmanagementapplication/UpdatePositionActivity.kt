@@ -28,9 +28,14 @@ class UpdatePositionActivity: AppCompatActivity() {
         binding = ActitvityUpdatepositionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         firebaseAuth = FirebaseAuth.getInstance()
-        bottomNavigationView = findViewById(com.example.hospitalmanagementapplication.R.id.bottomNavigationView)
-        bottomNavigationView.setSelectedItemId(com.example.hospitalmanagementapplication.R.id.others);
-        IntentManager(this, bottomNavigationView)
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         val spinner: Spinner = findViewById(com.example.hospitalmanagementapplication.R.id.spinner)
         var updateID=firebaseAuth.currentUser?.uid
