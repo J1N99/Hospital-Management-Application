@@ -6,6 +6,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.*
 import com.example.hospitalmanagementapplication.databinding.ActivityClerkdashboardBinding
+import com.example.hospitalmanagementapplication.databinding.ActivitySuperacchomeBinding
+import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
+import com.example.hospitalmanagementapplication.doctor.DoctorDisableAppointmentActivity
+import com.example.hospitalmanagementapplication.doctor.DoctorViewAppointment
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -13,15 +17,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
-class ClerkDashboardActivity:AppCompatActivity() {
-    private lateinit var binding: ActivityClerkdashboardBinding
+class SuperAccountHome:AppCompatActivity() {
+    private lateinit var binding: ActivitySuperacchomeBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
         super.onCreate(savedInstanceState)
-        binding = ActivityClerkdashboardBinding.inflate(layoutInflater)
+        binding = ActivitySuperacchomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
 
@@ -92,7 +96,54 @@ class ClerkDashboardActivity:AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        binding.logoutButton.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.createAppointment.setOnClickListener {
+            val intent = Intent(this, DoctorAvailableAppointmentActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.viewAppointment.setOnClickListener {
+            val intent = Intent(this, DoctorViewAppointment::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.disableAppointment.setOnClickListener {
+            val intent = Intent(this, DoctorDisableAppointmentActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.bookingAppointment.setOnClickListener{
+            finish()
+            val intent = Intent(this, SelectDoctorActivity::class.java)
+            startActivity(intent)
+        }
+        binding.viewAppointmentPatient.setOnClickListener{
+            val intent = Intent(this, ViewAppointmentActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.logoutButton.setOnClickListener{
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
+        binding.viewHospital.setOnClickListener {
+            val intent=Intent(this,ViewHospitalActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.viewIllness.setOnClickListener {
+            val intent=Intent(this,ViewIllnessActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
     }
 

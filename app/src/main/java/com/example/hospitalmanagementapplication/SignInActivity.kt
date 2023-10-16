@@ -151,6 +151,11 @@ class SignInActivity : AppCompatActivity() {
                     val intent = Intent(this, ClerkDashboardActivity::class.java)
                     startActivity(intent)
                 }
+                else if (position==4)
+                {
+                    val intent = Intent(this, ClerkDashboardActivity::class.java)
+                    startActivity(intent)
+                }
             } else {
                 Log.e("Position","Position is null")
             }
