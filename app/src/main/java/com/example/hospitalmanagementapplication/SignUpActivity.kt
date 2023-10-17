@@ -4,12 +4,14 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.hospitalmanagementapplication.databinding.ActivitySignupBinding
 import com.example.hospitalmanagementapplication.utils.Loader
 import com.example.hospitalmanagementapplication.utils.PasswordValidation
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 
 class SignUpActivity : AppCompatActivity() {
@@ -36,10 +38,10 @@ class SignUpActivity : AppCompatActivity() {
                 if (password == confirmPassword) {
                     if (!PasswordValidation.isPasswordValid(password)) {
                         progressDialog.dismiss()
-                        Toast.makeText(
-                            this,
+                        Snackbar.make(
+                            findViewById(android.R.id.content),
                             "The password length should include one upper and lower case letter, digit, and special character.",
-                            Toast.LENGTH_LONG
+                            Snackbar.LENGTH_LONG
                         ).show()
                     } else {
                         firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -52,7 +54,8 @@ class SignUpActivity : AppCompatActivity() {
                                             if (verificationTask.isSuccessful) {
                                                 showVerificationDialog()
                                             } else {
-                                                val errorMessage = verificationTask.exception?.message
+                                                val errorMessage =
+                                                    verificationTask.exception?.message
                                                 if (errorMessage != null) {
                                                     Toast.makeText(
                                                         this,
@@ -64,17 +67,26 @@ class SignUpActivity : AppCompatActivity() {
                                         }
                                 } else {
                                     progressDialog.dismiss() // Dismiss the progressDialog here
-                                    Toast.makeText(this, task.exception.toString(), Toast.LENGTH_LONG).show()
+                                    Snackbar.make(
+                                        findViewById(android.R.id.content),
+                                        task.exception.toString(),
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
                                 }
                             }
                     }
                 } else {
                     progressDialog.dismiss()
-                    Toast.makeText(this, "Password and confirm password do not match", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        "Password and confirm password do not match",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             } else {
                 progressDialog.dismiss()
-                Toast.makeText(this, "Please fill in all the required fields", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Please fill in all the required fields", Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }
