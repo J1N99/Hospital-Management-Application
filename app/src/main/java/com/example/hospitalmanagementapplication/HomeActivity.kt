@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -13,17 +14,49 @@ import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var firestore: FirebaseFirestore
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+
+        val currentUser: FirebaseUser? = firebaseAuth.currentUser
+        if (currentUser != null) {
+            if (currentUser.isEmailVerified) {
+
+                val userId = currentUser.uid
+                val usersRef = firestore.collection("users")
+
+                usersRef.document(userId).get().addOnCompleteListener { innerTask ->
+
+
+                    if (innerTask.isSuccessful) {
+                        val document: DocumentSnapshot? = innerTask.result
+                        if (document != null && document.exists()) {
+
+                        } else {
+                            val intent = Intent(this, userDetailsActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                    }
+                }
+            }
+        }
+
+
 
 
         firestore().getUserPosition(this) { position ->
@@ -35,7 +68,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser: FirebaseUser? = firebaseAuth.currentUser
+
 
         firestore().getAnnouncement { announcementData ->
             if (announcementData != null) {

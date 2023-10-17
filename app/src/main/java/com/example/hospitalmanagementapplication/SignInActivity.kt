@@ -145,19 +145,16 @@ class SignInActivity : AppCompatActivity() {
                     Log.e("this work", "this work")
                     val intent = Intent(this, DoctorHomeActivity::class.java)
                     startActivity(intent)
-                }
-                else if (position == 3) {
+                } else if (position == 3) {
                     Log.e("this work", "this work")
                     val intent = Intent(this, ClerkDashboardActivity::class.java)
                     startActivity(intent)
-                }
-                else if (position==4)
-                {
+                } else if (position == 4) {
                     val intent = Intent(this, ClerkDashboardActivity::class.java)
                     startActivity(intent)
                 }
             } else {
-                Log.e("Position","Position is null")
+                Log.e("Position", "Position is null")
             }
         }
 
@@ -167,6 +164,7 @@ class SignInActivity : AppCompatActivity() {
     private fun goRegisterUserDetails() {
         val intent = Intent(this, userDetailsActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun resetPassword() {
@@ -191,8 +189,7 @@ class SignInActivity : AppCompatActivity() {
                         val intent = Intent(this, DoctorHomeActivity::class.java)
                         startActivity(intent)
                         finish()
-                    }
-                    else if (position == 3) {
+                    } else if (position == 3) {
                         Log.e("this work", "this work")
                         val intent = Intent(this, ClerkDashboardActivity::class.java)
                         startActivity(intent)
