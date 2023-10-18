@@ -1,6 +1,11 @@
 package com.example.hospitalmanagementapplication
 
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,26 +15,43 @@ import android.widget.GridLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.hospitalmanagementapplication.databinding.ActivityBookingBinding
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.mail.*
+import javax.mail.Quota.Resource
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
+import android.util.Base64
+import androidx.core.net.toUri
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import java.io.File
 
 class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
     private lateinit var binding: ActivityBookingBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var progressDialog: Loader
 
     // private val availableDay = arrayOf(Calendar.TUESDAY, Calendar.FRIDAY)
     private val availableDays = mutableListOf<Int>()
     private var appointmentAvailableStartTime = ""
     private var appointmentAvailableEndTime = ""
-    private var doctorID=""
+    private var doctorID = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBookingBinding.inflate(layoutInflater)
@@ -40,13 +62,13 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
                 bottomNavigationView.setSelectedItemId(R.id.others);
-                IntentManager(this, bottomNavigationView,position)
+                IntentManager(this, bottomNavigationView, position)
             }
         }
 
-        doctorID= intent.getStringExtra("doctorID") ?: ""
+        doctorID = intent.getStringExtra("doctorID") ?: ""
 
-        Log.e(doctorID,doctorID)
+        Log.e(doctorID, doctorID)
         firebaseAuth = FirebaseAuth.getInstance()
 
 
@@ -107,7 +129,8 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                     // Finish the current activity (splash screen)
                     finish()
                 }, delayMillis)
-                Toast.makeText(this, "Doctor did not open for appointment yet", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Doctor did not open for appointment yet", Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }
@@ -215,9 +238,14 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
             val dateAppointment = binding.bookingAppointmentET.text.toString()
             button.text = formattedTime
 
-            firestore().getAppointment(doctorID, dateAppointment, formattedTime) { appointmentExists ->
+            firestore().getAppointment(
+                doctorID,
+                dateAppointment,
+                formattedTime
+            ) { appointmentExists ->
                 if (appointmentExists) {
                     button.isEnabled = false
+                    button.setTextColor(Color.parseColor("#808080"))
                 }
             }
 
@@ -229,7 +257,7 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                         val selectedTime = formattedTime
                         val currentUser = firebaseAuth.currentUser
                         val userId = currentUser?.uid.toString()
-
+                        val userEmail = currentUser?.email
                         firestore().makeAppointment(
                             doctorID,
                             userId,
@@ -237,9 +265,17 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                             selectedTime,
                             {
 
-                                val intent = Intent(this, ViewAppointmentActivity::class.java)
-                                startActivity(intent)
-                                finish()
+                                progressDialog = Loader(this@BookingActivity)
+                                progressDialog.show()
+
+                                sendEmailInBackground(
+                                    userEmail ?: "",
+                                    doctorID,
+                                    dateAppointment,
+                                    selectedTime
+                                )
+
+
                             },
                             { errorMessage ->
                                 // Handle the error while storing in Firestore
@@ -249,6 +285,7 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                     }
                 }
             }
+
 
             // Add layout parameters for the button (width and height)
             val buttonParams = GridLayout.LayoutParams()
@@ -273,12 +310,11 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
     }
 
 
-
-
-
-
-
-    private fun showConfirmationDialog(dateAppointment:String,time: String, callback: (Boolean) -> Unit) {
+    private fun showConfirmationDialog(
+        dateAppointment: String,
+        time: String,
+        callback: (Boolean) -> Unit
+    ) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Confirm Appointment")
         builder.setMessage("Do you want to book the appointment at $dateAppointment $time?")
@@ -298,6 +334,156 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
     private fun destroyAllButtons() {
         binding.LayoutButton.removeAllViews() // This will remove all child views (buttons) from the LinearLayout
+    }
+
+    private fun sendEmailInBackground(
+        to: String,
+        doctorID: String,
+        dateAppointment: String,
+        selectedTime: String
+    ) {
+        var doctorName = ""
+        var hospital = ""
+        var doctorHospitalID = ""
+        var doctorEmail=""
+        firestore().getOtherUserDetails(this, doctorID) { user ->
+            if (user != null) {
+                doctorName = user.lastname + " " + user.firstname
+                doctorEmail=user.email
+                Log.e("Doctor Name", doctorName)
+            }
+        }
+        firestore().getDoctorInfo(this@BookingActivity, doctorID ?: "") { doctorInfo ->
+            if (doctorInfo != null) {
+                doctorHospitalID = doctorInfo.hospital
+                firestore().getHospitalDetails(
+                    this@BookingActivity,
+                    doctorHospitalID
+                ) { hospitals ->
+                    if (hospitals != null) {
+                        hospital = hospitals.hospital
+
+
+                        // Use Kotlin Coroutine to perform this task in a background thread
+                        GlobalScope.launch(Dispatchers.IO) {
+                            try {
+                                val username = "angwj99@gmail.com"
+                                val password = "whrpltsbuwfgirzn"
+
+                                val props = Properties()
+                                props["mail.smtp.host"] = "smtp.gmail.com"
+                                props["mail.smtp.port"] = "465"
+                                props["mail.smtp.auth"] = "true"
+                                props["mail.smtp.starttls.enable"] = "true"
+                                props["mail.smtp.ssl.enable"] = "true"
+
+
+                                val session = Session.getInstance(props, object : Authenticator() {
+                                    override fun getPasswordAuthentication(): PasswordAuthentication {
+                                        return PasswordAuthentication(username, password)
+                                    }
+                                })
+
+                                val message = MimeMessage(session)
+                                message.setFrom(InternetAddress(username))
+                                message.addRecipient(Message.RecipientType.TO, InternetAddress(to))
+                                message.addRecipient(Message.RecipientType.CC, InternetAddress(doctorEmail)) // cc doctor
+                                message.subject = "Your Upcoming Appointment with Dr.$doctorName"
+
+
+
+
+
+
+
+
+
+                                Log.e("Image String", hospital)
+
+
+                                val htmlContent = """
+<html>
+  <head>
+    <style>
+      /* Add some basic styling to make the email visually appealing */
+      body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          margin: 0;
+          padding: 0;
+      }
+      .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f4f4f4;
+      }
+      h1 {
+          color: #333;
+      }
+      p {
+          color: #555;
+      }
+      .center{
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="center">Your Upcoming Appointment</h1>
+      <p>Hello,</p>
+      <p>Your appointment with Dr. $doctorName is confirmed.</p>
+      <p><strong>Appointment Details:</strong></p>
+      <ul>
+        <li><strong>Hospital:</strong> $hospital</li>
+        <li><strong>Date:</strong> $dateAppointment</li>
+        <li><strong>Time:</strong> $selectedTime</li>
+      </ul>
+      <p>We look forward to seeing you!</p>
+      <p>Best regards,<br />Vantist Team</p>
+    </div>
+  </body>
+</html>
+
+"""
+                                message.setContent(htmlContent, "text/html; charset=utf-8")
+                                Transport.send(message)
+                                Log.e("Doctor Name", doctorName)
+                                // Notify the UI thread that the email has been sent
+                                withContext(Dispatchers.Main) {
+                                    progressDialog.dismiss()
+
+                                }
+
+                                Log.e("Success", "Email sent successfully.")
+
+                                val intent = Intent(
+                                    this@BookingActivity,
+                                    ViewAppointmentActivity::class.java
+                                )
+                                startActivity(intent)
+                                finish()
+                            } catch (e: Exception) {
+                                Log.e("Fail", "Error sending email: ${e.message}")
+                                Log.e("To", "Error sending email: $to")
+
+                                // Notify the UI thread of the error
+                                withContext(Dispatchers.Main) {
+                                    progressDialog.dismiss()
+                                    Toast.makeText(
+                                        this@BookingActivity,
+                                        "Error sending email",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

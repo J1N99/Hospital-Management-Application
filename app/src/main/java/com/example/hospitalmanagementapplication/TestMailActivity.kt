@@ -86,8 +86,8 @@ class TestMailActivity : AppCompatActivity() {
         // Use Kotlin Coroutine to perform this task in a background thread
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val username = "ggit9000@gmail.com"
-                val password = "frrqnllrbbcbffrd"
+                val username = "angwj99@gmail.com"
+                val password = "lotoojgbuvppupgr"
 
                 val props = Properties()
                 props["mail.smtp.host"] = "smtp.gmail.com"
