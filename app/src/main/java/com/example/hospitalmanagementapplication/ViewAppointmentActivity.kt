@@ -27,6 +27,7 @@ import android.os.Environment
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -164,16 +165,14 @@ class ViewAppointmentActivity : AppCompatActivity() {
             }
 
             holder.cancelAppointment.setOnClickListener {
-                firestore().deleteDocument(appointment.documentID ?: "", "appointments",
-                    onSuccess = {
-                        // Create an Intent to restart the current activity
-                        val intent = intent
-                        finish() // Finish the current activity
-                        startActivity(intent) // Start a new instance of the current activity
-                    },
-                    onFailure = { e ->
-                        Log.w("ERROR", "Error deleting document", e)
-                    })
+                showConfirmationDialog(appointment.documentID?:""){confirmed ->
+                    if (confirmed) {
+                        Log.e("Deleted","Success")
+                    }
+                }
+
+
+
             }
 
             holder.viewPDF.setOnClickListener {
@@ -550,6 +549,34 @@ class ViewAppointmentActivity : AppCompatActivity() {
     private fun isExternalStorageWritable(): Boolean {
         val state = Environment.getExternalStorageState()
         return Environment.MEDIA_MOUNTED == state
+    }
+
+
+    private fun showConfirmationDialog(appointmentID:String, callback: (Boolean) -> Unit) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Confirm Cancel Appointment")
+        builder.setMessage("Do you want to cancel the appointment?")
+
+        builder.setPositiveButton("Yes") { _, _ ->
+            firestore().deleteDocument(appointmentID ?: "", "appointments",
+                onSuccess = {
+                    // Create an Intent to restart the current activity
+                    val intent = intent
+                    finish() // Finish the current activity
+                    startActivity(intent) // Start a new instance of the current activity
+                },
+                onFailure = { e ->
+                    Toast.makeText(this,"ERROR:Error deleting document+$e",Toast.LENGTH_SHORT)
+                })
+            callback(true)
+        }
+
+        builder.setNegativeButton("No") { _, _ ->
+            callback(false)
+        }
+
+        builder.setCancelable(false)
+        builder.show()
     }
 
 

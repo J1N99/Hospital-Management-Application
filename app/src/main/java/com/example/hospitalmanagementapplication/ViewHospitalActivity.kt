@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hospitalmanagementapplication.databinding.ActivityViewhospitalBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.util.*
@@ -40,6 +41,7 @@ class ViewHospitalActivity :AppCompatActivity() {
     private lateinit var adapter: HospitalAdapter
     private var sortedHospitalList: List<Hospital> = emptyList()
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var progressDialog: Loader
 
     data class Hospital(
         val documentID: String?,
@@ -85,6 +87,8 @@ class ViewHospitalActivity :AppCompatActivity() {
 
         // Fetch hospitals from Firestore and calculate distances
         firestore().getAllHospital { allHospitalList ->
+            progressDialog = Loader(this)
+            progressDialog.show()
             sortedHospitalList = allHospitalList.mapNotNull { hospitalInfo ->
                 val documentID = hospitalInfo.documentId
                 val address = hospitalInfo.address
@@ -106,15 +110,19 @@ class ViewHospitalActivity :AppCompatActivity() {
                         )
                         Hospital(documentID, hospital, address, privateGovernment, distance)
                     } else {
+                        progressDialog.dismiss()
                         null
+
                     }
                 } else {
+                    progressDialog.dismiss()
                     null
                 }
             }.sortedBy { it.distance }
 
             adapter = HospitalAdapter(sortedHospitalList)
             recyclerView.adapter = adapter
+            progressDialog.dismiss()
         }
 
         binding.searchBarText.addTextChangedListener(object : TextWatcher {

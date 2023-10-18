@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityBookingBinding
+import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -235,8 +236,10 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
                             dateAppointment,
                             selectedTime,
                             {
-                                // Once success, refresh the page
-                                refreshActivity()
+
+                                val intent = Intent(this, ViewAppointmentActivity::class.java)
+                                startActivity(intent)
+                                finish()
                             },
                             { errorMessage ->
                                 // Handle the error while storing in Firestore
@@ -292,11 +295,6 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
         builder.show()
     }
 
-    private fun refreshActivity() {
-        val intent = intent
-        finish()
-        startActivity(intent)
-    }
 
     private fun destroyAllButtons() {
         binding.LayoutButton.removeAllViews() // This will remove all child views (buttons) from the LinearLayout
