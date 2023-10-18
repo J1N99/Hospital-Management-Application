@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,13 +37,16 @@ class ViewIllnessActivity : AppCompatActivity() {
             illnessList.clear()
             illnessList.addAll(allIllness)
             adapter.notifyDataSetChanged()
+
+            // Initialize the original list when data is loaded from Firestore
+            adapter.initializeOriginalList(illnessList)
         }
 
         firestore().getUserPosition(this) { position ->
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
-                bottomNavigationView.setSelectedItemId(R.id.others);
-                IntentManager(this, bottomNavigationView,position)
+                bottomNavigationView.setSelectedItemId(R.id.others)
+                IntentManager(this, bottomNavigationView, position)
             }
         }
 
@@ -57,15 +61,29 @@ class ViewIllnessActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString()
-                adapter.filter(query)
+                adapter.filter(query) // Filter using the already initialized adapter
             }
         })
     }
+
+
 }
 
 class IllnessAdapter(private val context: Context, private val illnessList: MutableList<Illness>) :
     RecyclerView.Adapter<IllnessAdapter.ViewHolder>() {
 
+    private val originalIllnessList: MutableList<Illness> = ArrayList(illnessList)
+
+    init {
+        // Copy the initial data to originalIllnessList
+        originalIllnessList.addAll(illnessList)
+        Log.d("IllnessAdapter", "Original list size: ${originalIllnessList.size}")
+    }
+
+    fun initializeOriginalList(list: List<Illness>) {
+        originalIllnessList.clear()
+        originalIllnessList.addAll(list)
+    }
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameOfIllness: TextView = itemView.findViewById(R.id.nameOfIllness)
         val description: TextView = itemView.findViewById(R.id.description)
@@ -89,21 +107,30 @@ class IllnessAdapter(private val context: Context, private val illnessList: Muta
         return illnessList.size
     }
 
-    fun addAll(illnesses: List<Illness>) {
-        illnessList.addAll(illnesses)
-    }
-
     fun filter(query: String) {
-        val filteredList = mutableListOf<Illness>()
-        for (item in illnessList) {
-            if (item.illnessName.contains(query, ignoreCase = true)) {
-                filteredList.add(item)
+        Log.d("IllnessAdapter", "Filter function called with query: $query")
+
+        if (query.isEmpty()||query=="") {
+            // If the query is empty, reset the list to the original full list of illnesses
+            illnessList.clear()
+            illnessList.addAll(originalIllnessList)
+            Log.e("Run","Run")
+            Log.e("IllnessAdapter", "Original list size: ${originalIllnessList.size}")
+        } else {
+            val filteredList = originalIllnessList.filter { item ->
+                item.illnessName.contains(query, ignoreCase = true)
             }
+            illnessList.clear()
+            illnessList.addAll(filteredList)
         }
-        illnessList.clear()
-        illnessList.addAll(filteredList)
+
         notifyDataSetChanged()
     }
+
+
+
+
+
 }
 
 

@@ -23,7 +23,7 @@ class addHospitalActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var imageView: ImageView
-    private lateinit var itemSelected: Any
+    private var itemSelected: Any=""
     private var hospitalID = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,13 +65,13 @@ class addHospitalActivity : AppCompatActivity() {
 
 
         binding.button.setOnClickListener {
-            var privateGovernment = itemSelected.toString()
+
             var hospital = binding.hospitalET.text.toString().trim()
             var address = binding.addressET.text.toString().trim()
-            if (privateGovernment.isEmpty() && hospital.isEmpty() && address.isEmpty()) {
+            if (itemSelected==null || hospital.isEmpty() || address.isEmpty()) {
                 Toast.makeText(this, "Please enter all the fields", Toast.LENGTH_SHORT).show()
             } else {
-
+                var privateGovernment = itemSelected.toString()
                 if (binding.button.text == "Save Edit") {
 
 
@@ -128,17 +128,17 @@ class addHospitalActivity : AppCompatActivity() {
         buttonEmail.visibility = View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, ClerkDashboardActivity::class.java)
+            val intent = Intent(this, allHospitalActivity::class.java)
             startActivity(intent)
+            finish()
         }
-
-        // Add a listener to handle the user's action when dismissing the dialog
-        dialog.setOnDismissListener(DialogInterface.OnDismissListener {
-            // You can take further action here if needed
-            Toast.makeText(this, "Dialog dismissed", Toast.LENGTH_SHORT).show()
-        })
-
         dialog.show()
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, allHospitalActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
 

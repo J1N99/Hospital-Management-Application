@@ -33,8 +33,9 @@
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/baseline_search_24"
-            app:tint="@android:color/white" />
+            app:srcCompat="@drawable/baseline_search_24"
+            style="@style/nightForIcon"
+            />
 
     </LinearLayout>
 

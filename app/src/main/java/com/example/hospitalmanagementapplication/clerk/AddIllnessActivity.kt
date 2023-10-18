@@ -1,5 +1,7 @@
 package com.example.hospitalmanagementapplication
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -56,7 +58,7 @@ class AddIllnessActivity : AppCompatActivity() {
             var nameOfIllness = binding.nameOfIllnessET.text.toString().trim()
             var description = binding.descriptionET.text.toString().trim()
             var actionTaken = binding.actionTakenET.text.toString().trim()
-            if (nameOfIllness.isEmpty() && description.isEmpty() && actionTaken.isEmpty()) {
+            if (nameOfIllness.isEmpty() || description.isEmpty() || actionTaken.isEmpty()) {
                 Toast.makeText(this, "Please enter all the fields", Toast.LENGTH_SHORT).show()
             } else {
 
@@ -87,8 +89,9 @@ class AddIllnessActivity : AppCompatActivity() {
                 .setPositiveButton("Yes") { _, _ ->
                     firestore().deleteDocument(illnessID, "illness",
                         onSuccess = {
-                            val intent = Intent(this, AddIllnessActivity::class.java)
+                            val intent = Intent(this, AllIllnessActivity::class.java)
                             startActivity(intent)
+                            finish()
                         },
                         onFailure = { e ->
                             Log.w("ERROR", "Error deleting document", e)
@@ -116,17 +119,19 @@ class AddIllnessActivity : AppCompatActivity() {
         buttonEmail.visibility = View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, ClerkDashboardActivity::class.java)
+            val intent = Intent(this, AllIllnessActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
-        // Add a listener to handle the user's action when dismissing the dialog
-        dialog.setOnDismissListener(DialogInterface.OnDismissListener {
-            // You can take further action here if needed
-            Toast.makeText(this, "Dialog dismissed", Toast.LENGTH_SHORT).show()
-        })
 
         dialog.show()
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, AllIllnessActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
 

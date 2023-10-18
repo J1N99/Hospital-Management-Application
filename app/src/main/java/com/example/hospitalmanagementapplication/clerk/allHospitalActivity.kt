@@ -81,6 +81,7 @@ class allHospitalActivity : AppCompatActivity() {
         binding.floatingActionButton.setOnClickListener{
             val intent = Intent(this, addHospitalActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }

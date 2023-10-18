@@ -67,30 +67,30 @@ class ClerkDashboardActivity:AppCompatActivity() {
 
             val intent = Intent(this, allHospitalActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
         binding.logoutButton.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
         binding.addIllness.setOnClickListener{
 
             val intent = Intent(this, AllIllnessActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
         binding.addAnnouncement.setOnClickListener{
 
             val intent = Intent(this, AddAnnouncement::class.java)
             startActivity(intent)
-            finish()
+
         }
         binding.updatePosition.setOnClickListener {
-            val intent = Intent(this, UpdatePositionActivity::class.java)
+            val intent = Intent(this, AllUserActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
 
 
