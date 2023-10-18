@@ -138,7 +138,7 @@
         android:layout_height="60dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
-        android:background="@color/teal_700"
+        android:background="@drawable/green_rounded_button"
         android:text="Save Details"
         android:textColor="@color/white"
         android:textStyle="bold"

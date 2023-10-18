@@ -1,8 +1,11 @@
 package com.example.hospitalmanagementapplication.clerk
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.*
 import com.example.hospitalmanagementapplication.databinding.ActivityClerkdashboardBinding
@@ -145,6 +148,20 @@ class SuperAccountHome:AppCompatActivity() {
             finish()
         }
 
+    }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setMessage("Are you sure you want to exit the app?")
+            .setPositiveButton("Yes") { _, _ ->
+                // Call the system method to close the app
+                val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                activityManager.appTasks.forEach { taskInfo ->
+                    taskInfo.finishAndRemoveTask()
+                }
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 
 

@@ -1,6 +1,9 @@
 package com.example.hospitalmanagementapplication
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.GridLayout
@@ -87,8 +90,23 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
                 initializeDatePicker()
             } else {
-                Log.d("Fail", "Fail")
-                Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
+                val handler = Handler(Looper.getMainLooper())
+
+                // Define a delay of 3 seconds (3000 milliseconds)
+                val delayMillis: Long = 3000
+
+                // Use the Handler to post a delayed action
+                handler.postDelayed({
+                    // Create an Intent to navigate to the target activity
+                    val intent = Intent(this, BookingActivity::class.java)
+
+                    // Start the new activity
+                    startActivity(intent)
+
+                    // Finish the current activity (splash screen)
+                    finish()
+                }, delayMillis)
+                Toast.makeText(this, "Doctor did not open for appointment yet", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -156,7 +174,6 @@ class BookingActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener 
 
         // Set listener for date picker
         binding.bookingAppointmentET.setOnClickListener {
-            Log.d("CLICK", "CLICKED")
             datePickerDialog.show(supportFragmentManager, "DatePickerDialog")
         }
     }

@@ -95,22 +95,22 @@ class DoctorHomeActivity : AppCompatActivity() {
                 FirebaseAuth.getInstance().signOut()
                 val intent = Intent(this, SignInActivity::class.java)
                 startActivity(intent)
-                finish()
+
             }
             binding.createAppointment.setOnClickListener {
                 val intent = Intent(this, DoctorAvailableAppointmentActivity::class.java)
                 startActivity(intent)
-                finish()
+
             }
             binding.viewAppointment.setOnClickListener {
                 val intent = Intent(this, DoctorViewAppointment::class.java)
                 startActivity(intent)
-                finish()
+
             }
             binding.disableAppointment.setOnClickListener {
                 val intent = Intent(this, DoctorDisableAppointmentActivity::class.java)
                 startActivity(intent)
-                finish()
+
             }
         }
     }

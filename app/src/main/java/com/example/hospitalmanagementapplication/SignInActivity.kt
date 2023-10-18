@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
+import com.example.hospitalmanagementapplication.clerk.SuperAccountHome
 import com.example.hospitalmanagementapplication.databinding.ActivitySigninBinding
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.firebase.firestore
@@ -141,17 +142,21 @@ class SignInActivity : AppCompatActivity() {
                     Log.e("KENAPA", "KENAPA")
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
+                    finish()
                 } else if (position == 2) {
                     Log.e("this work", "this work")
                     val intent = Intent(this, DoctorHomeActivity::class.java)
                     startActivity(intent)
+                    finish()
                 } else if (position == 3) {
                     Log.e("this work", "this work")
                     val intent = Intent(this, ClerkDashboardActivity::class.java)
                     startActivity(intent)
+                    finish()
                 } else if (position == 4) {
-                    val intent = Intent(this, ClerkDashboardActivity::class.java)
+                    val intent = Intent(this, SuperAccountHome::class.java)
                     startActivity(intent)
+                    finish()
                 }
             } else {
                 Log.e("Position", "Position is null")
@@ -185,7 +190,7 @@ class SignInActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     }
-                    if (position == 2) {
+                    else if (position == 2) {
                         val intent = Intent(this, DoctorHomeActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -193,10 +198,17 @@ class SignInActivity : AppCompatActivity() {
                         Log.e("this work", "this work")
                         val intent = Intent(this, ClerkDashboardActivity::class.java)
                         startActivity(intent)
+                        finish()
+                    }
+                    else if (position == 4) {
+                        val intent = Intent(this, SuperAccountHome::class.java)
+                        startActivity(intent)
+                        finish()
                     }
                 } else {
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
+                    finish()
                 }
             }
 

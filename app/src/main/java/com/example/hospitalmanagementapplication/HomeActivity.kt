@@ -93,31 +93,31 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.bookingAppointment.setOnClickListener{
-            finish()
+
             val intent = Intent(this, SelectDoctorActivity::class.java)
             startActivity(intent)
         }
         binding.viewAppointment.setOnClickListener{
             val intent = Intent(this, ViewAppointmentActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
         binding.logoutButton.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
 
         binding.viewHospital.setOnClickListener {
             val intent=Intent(this,ViewHospitalActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
         binding.viewIllness.setOnClickListener {
             val intent=Intent(this,ViewIllnessActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
     }
 

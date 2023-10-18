@@ -117,6 +117,9 @@
         <activity android:name=".DoctorAddPDF"
         android:exported="false">
     </activity>
+        <activity android:name=".clerk.SuperAccountHome"
+            android:exported="false">
+        </activity>
 
 
     </application>
