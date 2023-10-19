@@ -17,6 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.example.hospitalmanagementapplication.databinding.ActivityAddhospitalBinding
 import com.example.hospitalmanagementapplication.model.Hospital
+import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.File
@@ -36,6 +37,13 @@ class AddAnnouncement : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         firestore().getAnnouncement { announcementData ->
             if (announcementData != null) {

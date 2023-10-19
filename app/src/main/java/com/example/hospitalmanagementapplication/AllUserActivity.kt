@@ -10,6 +10,7 @@ import com.example.hospitalmanagementapplication.databinding.ActivityAlluserBind
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -18,6 +19,7 @@ class AllUserActivity: AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var userList: List<User>
+    private lateinit var progressDialog: Loader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +36,12 @@ class AllUserActivity: AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         firestore().getAllUsers { users ->
+            progressDialog = Loader(this)
+            progressDialog.show()
             userList = users
             val userAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, users.map { "${it.firstname} ${it.lastname} - ${it.ic}" })
             binding.userListView.adapter = userAdapter
+            progressDialog.dismiss()
         }
 
         binding.userListView.setOnItemClickListener { parent, view, position, id ->

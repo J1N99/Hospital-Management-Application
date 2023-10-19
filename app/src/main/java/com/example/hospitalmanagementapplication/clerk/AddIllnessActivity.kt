@@ -16,6 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.example.hospitalmanagementapplication.databinding.ActivityAddillnessBinding
 import com.example.hospitalmanagementapplication.model.Illness
+import com.example.hospitalmanagementapplication.utils.IntentManager
 
 
 class AddIllnessActivity : AppCompatActivity() {
@@ -33,7 +34,13 @@ class AddIllnessActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         illnessID = intent.getStringExtra("illnessID") ?: ""
 

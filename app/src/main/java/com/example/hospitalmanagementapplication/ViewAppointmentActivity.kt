@@ -524,20 +524,19 @@ class ViewAppointmentActivity : AppCompatActivity() {
                     pdfFile
                 )
 
-                // Create an intent to open the PDF file
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.setDataAndType(pdfUri, "application/pdf")
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                // Check if there is a PDF viewer app installed
-                val packageManager = packageManager
-                val activities = packageManager.queryIntentActivities(intent, 0)
+                // Create a chooser dialog to let the user pick an app
+                val chooser = Intent.createChooser(intent, "Open PDF with...")
 
-                if (activities.isNotEmpty()) {
-                    startActivity(intent)
+                if (chooser.resolveActivity(packageManager) != null) {
+                    startActivity(chooser)
                 } else {
                     Toast.makeText(this, "No PDF viewer app found", Toast.LENGTH_SHORT).show()
                 }
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }

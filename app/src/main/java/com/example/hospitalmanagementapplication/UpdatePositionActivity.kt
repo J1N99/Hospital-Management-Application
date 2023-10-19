@@ -90,6 +90,11 @@ class UpdatePositionActivity : AppCompatActivity() {
                         binding.autoCompleteTextView.setText("Clerk",false)
 
                     }
+                    4->{
+                        binding.autoCompleteTextView.setText("Super Account",false)
+                        binding.autoCompleteTextView.isEnabled=false
+                        binding.autoCompleteTextView.setBackgroundResource(android.R.color.darker_gray)
+                    }
                 }
 
             } else {
