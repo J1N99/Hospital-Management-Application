@@ -60,7 +60,7 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
         firestore().getAppointmentAvailable(this) {documentID, appointmentAvailable ->
             if (appointmentAvailable != null) {
                 documentIDs=documentID?:"DefaultDocumentId"
-                binding.button.setText("Edit")
+                binding.button.setText("Save Edit")
                 binding.shiftET.setText(appointmentAvailable.appointmentStartTime)
                 binding.EndshiftET.setText(appointmentAvailable.appointmentEndTime)
                 binding.checkMonday.isChecked = appointmentAvailable.monday
@@ -138,7 +138,7 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
                 if (binding.button.text == "Submit") {
                     firestore().createAvailableAppointment(this, appointmentAvailable)
                     showDialogSuccessUpdate()
-                } else if (binding.button.text == "Edit") {
+                } else if (binding.button.text == "Save Edit") {
                     val dataToUpdate = mapOf(
                         "appointmentStartTime" to appoinmentStart,
                         "appointmentEndTime" to appoinmentEnd,
