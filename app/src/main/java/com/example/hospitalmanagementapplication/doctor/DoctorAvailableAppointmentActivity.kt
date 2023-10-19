@@ -15,6 +15,7 @@ import com.example.hospitalmanagementapplication.R
 import com.example.hospitalmanagementapplication.databinding.ActivityDoctoravailableappointmentBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.model.AppointmentAvailable
+import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -40,6 +41,16 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser=firebaseAuth.currentUser
         var userID=""
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
+
+
         if (currentUser != null) {
          userID = currentUser.uid
         } else {

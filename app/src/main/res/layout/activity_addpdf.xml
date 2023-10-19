@@ -119,6 +119,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/baseline_picture_as_pdf_24" />
-
+    <include
+        android:id="@+id/include"
+        layout="@layout/activity_footer" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 

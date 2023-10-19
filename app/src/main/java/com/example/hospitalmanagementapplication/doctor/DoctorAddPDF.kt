@@ -18,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.example.hospitalmanagementapplication.model.Illness
 import com.example.hospitalmanagementapplication.model.PDFInfo
+import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
@@ -63,6 +64,15 @@ class DoctorAddPDF : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddpdfBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
 
         appointmentID = intent.getStringExtra("appointmentId") ?: ""
         doctorId = intent.getStringExtra("doctorId") ?: ""

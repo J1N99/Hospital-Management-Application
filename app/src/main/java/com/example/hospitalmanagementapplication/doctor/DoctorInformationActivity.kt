@@ -35,6 +35,7 @@ import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.R
 import com.example.hospitalmanagementapplication.model.Hospital
 import com.example.hospitalmanagementapplication.model.Illness
+import com.example.hospitalmanagementapplication.userDetailsActivity
 
 class DoctorInformationActivity : AppCompatActivity() {
 
@@ -482,5 +483,9 @@ class DoctorInformationActivity : AppCompatActivity() {
 
         dialog.show()
     }
-
+    override fun onBackPressed() {
+        val intent = Intent(this, DoctorInformationActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+
     tools:context=".doctor.DoctorViewAppointment">
 
     <TextView
@@ -14,23 +14,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="0dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:text="Calendar"
         android:textAllCaps="true"
         android:textColor="#FF018786"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/calendarView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <CalendarView
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendar" />
 
 
     <TableLayout
+        android:id="@+id/tableLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="*">
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:stretchColumns="*"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendarView">
 
         <TableRow
             android:layout_width="match_parent"
@@ -57,6 +73,7 @@
                 android:text="Event"
                 android:textColor="#FFF"
                 android:textStyle="bold" />
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -70,21 +87,30 @@
 
 
         <TableRow
+            style="@style/backgroundColorForTableRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="#FFF"
-            style="@style/backgroundColorForTableRow">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+            android:textColor="#FFF">
 
         </TableRow>
-</TableLayout>
+    </TableLayout>
 
-</LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
 
+    <include
+        android:id="@+id/include"
+        layout="@layout/activity_footer"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
