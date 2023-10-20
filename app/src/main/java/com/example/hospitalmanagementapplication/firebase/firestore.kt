@@ -501,9 +501,12 @@ class firestore {
                     Log.e("WHY", dateAppointment ?: "")
 
                 }
+                // Sort the list by time
+                val sortedAppointmentsList = appointmentsList.sortedWith(compareBy { it.time })
 
-                // Pass the list of appointments to the callback function
-                callback(appointmentsList)
+                // Pass the sorted list of appointments to the callback function
+                callback(sortedAppointmentsList)
+
             }
             .addOnFailureListener { exception ->
                 // Handle any errors that occurred during the query

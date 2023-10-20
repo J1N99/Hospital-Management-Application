@@ -75,7 +75,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
                 bottomNavigationView.setSelectedItemId(R.id.others);
-                IntentManager(this, bottomNavigationView,position)
+                IntentManager(this, bottomNavigationView, position)
             }
         }
 
@@ -145,11 +145,10 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 ) { pdfInfoList ->
                     //if got pdf
                     if (pdfInfoList.isNotEmpty()) {
-                        holder.viewPDF.visibility=View.VISIBLE
+                        holder.viewPDF.visibility = View.VISIBLE
                     }
                 }
-            }else
-            {
+            } else {
                 // if over date then the close appointment Date gone
                 holder.cancelAppointment.visibility = View.VISIBLE
 
@@ -159,26 +158,25 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 ) { pdfInfoList ->
                     //if got pdf
                     if (pdfInfoList.isNotEmpty()) {
-                        holder.viewPDF.visibility=View.GONE
+                        holder.viewPDF.visibility = View.GONE
                     }
                 }
             }
 
             holder.cancelAppointment.setOnClickListener {
-                showConfirmationDialog(appointment.documentID?:""){confirmed ->
+                showConfirmationDialog(appointment.documentID ?: "") { confirmed ->
                     if (confirmed) {
-                        Log.e("Deleted","Success")
+                        Log.e("Deleted", "Success")
                     }
                 }
-
 
 
             }
 
             holder.viewPDF.setOnClickListener {
-                 appointmentID = appointment.documentID?:""
-                 doctorId = appointment.doctorId?:""
-                 patientID = appointment.userID?:""
+                appointmentID = appointment.documentID ?: ""
+                doctorId = appointment.doctorId ?: ""
+                patientID = appointment.userID ?: ""
                 //get hospital info
                 firestore().getDoctorInfo(
                     this@ViewAppointmentActivity,
@@ -226,27 +224,14 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 ) { pdfInfoList ->
                     if (pdfInfoList.isNotEmpty()) {
                         val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
-                        firestore().getIllnessActivity(
-                            this@ViewAppointmentActivity,
-                            firstPdfInfo.illness
-                        ) { illness ->
-                            if (illness != null) {
-                                illnessName = illness.illnessName
-                                medicinePDF = firstPdfInfo.medicine
-                                actionPDF = firstPdfInfo.action
-                                pdfFileName = firstPdfInfo.PDFName
-                                createPdf()
-                            }
-                        }
-
+                        illnessName = firstPdfInfo.illness
+                        medicinePDF = firstPdfInfo.medicine
+                        actionPDF = firstPdfInfo.action
+                        pdfFileName = firstPdfInfo.PDFName
+                        createPdf()
                     }
                 }
             }
-
-
-
-
-
 
 
             val doctorId = appointment.doctorId
@@ -312,7 +297,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
     }
 
     private fun createPdf() {
-        Log.e("PDFNAME",pdfFileName)
+        Log.e("PDFNAME", pdfFileName)
         if (isExternalStorageWritable()) {
             val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
 
@@ -513,7 +498,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
         }
     }
 
-    fun openPdf(){
+    fun openPdf() {
         val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
 
         if (pdfFile.exists()) {
@@ -551,7 +536,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
     }
 
 
-    private fun showConfirmationDialog(appointmentID:String, callback: (Boolean) -> Unit) {
+    private fun showConfirmationDialog(appointmentID: String, callback: (Boolean) -> Unit) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Confirm Cancel Appointment")
         builder.setMessage("Do you want to cancel the appointment?")
@@ -565,7 +550,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
                     startActivity(intent) // Start a new instance of the current activity
                 },
                 onFailure = { e ->
-                    Toast.makeText(this,"ERROR:Error deleting document+$e",Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "ERROR:Error deleting document+$e", Toast.LENGTH_SHORT)
                 })
             callback(true)
         }
@@ -577,7 +562,6 @@ class ViewAppointmentActivity : AppCompatActivity() {
         builder.setCancelable(false)
         builder.show()
     }
-
 
 
 }

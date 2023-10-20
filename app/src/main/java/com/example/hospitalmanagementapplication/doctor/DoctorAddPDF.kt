@@ -13,12 +13,15 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.example.hospitalmanagementapplication.databinding.ActivityAddpdfBinding
+import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
+import com.example.hospitalmanagementapplication.doctor.DoctorViewAppointment
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.example.hospitalmanagementapplication.model.Illness
 import com.example.hospitalmanagementapplication.model.PDFInfo
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.google.android.material.chip.Chip
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
@@ -36,6 +39,7 @@ class DoctorAddPDF : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var imageView: ImageView
     private lateinit var itemSelected: Any
+    private val userSelectedTags = mutableListOf<String>()
 
     /* pass data from other page*/
     private var appointmentID = ""
@@ -56,7 +60,7 @@ class DoctorAddPDF : AppCompatActivity() {
     private var actionPDF = ""
     private var PDFDocumentID = ""
     private var pdfFileName = ""
-    private var documentID=""
+    private var documentID = ""
     /* End */
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +74,7 @@ class DoctorAddPDF : AppCompatActivity() {
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
                 bottomNavigationView.setSelectedItemId(R.id.others);
-                IntentManager(this, bottomNavigationView,position)
+                IntentManager(this, bottomNavigationView, position)
             }
         }
 
@@ -79,29 +83,37 @@ class DoctorAddPDF : AppCompatActivity() {
         patientID = intent.getStringExtra("patientID") ?: ""
         firebaseAuth = FirebaseAuth.getInstance()
 
+
+
+
+
         initializedData()
         initializedPDFData()
-        var textIllness = ""
         firestore().checkPDFandDisplay(this, appointmentID) { pdfInfoList ->
             if (pdfInfoList.isNotEmpty()) {
                 val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
                 binding.actionET.setText(firstPdfInfo.action)
-                documentID=firstPdfInfo.documentID
-                // to get illness name
-
-                firestore().getIllnessActivity(this, firstPdfInfo.illness) { illness ->
-                    if (illness != null) {
-                        textIllness = illness.illnessName
-                        binding.autoCompleteTextView.setText(textIllness, false)
-                        itemSelected = firstPdfInfo.illness
-                        binding.medicineET.setText(firstPdfInfo.medicine)
-                        binding.button2.visibility = View.VISIBLE
-                        binding.button.text = "Edit Details"
+                documentID = firstPdfInfo.documentID
+                val illness = firstPdfInfo.illness
+                val seperateIllness = illness.split(",")
+                for (soloIllness in seperateIllness) {
+                    val chip = Chip(this)
+                    chip.text = soloIllness
+                    chip.isCloseIconVisible = true
+                    chip.setOnCloseIconClickListener {
+                        // Remove the chip when the close icon is clicked
+                        binding.chipGroup.removeView(chip)
                     }
-                }
 
+                    // Add the chip to a ChipGroup (assuming you have a ChipGroup named 'binding.chipGroup')
+                    binding.chipGroup.addView(chip)
+                }
+                binding.medicineET.setText(firstPdfInfo.medicine)
+                binding.button2.visibility = View.VISIBLE
+                binding.button.text = "Edit Details"
             }
         }
+
 
 
         binding.button2.setOnClickListener {
@@ -110,24 +122,23 @@ class DoctorAddPDF : AppCompatActivity() {
                     val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
                     var pdfInfoCompleted = false
                     Log.e("Test", firstPdfInfo.illness)
-                    firestore().getIllnessActivity(this, firstPdfInfo.illness) { illness ->
-                        if (illness != null) {
-                            medicinePDF = firstPdfInfo.medicine
-                            actionPDF = firstPdfInfo.action
-                            illnessName = illness.illnessName
-                            pdfInfoCompleted = true
-                            if (pdfInfoCompleted) {
-                                pdfFileName = firstPdfInfo.PDFName
-                                createPdf()
-                            }
-                        }
+                    medicinePDF = firstPdfInfo.medicine
+                    actionPDF = firstPdfInfo.action
+                    illnessName = firstPdfInfo.illness
+                    pdfInfoCompleted = true
+                    if (pdfInfoCompleted) {
+                        pdfFileName = firstPdfInfo.PDFName
+                        createPdf()
                     }
                 }
+
+
             }
         }
 
         binding.button.setOnClickListener {
-            var illness = itemSelected.toString()
+
+            var illness = updateChipsToCommaSeparatedString()
             var medicine = binding.medicineET.text.toString().trim()
             var action = binding.actionET.text.toString().trim()
             if (illness.isEmpty() || (medicine.isEmpty() && action.isEmpty())) {
@@ -144,8 +155,7 @@ class DoctorAddPDF : AppCompatActivity() {
                     PDFInfo("", illness, medicine, action, patientID, appointmentID, pdfFileName)
 
 
-                if(binding.button.text=="Edit Details")
-                {
+                if (binding.button.text == "Edit Details") {
                     val dataToUpdate = mapOf(
                         "illness" to illness,
                         "medicine" to medicine,
@@ -155,29 +165,20 @@ class DoctorAddPDF : AppCompatActivity() {
                         "pdfFileName" to pdfFileName
 
                     )
-                    firestore().updateDocument("pdfinfo", documentID , dataToUpdate)
+                    firestore().updateDocument("pdfinfo", documentID, dataToUpdate)
                     firestore().getPDFInfo(this, documentID) { pdfInfo ->
                         var pdfInfoCompleted = false
                         if (pdfInfo != null) {
-                            firestore().getIllnessActivity(
-                                this,
-                                pdfInfo.illness
-                            ) { illness ->
-                                if (illness != null) {
-                                    medicinePDF = pdfInfo.medicine
-                                    actionPDF = pdfInfo.action
-                                    illnessName = illness.illnessName
-                                    pdfInfoCompleted = true
-                                    if (pdfInfoCompleted) {
-                                        createPdf()
-
-                                    }
-                                }
+                            medicinePDF = pdfInfo.medicine
+                            actionPDF = pdfInfo.action
+                            illnessName = pdfInfo.illness
+                            pdfInfoCompleted = true
+                            if (pdfInfoCompleted) {
+                                createPdf()
                             }
                         }
                     }
-                }
-                else {
+                } else {
                     firestore().createPDFInfo(this, pdf) { documentId ->
                         if (documentId != null) {
                             PDFDocumentID = documentId
@@ -185,19 +186,13 @@ class DoctorAddPDF : AppCompatActivity() {
                             firestore().getPDFInfo(this, PDFDocumentID) { pdfInfo ->
                                 var pdfInfoCompleted = false
                                 if (pdfInfo != null) {
-                                    firestore().getIllnessActivity(
-                                        this,
-                                        pdfInfo.illness
-                                    ) { illness ->
-                                        if (illness != null) {
-                                            medicinePDF = pdfInfo.medicine
-                                            actionPDF = pdfInfo.action
-                                            illnessName = illness.illnessName
-                                            pdfInfoCompleted = true
-                                            if (pdfInfoCompleted) {
-                                                createPdf()
-
-                                            }
+                                    if (illness != null) {
+                                        medicinePDF = pdfInfo.medicine
+                                        actionPDF = pdfInfo.action
+                                        illnessName = pdfInfo.illness
+                                        pdfInfoCompleted = true
+                                        if (pdfInfoCompleted) {
+                                            createPdf()
                                         }
                                     }
                                 }
@@ -206,7 +201,32 @@ class DoctorAddPDF : AppCompatActivity() {
                     }
                 }
             }
+
+
         }
+
+
+
+        binding.autoCompleteTextView.setOnItemClickListener { adapterView, view, position, id ->
+            val selectedOption = binding.autoCompleteTextView.text.toString()
+            if (selectedOption.isNotEmpty()) {
+                // Add the selected option to the user-selected tags list
+                userSelectedTags.add(selectedOption)
+
+                // Create a Chip for the selected option
+                val chip = Chip(this)
+                chip.text = selectedOption
+                chip.isCloseIconVisible = true
+                chip.setOnCloseIconClickListener {
+                    // Remove the selected tag when the close icon is clicked
+                    binding.chipGroup.removeView(chip)
+                    userSelectedTags.remove(selectedOption)
+                }
+                binding.chipGroup.addView(chip)
+                binding.autoCompleteTextView.text = null // Clear the AutoCompleteTextView
+            }
+        }
+
     }
 
     private fun initializedPDFData() {
@@ -273,14 +293,24 @@ class DoctorAddPDF : AppCompatActivity() {
         }
 
         autoComplete.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
                 // Not used in this case
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 // Filter the list based on user input
                 val filteredIllnesses =
-                    allIllness.filter { it.illnessName.contains(s.toString(), ignoreCase = true) }
+                    allIllness.filter {
+                        it.illnessName.contains(
+                            s.toString(),
+                            ignoreCase = true
+                        )
+                    }
 
                 if (filteredIllnesses.isEmpty()) {
                     // No results found, clear the text
@@ -299,17 +329,13 @@ class DoctorAddPDF : AppCompatActivity() {
                 // Not used in this case
             }
         })
-
-        autoComplete.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                itemSelected = allIllness[position].documentID
-            }
     }
 
     private fun createPdf() {
 
         if (isExternalStorageWritable()) {
-            val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
+            val pdfFile =
+                File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
 
             try {
 
@@ -384,7 +410,8 @@ class DoctorAddPDF : AppCompatActivity() {
 
 
                 // Load the image from drawable resources
-                val imageBitmap: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
+                val imageBitmap: Bitmap =
+                    BitmapFactory.decodeResource(resources, R.drawable.logo)
 
                 // Convert the Bitmap to a byte array
                 val byteArrayOutputStream = ByteArrayOutputStream()
@@ -528,6 +555,7 @@ class DoctorAddPDF : AppCompatActivity() {
 
                 if (chooser.resolveActivity(packageManager) != null) {
                     startActivity(chooser)
+                    finish()
                 } else {
                     Toast.makeText(this, "No PDF viewer app found", Toast.LENGTH_SHORT).show()
                 }
@@ -544,6 +572,9 @@ class DoctorAddPDF : AppCompatActivity() {
         return Environment.MEDIA_MOUNTED == state
     }
 
-
+    // Function to update the comma-separated string based on userSelectedTags
+    fun updateChipsToCommaSeparatedString(): String {
+        return userSelectedTags.joinToString(", ")
+    }
 }
 
