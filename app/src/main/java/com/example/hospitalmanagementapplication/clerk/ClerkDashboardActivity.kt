@@ -95,6 +95,11 @@ class ClerkDashboardActivity:AppCompatActivity() {
             startActivity(intent)
 
         }
+        binding.addMedicine.setOnClickListener {
+            val intent = Intent(this, AllMedicineActivity::class.java)
+            startActivity(intent)
+
+        }
 
 
     }

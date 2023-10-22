@@ -941,4 +941,70 @@ class firestore {
 
 
 
+
+    fun getAllMedicine(callback: (List<Medicine>) -> Unit) {
+
+        mFirestore.collection("medicine").get()
+            .addOnSuccessListener { result ->
+                val medicineList = mutableListOf<Medicine>()
+
+                for (document in result) {
+                    val documentId = document.id
+                    val medicineName = document.getString("medicineName").toString()
+                    val description = document.getString("description").toString()
+                    val medicationTime = document.getString("medicationTime").toString()
+
+                    val medicine = Medicine(documentId, medicineName, description, medicationTime)
+                    medicineList.add(medicine)
+                }
+
+                callback(medicineList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
+
+
+    fun getMedicineActivity(activity: Activity, medicineID: String, callback: (Medicine?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("medicine")
+            // Get documentation id from the field of users
+            .document(medicineID)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+
+                // Received the document ID and convert it into the User Data model object
+                val medicine = document.toObject(Medicine::class.java)
+                if (medicine != null) {
+                    Log.e("XIXI",medicine.medicineName)
+                }
+                // Pass the user object to the callback
+                callback(medicine)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting illness details: $e")
+                callback(null) // Notify callback of the error
+            }
+    }
+
+    fun createMedicine(activity: Activity, medicineInfo: Medicine) {
+
+        //create collection names, is exist just use
+        mFirestore.collection("medicine")
+            //create document id
+            .document()
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
+            .set(medicineInfo, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
 }

@@ -120,6 +120,12 @@
         <activity android:name=".clerk.SuperAccountHome"
             android:exported="false">
         </activity>
+        <activity android:name=".AllMedicineActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".AddMedicineActivity"
+            android:exported="false">
+        </activity>
 
 
     </application>
