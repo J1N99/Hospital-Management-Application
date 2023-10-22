@@ -180,32 +180,37 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
+        progressDialog = Loader(this)
+        progressDialog.show()
         if (firebaseAuth.currentUser != null) {
 
             firestore().getUserPosition(this) { position ->
                 if (position != null) {
                     if (position == 1) {
+                        progressDialog.dismiss()
                         val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
                         finish()
                     }
                     else if (position == 2) {
+                        progressDialog.dismiss()
                         val intent = Intent(this, DoctorHomeActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else if (position == 3) {
-                        Log.e("this work", "this work")
+                        progressDialog.dismiss()
                         val intent = Intent(this, ClerkDashboardActivity::class.java)
                         startActivity(intent)
                         finish()
                     }
                     else if (position == 4) {
+                        progressDialog.dismiss()
                         val intent = Intent(this, SuperAccountHome::class.java)
                         startActivity(intent)
                         finish()
                     }
                 } else {
+                    progressDialog.dismiss()
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -213,6 +218,7 @@ class SignInActivity : AppCompatActivity() {
             }
 
         }
+        progressDialog.dismiss()
     }
 
     fun showVerificationDialog() {

@@ -297,7 +297,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
     }
 
     private fun createPdf() {
-        Log.e("PDFNAME", pdfFileName)
+
         if (isExternalStorageWritable()) {
             val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), pdfFileName)
 

@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.R
+import com.example.hospitalmanagementapplication.RedesignActivity
 import com.example.hospitalmanagementapplication.SignInActivity
 import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityDoctorhomeBinding
@@ -111,6 +112,11 @@ class DoctorHomeActivity : AppCompatActivity() {
                 val intent = Intent(this, DoctorDisableAppointmentActivity::class.java)
                 startActivity(intent)
 
+            }
+            //delete later
+            binding.redesign.setOnClickListener {
+                val intent = Intent(this, RedesignActivity::class.java)
+                startActivity(intent)
             }
         }
     }
