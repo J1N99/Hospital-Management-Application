@@ -19,6 +19,7 @@ import com.example.hospitalmanagementapplication.firebase.firestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.example.hospitalmanagementapplication.model.Illness
+import com.example.hospitalmanagementapplication.model.Medicine
 import com.example.hospitalmanagementapplication.model.PDFInfo
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.chip.Chip
@@ -26,6 +27,10 @@ import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -40,6 +45,7 @@ class DoctorAddPDF : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var itemSelected: Any
     private val userSelectedTags = mutableListOf<String>()
+    private val medicineSelectedTags = mutableListOf<String>()
 
     /* pass data from other page*/
     private var appointmentID = ""
@@ -88,12 +94,15 @@ class DoctorAddPDF : AppCompatActivity() {
 
 
         initializedData()
+        initializedMedicineData()
         initializedPDFData()
         firestore().checkPDFandDisplay(this, appointmentID) { pdfInfoList ->
             if (pdfInfoList.isNotEmpty()) {
                 val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
                 binding.actionET.setText(firstPdfInfo.action)
                 documentID = firstPdfInfo.documentID
+
+
                 val illness = firstPdfInfo.illness
                 val seperateIllness = illness.split(",")
                 for (soloIllness in seperateIllness) {
@@ -108,7 +117,22 @@ class DoctorAddPDF : AppCompatActivity() {
                     // Add the chip to a ChipGroup (assuming you have a ChipGroup named 'binding.chipGroup')
                     binding.chipGroup.addView(chip)
                 }
-                binding.medicineET.setText(firstPdfInfo.medicine)
+
+                val medicine = firstPdfInfo.medicine
+                val seperateMedicine = medicine.split(",")
+                for (soloMedicine in seperateMedicine) {
+                    val chip = Chip(this)
+                    chip.text = soloMedicine
+                    chip.isCloseIconVisible = true
+                    chip.setOnCloseIconClickListener {
+                        // Remove the chip when the close icon is clicked
+                        binding.chipGroupMedicine.removeView(chip)
+                    }
+
+                    // Add the chip to a ChipGroup (assuming you have a ChipGroup named 'binding.chipGroup')
+                    binding.chipGroupMedicine.addView(chip)
+                }
+
                 binding.button2.visibility = View.VISIBLE
                 binding.button.text = "Edit Details"
             }
@@ -139,7 +163,7 @@ class DoctorAddPDF : AppCompatActivity() {
         binding.button.setOnClickListener {
 
             var illness = updateChipsToCommaSeparatedString()
-            var medicine = binding.medicineET.text.toString().trim()
+            var medicine = updateMedicineChipsToCommaSeparatedString()
             var action = binding.actionET.text.toString().trim()
             if (illness.isEmpty() || (medicine.isEmpty() && action.isEmpty())) {
                 Toast.makeText(this, "Please enter all the fields", Toast.LENGTH_SHORT).show()
@@ -227,6 +251,28 @@ class DoctorAddPDF : AppCompatActivity() {
             }
         }
 
+
+        binding.autoCompleteMedicineET.setOnItemClickListener { adapterView, view, position, id ->
+            val selectedOption = binding.autoCompleteMedicineET.text.toString()
+            if (selectedOption.isNotEmpty()) {
+                // Add the selected option to the user-selected tags list
+                medicineSelectedTags.add(selectedOption)
+
+                // Create a Chip for the selected option
+                val chip = Chip(this)
+                chip.text = selectedOption
+                chip.isCloseIconVisible = true
+                chip.setOnCloseIconClickListener {
+                    // Remove the selected tag when the close icon is clicked
+                    binding.chipGroupMedicine.removeView(chip)
+                    userSelectedTags.remove(selectedOption)
+                }
+                binding.chipGroupMedicine.addView(chip)
+                binding.autoCompleteMedicineET.text = null // Clear the AutoCompleteTextView
+            }
+        }
+
+
     }
 
     private fun initializedPDFData() {
@@ -265,6 +311,74 @@ class DoctorAddPDF : AppCompatActivity() {
 
 
     }
+
+    private fun initializedMedicineData() {
+        val autoComplete: AutoCompleteTextView = findViewById(R.id.autoCompleteMedicineET)
+        val allMedicine: MutableList<Medicine> =
+            mutableListOf() // Use MutableList to allow modification
+
+        // Initialize an empty adapter for now
+        val adapter = ArrayAdapter(this, R.layout.list_private_government, listOf<String>())
+        autoComplete.setAdapter(adapter)
+
+
+
+        firestore().getAllMedicine { fetchedMedicine ->
+            // Populate the allIllness list with data from Firestore
+            allMedicine.clear() // Clear the list to remove any existing data
+            allMedicine.addAll(fetchedMedicine)
+
+            // Create the adapter with all illnesses
+            val initialAdapter = ArrayAdapter(
+                this,
+                R.layout.list_private_government,
+                allMedicine.map { it.medicineName })
+
+            // Set the adapter for the AutoCompleteTextView
+            autoComplete.setAdapter(initialAdapter)
+        }
+
+        autoComplete.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+                // Not used in this case
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Filter the list based on user input
+                val filteredIllnesses =
+                    allMedicine.filter {
+                        it.medicineName.contains(
+                            s.toString(),
+                            ignoreCase = true
+                        )
+                    }
+
+                if (filteredIllnesses.isEmpty()) {
+                    // No results found, clear the text
+                    autoComplete.text = null
+                }
+
+                // Update the adapter with filtered results
+                val filteredAdapter = ArrayAdapter(
+                    this@DoctorAddPDF,
+                    R.layout.list_private_government,
+                    filteredIllnesses.map { it.medicineName })
+                autoComplete.setAdapter(filteredAdapter)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Not used in this case
+            }
+        })
+    }
+
+
+
 
     private fun initializedData() {
         val autoComplete: AutoCompleteTextView = findViewById(R.id.autoCompleteTextView)
@@ -454,7 +568,7 @@ class DoctorAddPDF : AppCompatActivity() {
                 // Create a table for the item list
                 val itemListTable = PdfPTable(3)
                 itemListTable.widthPercentage = 100f
-                itemListTable.setWidths(floatArrayOf(1f, 1f, 3f))
+                itemListTable.setWidths(floatArrayOf(1f, 2f, 2f))
 
                 // Add table headers
                 itemListTable.addCell(
@@ -482,8 +596,32 @@ class DoctorAddPDF : AppCompatActivity() {
                 illnessCell.minimumHeight = 500f // Adjust the minimum height as needed
                 itemListTable.addCell(illnessCell)
 
+
+
+                val allMedicine = medicinePDF
+                val itemsMedicine = allMedicine.split(",").map { it.trim() }
+                val medicineList = mutableListOf<Medicine?>()
+
+                runBlocking {
+                    val deferredMedicines = itemsMedicine.map { item ->
+                        async(Dispatchers.IO) {
+                            firestore().getIllnessByName(this@DoctorAddPDF, item)
+                        }
+                    }
+                    medicineList.addAll(deferredMedicines.awaitAll())
+                }
+
+                val concatenatedMedicineInfoList = medicineList.map { medicine ->
+                    "${medicine?.medicineName ?: ""} - ${medicine?.medicationTime ?: ""}"
+                }
+                val resultMedicineName = concatenatedMedicineInfoList.joinToString("\n")
+
+
+
+
+
                 val medicineCell =
-                    PdfPCell(Phrase(medicinePDF, FontFactory.getFont(FontFactory.HELVETICA)))
+                    PdfPCell(Phrase(resultMedicineName, FontFactory.getFont(FontFactory.HELVETICA)))
                 medicineCell.minimumHeight = 500f // Adjust the minimum height as needed
                 itemListTable.addCell(medicineCell)
 
@@ -575,6 +713,9 @@ class DoctorAddPDF : AppCompatActivity() {
     // Function to update the comma-separated string based on userSelectedTags
     fun updateChipsToCommaSeparatedString(): String {
         return userSelectedTags.joinToString(", ")
+    }
+    fun updateMedicineChipsToCommaSeparatedString(): String {
+        return medicineSelectedTags.joinToString(", ")
     }
 }
 

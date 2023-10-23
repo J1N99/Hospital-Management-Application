@@ -33,10 +33,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.hospitalmanagementapplication.model.Appointment
+import com.example.hospitalmanagementapplication.model.Medicine
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
 
@@ -417,7 +422,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 // Create a table for the item list
                 val itemListTable = PdfPTable(3)
                 itemListTable.widthPercentage = 100f
-                itemListTable.setWidths(floatArrayOf(1f, 1f, 3f))
+                itemListTable.setWidths(floatArrayOf(1f, 2f, 2f))
 
                 // Add table headers
                 itemListTable.addCell(
@@ -445,8 +450,40 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 illnessCell.minimumHeight = 500f // Adjust the minimum height as needed
                 itemListTable.addCell(illnessCell)
 
+
+
+
+                val allMedicine = medicinePDF
+                val itemsMedicine = allMedicine.split(",").map { it.trim() }
+                val medicineList = mutableListOf<Medicine?>()
+
+                runBlocking {
+                    val deferredMedicines = itemsMedicine.map { item ->
+                        async(Dispatchers.IO) {
+                            firestore().getIllnessByName(this@ViewAppointmentActivity, item)
+                        }
+                    }
+                    medicineList.addAll(deferredMedicines.awaitAll())
+                }
+
+                val concatenatedMedicineInfoList = medicineList.map { medicine ->
+                    "${medicine?.medicineName ?: ""} - ${medicine?.medicationTime ?: ""}"
+                }
+                val resultMedicineName = concatenatedMedicineInfoList.joinToString("\n")
+
+
+
+
+
+
+
+
+
+
+
+
                 val medicineCell =
-                    PdfPCell(Phrase(medicinePDF, FontFactory.getFont(FontFactory.HELVETICA)))
+                    PdfPCell(Phrase(resultMedicineName, FontFactory.getFont(FontFactory.HELVETICA)))
                 medicineCell.minimumHeight = 500f // Adjust the minimum height as needed
                 itemListTable.addCell(medicineCell)
 

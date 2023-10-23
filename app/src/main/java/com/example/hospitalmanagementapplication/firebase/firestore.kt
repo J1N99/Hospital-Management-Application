@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.tasks.await
 
 
 class firestore {
@@ -1006,5 +1007,32 @@ class firestore {
                 Log.w(ContentValues.TAG, "Error adding document", e)
             }
     }
+
+
+
+
+    suspend fun getIllnessByName(
+        activity: Activity,
+        medicineName: String
+    ): Medicine? {
+        try {
+            val querySnapshot = mFirestore.collection("medicine")
+                .whereEqualTo("medicineName", medicineName)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                val document = querySnapshot.documents[0]
+                return document.toObject(Medicine::class.java)
+            } else {
+                return null
+            }
+        } catch (e: Exception) {
+            Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+            return null
+        }
+    }
+
+
 
 }
