@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -231,6 +232,8 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        val buttonEmail=dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility= View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, DoctorHomeActivity::class.java)

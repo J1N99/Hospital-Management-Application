@@ -6,7 +6,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
@@ -30,6 +34,7 @@
 
         <activity
             android:name=".SignInActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,91 +44,120 @@
         </activity>
         <activity
             android:name=".SignUpActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity
             android:name=".HomeActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".userDetailsActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".ForgetPasswordActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".ProfileActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".AllUserActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".UpdatePositionActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".doctor.DoctorHomeActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".clerk.ClerkDashboardActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".doctor.DoctorAvailableAppointmentActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".BookingActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".SelectDoctorActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".resetPasswordActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".ViewAppointmentActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".doctor.DoctorViewAppointment"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".doctor.DoctorDisableAppointmentActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".doctor.DoctorInformationActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".addHospitalActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".allHospitalActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".ViewHospitalActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".AllIllnessActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".AddIllnessActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".ViewIllnessActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".AddAnnouncement"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".RedesignActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".DoctorAddPDF"
+            android:screenOrientation="portrait"
         android:exported="false">
     </activity>
         <activity android:name=".clerk.SuperAccountHome"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".AllMedicineActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
         <activity android:name=".AddMedicineActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
 

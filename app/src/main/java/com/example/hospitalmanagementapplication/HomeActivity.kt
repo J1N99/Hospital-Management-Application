@@ -1,13 +1,21 @@
 package com.example.hospitalmanagementapplication
 
+import android.Manifest
 import android.app.ActivityManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.example.hospitalmanagementapplication.databinding.ActivityMainBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
@@ -16,12 +24,22 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.concurrent.TimeUnit
+import android.os.Build
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.work.OneTimeWorkRequest
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var requestLauncher:ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
@@ -31,6 +49,17 @@ class HomeActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+            }
+        }
+
+
+
+
+
 
         val currentUser: FirebaseUser? = firebaseAuth.currentUser
         if (currentUser != null) {
@@ -55,6 +84,23 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
+
+
+
+
+
+
+        // Create a periodic work request to run the worker every hour
+        val workRequest = PeriodicWorkRequest.Builder(
+            AppointmentNotification::class.java,
+            1, // Repeat interval
+            TimeUnit.HOURS
+        ).build()
+
+
+        // Enqueue the work request with WorkManager
+        WorkManager.getInstance(this).enqueue(workRequest)
+
 
 
 
@@ -134,5 +180,6 @@ class HomeActivity : AppCompatActivity() {
             .setNegativeButton("No", null)
             .show()
     }
+
 }
 

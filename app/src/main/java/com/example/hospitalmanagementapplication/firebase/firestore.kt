@@ -2,17 +2,22 @@ package com.example.hospitalmanagementapplication.firebase
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.AppOpsManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
+import android.os.Build
 import android.util.Log
-import com.example.hospitalmanagementapplication.AddAnnouncement
-import com.example.hospitalmanagementapplication.HomeActivity
-import com.example.hospitalmanagementapplication.RedesignActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorAvailableAppointmentActivity
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.example.hospitalmanagementapplication.model.*
-import com.example.hospitalmanagementapplication.userDetailsActivity
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthCredential
@@ -25,6 +30,15 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import android.os.Process
+import com.example.hospitalmanagementapplication.*
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class firestore {
@@ -52,7 +66,7 @@ class firestore {
             }
     }
 
-     fun getCurrentUserID(): String {
+    fun getCurrentUserID(): String {
         val currentUser = FirebaseAuth.getInstance().currentUser
         var currentUserID = ""
         if (currentUser != null) {
@@ -467,8 +481,11 @@ class firestore {
                     appointmentsList.add(appointment)
                 }
 
+                // Sort the list of appointments by date and time
+                val sortedAppointments = appointmentsList.sortedWith(compareBy({ it.dateAppointment }, { it.time }))
+
                 // Pass the list of appointments to the callback function
-                callback(appointmentsList)
+                callback(sortedAppointments)
             }
             .addOnFailureListener { exception ->
                 // Handle any errors that occurred during the query
@@ -774,7 +791,7 @@ class firestore {
                 // Received the document ID and convert it into the User Data model object
                 val illness = document.toObject(Illness::class.java)
                 if (illness != null) {
-                    Log.e("XIXI",illness.illnessName)
+                    Log.e("XIXI", illness.illnessName)
                 }
                 // Pass the user object to the callback
                 callback(illness)
@@ -907,7 +924,11 @@ class firestore {
 
 
     //retrieve to see the data
-    fun checkPDFandDisplay(activity: Activity, appointmentID: String, callback: (List<PDFInfo>) -> Unit) {
+    fun checkPDFandDisplay(
+        activity: Activity,
+        appointmentID: String,
+        callback: (List<PDFInfo>) -> Unit
+    ) {
         // Create a Firestore query to check if an appointment exists
         val query = mFirestore.collection("pdfinfo")
             .whereEqualTo("appointmentID", appointmentID)
@@ -924,7 +945,15 @@ class firestore {
                     val patientID = document.getString("patientID") ?: ""
                     val pdfname = document.getString("pdfname") ?: ""
 
-                    val pdfinfo = PDFInfo(documentID, illness, medicine, action, patientID, appointmentID, pdfname)
+                    val pdfinfo = PDFInfo(
+                        documentID,
+                        illness,
+                        medicine,
+                        action,
+                        patientID,
+                        appointmentID,
+                        pdfname
+                    )
                     pdfInfoList.add(pdfinfo)
                 }
 
@@ -939,8 +968,6 @@ class firestore {
                 callback(emptyList())
             }
     }
-
-
 
 
     fun getAllMedicine(callback: (List<Medicine>) -> Unit) {
@@ -980,7 +1007,7 @@ class firestore {
                 // Received the document ID and convert it into the User Data model object
                 val medicine = document.toObject(Medicine::class.java)
                 if (medicine != null) {
-                    Log.e("XIXI",medicine.medicineName)
+                    Log.e("XIXI", medicine.medicineName)
                 }
                 // Pass the user object to the callback
                 callback(medicine)
@@ -1009,8 +1036,6 @@ class firestore {
     }
 
 
-
-
     suspend fun getIllnessByName(
         activity: Activity,
         medicineName: String
@@ -1032,6 +1057,77 @@ class firestore {
             return null
         }
     }
+
+
+        fun checkAndScheduleAppointments(context: Context) {
+            // Get the current date and time
+            val currentDateTime = Date()
+
+            // Set the date format for parsing appointment date and time
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
+
+            mFirestore.collection("appointments")
+                .whereEqualTo("userId", getCurrentUserID())
+                .get()
+                .addOnSuccessListener { queryDocumentSnapshots ->
+                    for (document in queryDocumentSnapshots) {
+                        // Parse appointment data
+                        val appointmentId = document.id
+                        val dateAppointmentString = document.getString("dateAppointment")
+                        val timeString = document.getString("time")
+
+                        // Convert dateAppointmentString and timeString to Date objects
+                        val appointmentDateTimeString = "$dateAppointmentString $timeString"
+                        val appointmentDateTime = dateFormat.parse(appointmentDateTimeString)
+
+                        // Calculate time difference
+                        val currentTime = currentDateTime.time
+                        val appointmentTimeMillis = appointmentDateTime.time
+                        val timeDiff = appointmentTimeMillis - currentTime
+
+                        // Set the notification threshold to 2 hour (in milliseconds)
+                        val notificationThreshold = 7200000  // 2 hour in milliseconds
+
+                        Log.e("Second",timeDiff.toString())
+                        Log.e("Third",notificationThreshold.toString())
+
+
+
+                        if (timeDiff >=0 && timeDiff<=notificationThreshold) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                val channel = NotificationChannel("Appoint Reminder", "Appointment Reminders", NotificationManager.IMPORTANCE_HIGH)
+                                val notificationManager = context.getSystemService(NotificationManager::class.java)
+                                notificationManager?.createNotificationChannel(channel)
+                            }
+                            Log.e("RUN","POKAI")
+
+                            val intent = Intent(context, ViewAppointmentActivity::class.java)
+                            val pendingIntent = PendingIntent.getActivity(
+                                context,
+                                0,
+                                intent,
+                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                            )
+
+
+                            // Schedule a notification for this appointment
+                            val builder = NotificationCompat.Builder(context, "Appoint Reminder")
+                                .setSmallIcon(R.drawable.logo)
+                                .setContentTitle("Appointment Reminder")
+                                .setContentText("Your $appointmentDateTimeString appointment is in 2 hour.")
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setContentIntent(pendingIntent)
+
+                            // Create a unique notification ID based on appointment time
+                            val notificationId = appointmentTimeMillis.toInt()
+
+                            // Show the notification
+                            val notificationManager = NotificationManagerCompat.from(context)
+                            notificationManager.notify(notificationId, builder.build())
+                        }
+                    }
+                }
+        }
 
 
 

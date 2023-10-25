@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hospitalmanagementapplication.DoctorAddPDF
 import com.example.hospitalmanagementapplication.R
 import com.example.hospitalmanagementapplication.firebase.firestore
+import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.example.hospitalmanagementapplication.utils.Loader
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,10 +22,22 @@ class DoctorViewAppointment : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AdapterTimeSlots
     private lateinit var progressDialog: Loader
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doctorviewappointment)
+
+
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
+
+
 
         // Initialize your data (time slots and events)
         val timeSlots = mutableListOf<String>()
