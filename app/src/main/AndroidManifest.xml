@@ -160,6 +160,10 @@
             android:screenOrientation="portrait"
             android:exported="false">
         </activity>
+        <activity android:name=".healthActivity"
+            android:screenOrientation="portrait"
+            android:exported="false">
+        </activity>
 
 
     </application>

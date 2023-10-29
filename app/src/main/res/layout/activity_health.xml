@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:text="Health Records"
+        android:textAllCaps="true"
+        android:textColor="#FF018786"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:rowCount="2"
+        android:columnCount="2"
+        android:layout_margin="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeText">
+
+    <!-- First Grid Cell -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/heightCard"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_gravity="fill"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="@color/teal_700"
+        android:background="@color/black"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        android:layout_columnSpan="1">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/baseline_height_24"
+                app:tint="@color/white"/>
+
+
+            <TextView
+                android:id="@+id/heightLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/imageView"
+                android:layout_marginStart="16dp"
+                android:text="Height: "
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                />
+            <TextView
+                android:id="@+id/heightET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/heightLabel"
+                android:layout_toRightOf="@id/imageView"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+
+
+
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Second Grid Cell -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/weightCard"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_row="0"
+        android:layout_column="1"
+        android:layout_gravity="fill"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="@color/teal_700"
+        android:background="@color/black"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        android:layout_columnSpan="1">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/weightImageView"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/baseline_monitor_weight_24"
+                    app:tint="@color/white"/>
+
+
+                <TextView
+                    android:id="@+id/weightLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/weightImageView"
+                    android:layout_marginStart="16dp"
+                    android:text="Weight: "
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    />
+                <TextView
+                    android:id="@+id/weightInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/weightLabel"
+                    android:layout_toRightOf="@id/weightImageView"
+                    android:layout_marginStart="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+
+
+
+            </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Third Grid Cell -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bmiCard"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_row="1"
+        android:layout_column="0"
+        android:layout_gravity="fill"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="@color/teal_700"
+        android:background="@color/black"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        android:layout_columnSpan="1">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/bmiImageView"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/bmi"
+                app:tint="@color/white"/>
+
+
+            <TextView
+                android:id="@+id/bmiLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bmiImageView"
+                android:layout_marginStart="16dp"
+                android:text="BMI: "
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                />
+            <TextView
+                android:id="@+id/bmiResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bmiLabel"
+                android:layout_toRightOf="@id/bmiImageView"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+
+
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+
+        <!-- Third Grid Cell -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bloodTypeCard"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_row="1"
+            android:layout_column="1"
+            android:layout_gravity="fill"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardBackgroundColor="@color/teal_700"
+            android:background="@color/black"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            android:layout_columnSpan="1">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/bloodTypeImage"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/baseline_bloodtype_24"
+                    app:tint="@color/white"/>
+
+
+                <TextView
+                    android:id="@+id/bloodTypeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/bloodTypeImage"
+                    android:layout_marginStart="16dp"
+                    android:text="Blood Type: "
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    />
+                <TextView
+                    android:id="@+id/bloodTypeResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/bloodTypeLabel"
+                    android:layout_toRightOf="@id/bloodTypeImage"
+                    android:layout_marginStart="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+
+
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+    </GridLayout>
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/activity_footer" />
+</androidx.constraintlayout.widget.ConstraintLayout>

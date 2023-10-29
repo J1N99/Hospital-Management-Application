@@ -33,7 +33,7 @@ class IntentManager(
                     true
                 }
                 R.id.others->{
-                    startActivity(activity,AllUserActivity::class.java)
+                    startActivity(activity,healthActivity::class.java)
                     true
                 }
                 // Add more cases for additional items

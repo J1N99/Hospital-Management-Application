@@ -482,7 +482,8 @@ class firestore {
                 }
 
                 // Sort the list of appointments by date and time
-                val sortedAppointments = appointmentsList.sortedWith(compareBy({ it.dateAppointment }, { it.time }))
+                val sortedAppointments = appointmentsList.sortedWith(compareByDescending<Appointment> { it.dateAppointment }.thenByDescending { it.time })
+
 
                 // Pass the list of appointments to the callback function
                 callback(sortedAppointments)
@@ -1129,6 +1130,47 @@ class firestore {
                 }
         }
 
+
+    fun getHealthReport(
+        activity: Activity,
+        callback: (List<healthReport>) -> Unit
+    ) {
+        // Create a Firestore query to get the user's health report
+        val query = mFirestore.collection("healthReport")
+            .document(getCurrentUserID())
+
+        query.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val healthReportList = mutableListOf<healthReport>()
+
+                    // Extract data from the document snapshot
+                    val data = documentSnapshot.data
+                    if (data != null) {
+                        val bloodType = data["bloodType"] as String? ?: ""
+                        val height = data["height"] as String? ?: ""
+                        val weight = data["weight"] as String? ?: ""
+
+                        val healthReport = healthReport(bloodType, height, weight)
+                        healthReportList.add(healthReport)
+                    }
+
+                    // Pass the list of HealthReport objects to the callback function
+                    callback(healthReportList)
+                } else {
+                    // If the document doesn't exist, pass an empty list to the callback
+                    callback(emptyList())
+                }
+            }
+            .addOnFailureListener { e ->
+                // Handle the query failure if needed
+                // You can add logging or error handling here
+                Log.w("Firestore", "Error getting document: ", e)
+
+                // Notify the callback of the failure by passing an empty list or an error indicator
+                callback(emptyList())
+            }
+    }
 
 
 }
