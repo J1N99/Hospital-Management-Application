@@ -326,7 +326,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
 
                 val headerText = Paragraph(
                     "Appointment Report",
-                    Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)
+                    Font(Font.FontFamily.HELVETICA, 15f, Font.BOLD, BaseColor.BLACK)
                 )
                 headerText.add(Chunk.NEWLINE)
                 headerText.add(
@@ -349,7 +349,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 headerText.add(
                     Phrase(
                         hospitalAddress,
-                        Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)
+                        Font(Font.FontFamily.HELVETICA, 12f, Font.NORMAL, BaseColor.BLACK)
                     )
                 )
                 headerText.add(Chunk.NEWLINE)
@@ -364,7 +364,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 headerText.add(
                     Phrase(
                         doctorEmail,
-                        Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)
+                        Font(Font.FontFamily.HELVETICA, 12f, Font.NORMAL, BaseColor.BLACK)
                     )
                 )
                 headerCell1.addElement(headerText)
@@ -447,7 +447,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 // Item List
                 val illnessCell =
                     PdfPCell(Phrase(illnessName, FontFactory.getFont(FontFactory.HELVETICA)))
-                illnessCell.minimumHeight = 500f // Adjust the minimum height as needed
+                illnessCell.minimumHeight = 400f // Adjust the minimum height as needed
                 itemListTable.addCell(illnessCell)
 
 
@@ -484,12 +484,12 @@ class ViewAppointmentActivity : AppCompatActivity() {
 
                 val medicineCell =
                     PdfPCell(Phrase(resultMedicineName, FontFactory.getFont(FontFactory.HELVETICA)))
-                medicineCell.minimumHeight = 500f // Adjust the minimum height as needed
+                medicineCell.minimumHeight = 400f // Adjust the minimum height as needed
                 itemListTable.addCell(medicineCell)
 
                 val actionCell =
                     PdfPCell(Phrase(actionPDF, FontFactory.getFont(FontFactory.HELVETICA)))
-                actionCell.minimumHeight = 500f // Adjust the minimum height as needed
+                actionCell.minimumHeight = 400f // Adjust the minimum height as needed
                 itemListTable.addCell(actionCell)
 
                 val thankYouCell = PdfPCell(

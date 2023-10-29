@@ -466,12 +466,11 @@ class DoctorAddPDF : AppCompatActivity() {
                 //headerCell1.backgroundColor = BaseColor(12, 173, 128)
                 headerCell1.horizontalAlignment = Element.ALIGN_LEFT
                 headerCell1.verticalAlignment = Element.ALIGN_MIDDLE
-                headerCell1.setPadding(10f)
                 headerCell1.borderWidthRight = 0f // Remove left border
-
+                headerCell1.setPadding(10f)
                 val headerText = Paragraph(
                     "Appointment Report",
-                    Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)
+                    Font(Font.FontFamily.HELVETICA, 15f, Font.BOLD, BaseColor.BLACK)
                 )
                 headerText.add(Chunk.NEWLINE)
                 headerText.add(
@@ -494,7 +493,7 @@ class DoctorAddPDF : AppCompatActivity() {
                 headerText.add(
                     Phrase(
                         hospitalAddress,
-                        Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)
+                        Font(Font.FontFamily.HELVETICA, 12f, Font.NORMAL, BaseColor.BLACK)
                     )
                 )
                 headerText.add(Chunk.NEWLINE)
@@ -509,7 +508,7 @@ class DoctorAddPDF : AppCompatActivity() {
                 headerText.add(
                     Phrase(
                         doctorEmail,
-                        Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD, BaseColor.BLACK)
+                        Font(Font.FontFamily.HELVETICA, 12f, Font.NORMAL, BaseColor.BLACK)
                     )
                 )
                 headerCell1.addElement(headerText)
@@ -570,6 +569,8 @@ class DoctorAddPDF : AppCompatActivity() {
                 itemListTable.widthPercentage = 100f
                 itemListTable.setWidths(floatArrayOf(1f, 2f, 2f))
 
+
+
                 // Add table headers
                 itemListTable.addCell(
                     Phrase(
@@ -593,7 +594,7 @@ class DoctorAddPDF : AppCompatActivity() {
                 // Item List
                 val illnessCell =
                     PdfPCell(Phrase(illnessName, FontFactory.getFont(FontFactory.HELVETICA)))
-                illnessCell.minimumHeight = 500f // Adjust the minimum height as needed
+                illnessCell.minimumHeight = 400f // Adjust the minimum height as needed
                 itemListTable.addCell(illnessCell)
 
 
@@ -622,12 +623,12 @@ class DoctorAddPDF : AppCompatActivity() {
 
                 val medicineCell =
                     PdfPCell(Phrase(resultMedicineName, FontFactory.getFont(FontFactory.HELVETICA)))
-                medicineCell.minimumHeight = 500f // Adjust the minimum height as needed
+                medicineCell.minimumHeight = 400f // Adjust the minimum height as needed
                 itemListTable.addCell(medicineCell)
 
                 val actionCell =
                     PdfPCell(Phrase(actionPDF, FontFactory.getFont(FontFactory.HELVETICA)))
-                actionCell.minimumHeight = 500f // Adjust the minimum height as needed
+                actionCell.minimumHeight = 400f // Adjust the minimum height as needed
                 itemListTable.addCell(actionCell)
 
                 val thankYouCell = PdfPCell(

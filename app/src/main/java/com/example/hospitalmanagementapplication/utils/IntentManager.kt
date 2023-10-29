@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.example.hospitalmanagementapplication.*
 import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
+import com.example.hospitalmanagementapplication.clerk.SuperAccountHome
 import com.example.hospitalmanagementapplication.doctor.DoctorHomeActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -25,6 +26,9 @@ class IntentManager(
                     }
                     if (position==3) {
                         startActivity(activity, ClerkDashboardActivity::class.java)
+                    }
+                    if (position==4) {
+                        startActivity(activity, SuperAccountHome::class.java)
                     }
                     true
                 }

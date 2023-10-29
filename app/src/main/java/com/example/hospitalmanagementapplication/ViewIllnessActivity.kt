@@ -21,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class ViewIllnessActivity : AppCompatActivity() {
     private lateinit var binding: ActivityViewillnessBinding
     private val illnessList = mutableListOf<Illness>()
+
     private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,9 +99,9 @@ class IllnessAdapter(private val context: Context, private val illnessList: Muta
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val illness = illnessList[position]
-        holder.nameOfIllness.text = illness.illnessName
-        holder.description.text = illness.description
-        holder.actionTaken.text = illness.actionTaken
+        holder.nameOfIllness.text = "Illness Name: "+illness.illnessName
+        holder.description.text ="Illness Description: "+ illness.description
+        holder.actionTaken.text = "Illness Taken: "+ illness.actionTaken
     }
 
     override fun getItemCount(): Int {
