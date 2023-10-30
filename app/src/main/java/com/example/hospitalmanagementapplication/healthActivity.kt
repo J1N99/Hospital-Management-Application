@@ -60,7 +60,7 @@ class healthActivity : AppCompatActivity() {
         firestore().getUserPosition(this) { position ->
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
-                bottomNavigationView.setSelectedItemId(R.id.profile);
+                bottomNavigationView.setSelectedItemId(R.id.others);
                 IntentManager(this, bottomNavigationView, position)
             }
         }

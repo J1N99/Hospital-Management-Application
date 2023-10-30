@@ -5,13 +5,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.hospitalmanagementapplication.databinding.ActivitySelectdoctorBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
+import com.example.hospitalmanagementapplication.model.Hospital
+import com.example.hospitalmanagementapplication.model.department
 import com.example.hospitalmanagementapplication.model.doctorInformation
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.example.hospitalmanagementapplication.utils.Loader
@@ -35,6 +36,9 @@ class SelectDoctorActivity : AppCompatActivity() {
     private lateinit var progressDialog: Loader
     private lateinit var recyclerView: RecyclerView
     private lateinit var doctorAdapter: DoctorAdapter
+    private lateinit var hospitalItemSelected: Any
+    private lateinit var departmentItemSelected: Any
+    private var originalDoctorList: List<doctorInformation> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +49,7 @@ class SelectDoctorActivity : AppCompatActivity() {
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
                 bottomNavigationView.setSelectedItemId(R.id.others);
-                IntentManager(this, bottomNavigationView,position)
+                IntentManager(this, bottomNavigationView, position)
             }
         }
         firebaseAuth = FirebaseAuth.getInstance()
@@ -63,7 +67,7 @@ class SelectDoctorActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString().trim().toLowerCase()
-                filterDoctors(query)
+                filterDoctors(query,1)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -73,7 +77,132 @@ class SelectDoctorActivity : AppCompatActivity() {
 
         firestore().getAllDoctorFromDoctorInfo { doctorList ->
             doctorAdapter.setDoctors(doctorList)
+            originalDoctorList = doctorAdapter.getDoctors()
         }
+
+        binding.resetFilter.setOnClickListener {
+            resetDoctorList()
+        }
+
+        val autoComplete: AutoCompleteTextView = findViewById(R.id.hospitalAutoCompleteTextView)
+        val allHospital: MutableList<Hospital> = mutableListOf()
+
+        // Initialize an empty adapter for now
+        val adapter = ArrayAdapter(this, R.layout.list_private_government, listOf<String>())
+        autoComplete.setAdapter(adapter)
+
+        firestore().getAllHospital { fetchHospital ->
+            // Populate the allIllness list with data from Firestore
+            allHospital.clear() // Clear the list to remove any existing data
+            allHospital.addAll(fetchHospital)
+
+            // Create the adapter with all illnesses
+            val initialAdapter = ArrayAdapter(
+                this,
+                R.layout.list_private_government,
+                allHospital.map { it.hospital })
+
+            // Set the adapter for the AutoCompleteTextView
+            autoComplete.setAdapter(initialAdapter)
+        }
+
+        autoComplete.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not used in this case
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Filter the list based on user input
+                val filteredIllnesses =
+                    allHospital.filter { it.hospital.contains(s.toString(), ignoreCase = true) }
+
+                if (filteredIllnesses.isEmpty()) {
+                    // No results found, clear the text
+                    autoComplete.text = null
+                }
+
+                // Update the adapter with filtered results
+                val filteredAdapter = ArrayAdapter(
+                    this@SelectDoctorActivity,
+                    R.layout.list_private_government,
+                    filteredIllnesses.map { it.hospital })
+                autoComplete.setAdapter(filteredAdapter)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Not used in this case
+            }
+        })
+
+        autoComplete.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                hospitalItemSelected = allHospital[position].documentId
+                filterDoctors(hospitalItemSelected.toString(),2)
+            }
+
+
+
+
+
+        val departmentAutoComplete: AutoCompleteTextView =
+            findViewById(R.id.departmentAutoCompleteTextView)
+        val allDepartment: MutableList<department> = mutableListOf()
+
+        // Initialize an empty adapter for now
+        val departmentAdapter =
+            ArrayAdapter(this, R.layout.list_private_government, listOf<String>())
+        departmentAutoComplete.setAdapter(departmentAdapter)
+
+        firestore().getAllDepartment { fetchDepartment ->
+            // Populate the allIllness list with data from Firestore
+            allDepartment.clear() // Clear the list to remove any existing data
+            allDepartment.addAll(fetchDepartment)
+
+            // Create the adapter with all illnesses
+            val initialAdapter = ArrayAdapter(
+                this,
+                R.layout.list_private_government,
+                allDepartment.map { it.department })
+
+            // Set the adapter for the AutoCompleteTextView
+            departmentAutoComplete.setAdapter(initialAdapter)
+        }
+
+        departmentAutoComplete.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not used in this case
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Filter the list based on user input
+                val filteredDepartment =
+                    allDepartment.filter { it.department.contains(s.toString(), ignoreCase = true) }
+
+                if (filteredDepartment.isEmpty()) {
+                    // No results found, clear the text
+                    departmentAutoComplete.text = null
+                }
+
+                // Update the adapter with filtered results
+                val filteredAdapter = ArrayAdapter(
+                    this@SelectDoctorActivity,
+                    R.layout.list_private_government,
+                    filteredDepartment.map { it.department })
+                departmentAutoComplete.setAdapter(filteredAdapter)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Not used in this case
+            }
+        })
+
+        departmentAutoComplete.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                departmentItemSelected = allDepartment[position].documentID
+                filterDoctors(departmentItemSelected.toString(),3)
+
+            }
+
     }
 
     inner class DoctorAdapter : RecyclerView.Adapter<DoctorAdapter.DoctorViewHolder>() {
@@ -83,9 +212,11 @@ class SelectDoctorActivity : AppCompatActivity() {
             this.doctorList = doctors
             notifyDataSetChanged()
         }
+
         fun getDoctors(): List<doctorInformation> {
             return doctorList
         }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoctorViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.doctorlist_card_view, parent, false)
@@ -119,8 +250,20 @@ class SelectDoctorActivity : AppCompatActivity() {
             }
 
             fun bind(doctor: doctorInformation) {
-                department.text = "Department: " + doctor.department
-                firestore().getHospitalDetails(this@SelectDoctorActivity, doctor.hospital) { hospitals ->
+                firestore().getDepartmentDetails(this@SelectDoctorActivity, doctor.department) { departments ->
+                    if (departments != null) {
+
+                        department.text = "Department: " + departments.department
+                    }
+                }
+
+
+
+
+                firestore().getHospitalDetails(
+                    this@SelectDoctorActivity,
+                    doctor.hospital
+                ) { hospitals ->
                     if (hospitals != null) {
                         hospital.text = "Hospital: " + hospitals.hospital
                     }
@@ -166,24 +309,59 @@ class SelectDoctorActivity : AppCompatActivity() {
             .into(imageView)
     }
 
-    private fun filterDoctors(query: String) {
+    private fun filterDoctors(query: String, type: Int) {
         val filteredDoctors = mutableListOf<doctorInformation>()
+        val doctorList = doctorAdapter.getDoctors()
 
-        // Access doctorList using the getDoctors() method
-        for (doctor in doctorAdapter.getDoctors()) {
-            val doctorName = getUserFullName(doctor.userID) { fullName ->
-                // Callback function to handle the full name
-                if (fullName.toLowerCase().contains(query)) {
-                    // Add the doctor to the filtered list
-                    filteredDoctors.add(doctor)
+        var callbacksCompleted = 0
+
+        for (doctor in doctorList) {
+            if (type == 1) {
+                getUserFullName(doctor.userID) { fullName ->
+                    callbacksCompleted++
+                    if (fullName.toLowerCase().contains(query)) {
+                        // Add the doctor to the filtered list
+                        filteredDoctors.add(doctor)
+                    }
+
+                    if (callbacksCompleted == doctorList.size) {
+                        // All callbacks have completed, update the RecyclerView
+                        doctorAdapter.setDoctors(filteredDoctors)
+                    }
                 }
             }
-        }
+            else if(type==2){
+                callbacksCompleted++
+                if(doctor.hospital==query)
+                {
+                    filteredDoctors.add(doctor)
+                }
+                if (callbacksCompleted == doctorList.size) {
+                    // All callbacks have completed, update the RecyclerView
+                    doctorAdapter.setDoctors(filteredDoctors)
+                }
+            }
+            else if(type==3){
+                callbacksCompleted++
+                if(doctor.department==query)
+                {
+                    filteredDoctors.add(doctor)
+                }
+                if (callbacksCompleted == doctorList.size) {
+                    // All callbacks have completed, update the RecyclerView
+                    doctorAdapter.setDoctors(filteredDoctors)
+                }
+            }
 
-        // Set the filtered list of doctors in the adapter to update the RecyclerView
-        doctorAdapter.setDoctors(filteredDoctors)
+
+
+        }
     }
 
+    private fun resetDoctorList() {
+        startActivity(intent)
+        finish()
+    }
 
 
     private fun getUserFullName(userId: String, callback: (String) -> Unit) {

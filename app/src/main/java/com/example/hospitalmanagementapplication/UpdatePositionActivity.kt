@@ -1,8 +1,11 @@
 package com.example.hospitalmanagementapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActitvityUpdatepositionBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
@@ -113,6 +116,7 @@ class UpdatePositionActivity : AppCompatActivity() {
                 )
 
                 firestore().updatePosition(documentID, dataToUpdate)
+                showDialogSuccessUpdate("Updated successful")
             } else {
 
                 Toast.makeText(
@@ -124,5 +128,26 @@ class UpdatePositionActivity : AppCompatActivity() {
 
             }
         }
+    }
+    private fun showDialogSuccessUpdate(textShow: String) {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
+
+        val textViewMessage = dialogView.findViewById<TextView>(R.id.textViewMessage)
+        textViewMessage.text = textShow
+        builder.setView(dialogView)
+        val dialog = builder.create()
+
+        val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
+        var buttonEmail = dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility = View.GONE
+        buttonDismiss.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, AllUserActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        dialog.show()
     }
 }

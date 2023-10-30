@@ -35,6 +35,7 @@ import com.example.hospitalmanagementapplication.HomeActivity
 import com.example.hospitalmanagementapplication.R
 import com.example.hospitalmanagementapplication.model.Hospital
 import com.example.hospitalmanagementapplication.model.Illness
+import com.example.hospitalmanagementapplication.model.department
 import com.example.hospitalmanagementapplication.userDetailsActivity
 
 class DoctorInformationActivity : AppCompatActivity() {
@@ -48,6 +49,8 @@ class DoctorInformationActivity : AppCompatActivity() {
     private lateinit var selectImageButton: Button
     private lateinit var uploadButton: Button
     private lateinit var itemSelected: Any
+    private lateinit var departmentItemSelected: Any
+
     private var selectedImageUri: Uri? = null
     private var imageFileName = ""
 
@@ -121,24 +124,97 @@ class DoctorInformationActivity : AppCompatActivity() {
             }
 
 
+        val departmentAutoComplete: AutoCompleteTextView =
+            findViewById(R.id.departmentAutoCompleteTextView)
+        val allDepartment: MutableList<department> = mutableListOf()
+
+        // Initialize an empty adapter for now
+        val departmentAdapter =
+            ArrayAdapter(this, R.layout.list_private_government, listOf<String>())
+        departmentAutoComplete.setAdapter(departmentAdapter)
+
+        firestore().getAllDepartment { fetchDepartment ->
+            // Populate the allIllness list with data from Firestore
+            allDepartment.clear() // Clear the list to remove any existing data
+            allDepartment.addAll(fetchDepartment)
+
+            // Create the adapter with all illnesses
+            val initialAdapter = ArrayAdapter(
+                this,
+                R.layout.list_private_government,
+                allDepartment.map { it.department })
+
+            // Set the adapter for the AutoCompleteTextView
+            departmentAutoComplete.setAdapter(initialAdapter)
+        }
+
+        departmentAutoComplete.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not used in this case
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Filter the list based on user input
+                val filteredDepartment =
+                    allDepartment.filter { it.department.contains(s.toString(), ignoreCase = true) }
+
+                if (filteredDepartment.isEmpty()) {
+                    // No results found, clear the text
+                    departmentAutoComplete.text = null
+                }
+
+                // Update the adapter with filtered results
+                val filteredAdapter = ArrayAdapter(
+                    this@DoctorInformationActivity,
+                    R.layout.list_private_government,
+                    filteredDepartment.map { it.department })
+                departmentAutoComplete.setAdapter(filteredAdapter)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Not used in this case
+            }
+        })
+
+        departmentAutoComplete.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                departmentItemSelected = allDepartment[position].documentID
+
+            }
+
+
         val userId = getCurrentUserId()
         firestore().getDoctorInfo(this, userId) { doctorInfo ->
             if (doctorInfo != null) {
                 binding.uploadimagebtn.text = "Edit information"
-                binding.departmentET.setText(doctorInfo.department)
-                binding.departmentET.isEnabled = false
+
 
                 binding.qualificationET.setText(doctorInfo.quanlification)
                 binding.qualificationET.isEnabled = false
 
                 binding.autoCompleteTextView.isEnabled = false
+                binding.departmentAutoCompleteTextView.isEnabled = false
 
-
-
+                itemSelected = doctorInfo.hospital
+                departmentItemSelected = doctorInfo.department
                 firestore().getHospitalDetails(this, doctorInfo.hospital) { hospital ->
                     if (hospital != null) {
                         autoComplete.setText(hospital.hospital, false)
-                        itemSelected = hospital.hospital
+
+
+                        firestore().getDepartmentDetails(
+                            this,
+                            doctorInfo.department
+                        ) { department ->
+                            if (department != null) {
+                                departmentAutoComplete.setText(department.department, false)
+
+
+                            } else {
+                                Toast.makeText(this, "Department is null", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
 
                     } else {
                         Toast.makeText(this, "Hospital is null", Toast.LENGTH_SHORT).show()
@@ -147,6 +223,7 @@ class DoctorInformationActivity : AppCompatActivity() {
 
 
                 binding.autoCompleteTextView.setText(doctorInfo.hospital)
+                binding.departmentAutoCompleteTextView.setText(doctorInfo.department)
 
 
 
@@ -193,11 +270,11 @@ class DoctorInformationActivity : AppCompatActivity() {
 
             if (binding.uploadimagebtn.text == "Save Information") {
 
-                var doctorDepartment = binding.departmentET.text.toString().trim()
+                var doctorDepartment = departmentItemSelected
                 var Quanlification = binding.qualificationET.text.toString().trim()
                 var hospitalID = itemSelected
 
-                if (doctorDepartment.isEmpty() || Quanlification.isEmpty() || selectedImageUri == null || hospitalID == null) {
+                if (doctorDepartment == null || Quanlification.isEmpty() || selectedImageUri == null || hospitalID == null) {
                     Toast.makeText(
                         this,
                         "Please enter all the fields or please select the image",
@@ -209,8 +286,7 @@ class DoctorInformationActivity : AppCompatActivity() {
 
             } else if (binding.uploadimagebtn.text == "Edit information") {
                 binding.uploadimagebtn.text = "Save Edit"
-                binding.departmentET.isEnabled = true
-                binding.departmentLayout.boxStrokeColor = Color.BLACK
+                binding.departmentAutoCompleteTextView.isEnabled = true
                 binding.qualificationLayout.boxStrokeColor = Color.BLACK
                 binding.qualificationET.isEnabled = true
 
@@ -218,10 +294,10 @@ class DoctorInformationActivity : AppCompatActivity() {
                 binding.selectImagebtn.visibility = View.VISIBLE
                 binding.imageInfo.visibility = View.VISIBLE
             } else if (binding.uploadimagebtn.text == "Save Edit") {
-                var doctorDepartment = binding.departmentET.text.toString().trim()
+                var doctorDepartment = departmentItemSelected
                 var Quanlification = binding.qualificationET.text.toString().trim()
                 var hospitalID = itemSelected
-                if (doctorDepartment.isEmpty() || Quanlification.isEmpty()  || hospitalID == null) {
+                if (doctorDepartment == null || Quanlification.isEmpty() || hospitalID == null) {
                     Toast.makeText(
                         this,
                         "Please enter all the fields or please select the image",
@@ -234,10 +310,10 @@ class DoctorInformationActivity : AppCompatActivity() {
                         val currentUser = firebaseAuth.currentUser
                         val userId = currentUser?.uid
                         if (userId != null) {
-                            val department = binding.departmentET.text.toString()
+                            val department = departmentItemSelected.toString()
                             val quanlification = binding.qualificationET.text.toString()
                             val hospitalID = itemSelected.toString()
-                            Log.e(hospitalID,hospitalID)
+                            Log.e(hospitalID, hospitalID)
 
                             val dataToUpdate = mapOf(
                                 "department" to department,
@@ -311,7 +387,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                         val currentUser = firebaseAuth.currentUser
                         val userId = currentUser?.uid
                         if (userId != null) {
-                            val department = binding.departmentET.text.toString()
+                            val department = departmentItemSelected.toString()
                             val quanlification = binding.qualificationET.text.toString()
                             val hospitalID = itemSelected.toString()
                             val filename = imageFileName
@@ -366,7 +442,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                         val currentUser = firebaseAuth.currentUser
                         val userId = currentUser?.uid
                         if (userId != null) {
-                            val department = binding.departmentET.text.toString()
+                            val department = departmentItemSelected.toString()
                             val quanlification = binding.qualificationET.text.toString()
                             val filename = imageFileName
                             val hospitalID = itemSelected.toString()
@@ -442,7 +518,7 @@ class DoctorInformationActivity : AppCompatActivity() {
         buttonEmail.visibility = View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, HomeActivity::class.java)
+            val intent = Intent(this, DoctorHomeActivity::class.java)
             startActivity(intent)
         }
 
@@ -483,6 +559,7 @@ class DoctorInformationActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
     override fun onBackPressed() {
         val intent = Intent(this, DoctorInformationActivity::class.java)
         startActivity(intent)

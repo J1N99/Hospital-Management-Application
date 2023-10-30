@@ -1172,5 +1172,70 @@ class firestore {
             }
     }
 
+    fun getAllDepartment(callback: (List<department>) -> Unit) {
+
+        mFirestore.collection("department").get()
+            .addOnSuccessListener { result ->
+                val departmentList = mutableListOf<department>()
+
+                for (document in result) {
+                    val documentId = document.id
+                    val department = document.getString("department").toString()
+
+
+                    val departmentDetails = department(documentId, department)
+                    departmentList.add(departmentDetails)
+                }
+
+                callback(departmentList)
+            }
+            .addOnFailureListener { exception ->
+                // Handle errors here
+                callback(emptyList()) // You can also return an empty list or handle errors differently
+            }
+    }
+
+
+    fun getDepartmentDetails(activity: Activity, departmentID: String, callback: (department?) -> Unit) {
+        // Get user in collection
+        mFirestore.collection("department")
+            // Get documentation id from the field of users
+            .document(departmentID)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d(activity.javaClass.simpleName, document.toString())
+
+                // Received the document ID and convert it into the User Data model object
+                val departments = document.toObject(department::class.java)
+
+                // Pass the user object to the callback
+                callback(departments)
+            }
+            .addOnFailureListener { e ->
+                Log.e(activity.javaClass.simpleName, "Error getting user details: $e")
+                callback(null) // Notify callback of the error
+            }
+    }
+
+    fun createDepartment(activity: Activity, department: department) {
+
+        //create collection names, is exist just use
+        mFirestore.collection("department")
+            //create document id
+            .document()
+            // We set the user object in the document, using SetOptions.merge() to merge data if the document already exists
+            .set(department, SetOptions.merge())
+            .addOnSuccessListener { documentReference ->
+                Log.d("Tag-Document ID", "Document added with ID: $documentReference")
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error adding document", e)
+            }
+    }
+
+
+
+
+
 
 }
