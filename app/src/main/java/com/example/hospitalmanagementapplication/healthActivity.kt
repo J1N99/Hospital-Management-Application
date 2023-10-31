@@ -73,8 +73,9 @@ class healthActivity : AppCompatActivity() {
                 binding.heightET.text = healthReport.height
                 binding.weightInput.text = healthReport.weight
             }
-
-            calculateBMI()
+            if(binding.heightET.text!="--"&& binding.weightInput.text!="--") {
+                calculateBMI()
+            }
         }
 
         binding.heightCard.setOnClickListener {
@@ -97,7 +98,9 @@ class healthActivity : AppCompatActivity() {
                     )
 
                     firestore().updateDocument("healthReport", userID ?: "", dataToUpdate)
-                    calculateBMI()
+                    if(binding.heightET.text!="--"&& binding.weightInput.text!="--") {
+                        calculateBMI()
+                    }
                 }
                 .setNegativeButton("Cancel") { dialog, which ->
                     // Handle cancel if needed
@@ -128,7 +131,9 @@ class healthActivity : AppCompatActivity() {
                     )
 
                     firestore().updateDocument("healthReport", userID ?: "", dataToUpdate)
-                    calculateBMI()
+                    if(binding.heightET.text!="--"&& binding.weightInput.text!="--") {
+                        calculateBMI()
+                    }
                 }
                 .setNegativeButton("Cancel") { dialog, which ->
                     // Handle cancel if needed
