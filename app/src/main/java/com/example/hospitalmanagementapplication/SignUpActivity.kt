@@ -100,7 +100,9 @@ class SignUpActivity : AppCompatActivity() {
 
         builder.setView(dialogView)
         val dialog = builder.create()
-
+        val buttonResendVerificationCode =
+            dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonResendVerificationCode.visibility=View.GONE
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
         buttonDismiss.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
