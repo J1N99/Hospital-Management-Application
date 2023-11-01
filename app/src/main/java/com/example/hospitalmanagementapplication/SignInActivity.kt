@@ -183,42 +183,29 @@ class SignInActivity : AppCompatActivity() {
         progressDialog = Loader(this)
         progressDialog.show()
         if (firebaseAuth.currentUser != null) {
-
             firestore().getUserPosition(this) { position ->
+                progressDialog.dismiss() // Dismiss the progress dialog when you have the result.
                 if (position != null) {
-                    if (position == 1) {
-                        progressDialog.dismiss()
-                        val intent = Intent(this, HomeActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    }
-                    else if (position == 2) {
-                        progressDialog.dismiss()
-                        val intent = Intent(this, DoctorHomeActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    } else if (position == 3) {
-                        progressDialog.dismiss()
-                        val intent = Intent(this, ClerkDashboardActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    }
-                    else if (position == 4) {
-                        progressDialog.dismiss()
-                        val intent = Intent(this, SuperAccountHome::class.java)
-                        startActivity(intent)
-                        finish()
+                    when (position) {
+                        1 -> startActivityAndFinish(HomeActivity::class.java)
+                        2 -> startActivityAndFinish(DoctorHomeActivity::class.java)
+                        3 -> startActivityAndFinish(ClerkDashboardActivity::class.java)
+                        4 -> startActivityAndFinish(SuperAccountHome::class.java)
+                        else -> startActivityAndFinish(HomeActivity::class.java)
                     }
                 } else {
-                    progressDialog.dismiss()
-                    val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    startActivityAndFinish(HomeActivity::class.java)
                 }
             }
-
+        } else {
+            progressDialog.dismiss() // Dismiss the progress dialog when the user is not logged in.
         }
-        progressDialog.dismiss()
+    }
+
+    private fun startActivityAndFinish(activityClass: Class<*>) {
+        val intent = Intent(this, activityClass)
+        startActivity(intent)
+        finish()
     }
 
     fun showVerificationDialog() {
