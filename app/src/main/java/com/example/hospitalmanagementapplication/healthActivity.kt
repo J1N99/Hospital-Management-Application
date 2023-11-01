@@ -26,7 +26,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.TimeUnit
 import android.os.Build
+import android.text.InputFilter
 import android.text.InputType
+import android.text.SpannableStringBuilder
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
@@ -73,7 +75,7 @@ class healthActivity : AppCompatActivity() {
                 binding.heightET.text = healthReport.height
                 binding.weightInput.text = healthReport.weight
             }
-            if(binding.heightET.text!="--"&& binding.weightInput.text!="--") {
+            if (binding.heightET.text != "--" && binding.weightInput.text != "--") {
                 calculateBMI()
             }
         }
@@ -81,9 +83,30 @@ class healthActivity : AppCompatActivity() {
         binding.heightCard.setOnClickListener {
             // Create an EditText to get user input
             val inputEditText = EditText(this)
-            // Set an InputFilter to allow only numeric input
+
+            // Set an InputFilter to allow only up to 3 numeric characters
             inputEditText.inputType =
-                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
+                InputType.TYPE_CLASS_NUMBER
+
+            // Create a custom InputFilter
+            val customInputFilter = InputFilter { source, start, end, dest, dstart, dend ->
+                val builder = SpannableStringBuilder(dest)
+                builder.replace(dstart, dend, source, start, end)
+
+                val inputText = builder.toString()
+
+                // Define a regex pattern to match up to 3 numeric characters
+                val pattern = "^[0-9]{0,3}\$".toRegex()
+
+                // Check if the input matches the desired format
+                if (pattern.matches(inputText)) {
+                    null // Input is valid
+                } else {
+                    "" // Input is invalid, so return an empty string to reject the input
+                }
+            }
+
+            inputEditText.filters = arrayOf(customInputFilter)
 
             // Create an AlertDialog
             val alertDialog = AlertDialog.Builder(this)
@@ -98,7 +121,7 @@ class healthActivity : AppCompatActivity() {
                     )
 
                     firestore().updateDocument("healthReport", userID ?: "", dataToUpdate)
-                    if(binding.heightET.text!="--"&& binding.weightInput.text!="--") {
+                    if (binding.heightET.text != "--" && binding.weightInput.text != "--") {
                         calculateBMI()
                     }
                 }
@@ -114,9 +137,33 @@ class healthActivity : AppCompatActivity() {
         binding.weightCard.setOnClickListener {
             // Create an EditText to get user input
             val inputEditText = EditText(this)
-            // Set an InputFilter to allow only numeric input
+
+            // Set an InputFilter to allow numbers with up to two decimal places and disallow +, -, and /
             inputEditText.inputType =
-                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
+                InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_NUMBER_FLAG_DECIMAL
+
+            // Create a custom InputFilter
+            val customInputFilter = InputFilter { source, start, end, dest, dstart, dend ->
+                val builder = SpannableStringBuilder(dest)
+                builder.replace(dstart, dend, source, start, end)
+
+                val inputText = builder.toString()
+
+                // Define a regex pattern to match the desired format with an optional decimal point
+                val pattern = "^(\\d{0,3}(\\.\\d{0,2})?)?\$".toRegex()
+
+                // Check if the input matches the desired format and doesn't contain +, -, or /
+                if (pattern.matches(inputText) && !inputText.contains("+") && !inputText.contains("-") && !inputText.contains(
+                        "/"
+                    )
+                ) {
+                    null // Input is valid
+                } else {
+                    "" // Input is invalid, so return an empty string to reject the input
+                }
+            }
+
+            inputEditText.filters = arrayOf(customInputFilter)
 
             // Create an AlertDialog
             val alertDialog = AlertDialog.Builder(this)
@@ -131,7 +178,7 @@ class healthActivity : AppCompatActivity() {
                     )
 
                     firestore().updateDocument("healthReport", userID ?: "", dataToUpdate)
-                    if(binding.heightET.text!="--"&& binding.weightInput.text!="--") {
+                    if (binding.heightET.text != "--" && binding.weightInput.text != "--") {
                         calculateBMI()
                     }
                 }
@@ -141,8 +188,9 @@ class healthActivity : AppCompatActivity() {
                 .create()
 
             alertDialog.show()
-
         }
+
+
 
 
 
