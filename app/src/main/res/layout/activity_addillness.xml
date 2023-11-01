@@ -7,128 +7,140 @@
     tools:context=".userDetailsActivity">
 
 
-
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/nameOfIllnessLayout"
-        style="@style/LoginTextInputOuterFieldStyle"
-        android:layout_width="320dp"
-        android:layout_height="60dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/nameOfIllnessET"
-            style="@style/LoginTextInputInnerFieldStyle"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Name of Illness"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content">
 
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/descriptionLayout"
-        style="@style/LoginTextInputOuterFieldStyle"
-        android:layout_width="320dp"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/nameOfIllnessLayout"
+                style="@style/LoginTextInputOuterFieldStyle"
+                android:layout_width="320dp"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imageView2">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/nameOfIllnessET"
+                    style="@style/LoginTextInputInnerFieldStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Name of Illness"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/descriptionLayout"
+                style="@style/LoginTextInputOuterFieldStyle"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nameOfIllnessLayout">
+
+                <EditText
+                    android:id="@+id/descriptionET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|top"
+                    android:hint="Description of Illness"
+                    android:inputType="textMultiLine"
+                    android:lines="4"
+                    android:scrollbars="vertical" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/actionTakenLayout"
+                style="@style/LoginTextInputOuterFieldStyle"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/descriptionLayout">
+
+                <EditText
+                    android:id="@+id/actionTakenET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|top"
+                    android:hint="Action taken"
+                    android:inputType="textMultiLine"
+                    android:lines="4"
+                    android:scrollbars="vertical" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button"
+                android:layout_width="320dp"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/green_rounded_button"
+                android:text="Save Details"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/actionTakenLayout" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonDeleteHospital"
+                android:layout_width="320dp"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/red_rounded_button"
+                android:text="Delete Illness "
+                android:textColor="@color/white"
+
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                style="@style/nightForIcon"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="88dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/baseline_sick_24" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nameOfIllnessLayout"
-        >
-
-    <EditText
-        android:id="@+id/descriptionET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Description of Illness"
-        android:inputType="textMultiLine"
-        android:lines="4"
-        android:gravity="start|top"
-        android:scrollbars="vertical"
-    />
-</com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/actionTakenLayout"
-        style="@style/LoginTextInputOuterFieldStyle"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/descriptionLayout"
-        >
-
-        <EditText
-            android:id="@+id/actionTakenET"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Action taken"
-            android:inputType="textMultiLine"
-            android:lines="4"
-            android:gravity="start|top"
-            android:scrollbars="vertical"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button"
-        android:layout_width="320dp"
-        android:layout_height="60dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/green_rounded_button"
-        android:text="Save Details"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/actionTakenLayout" />
-
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/buttonDeleteHospital"
-        android:layout_width="320dp"
-        android:layout_height="60dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/red_rounded_button"
-        android:text="Delete Illness "
-        android:textColor="@color/white"
-
-        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="88dp"
-        style="@style/nightForIcon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_sick_24" />
-
-
-    <include
-        android:id="@+id/include"
-        layout="@layout/activity_footer" />
-
+        app:menu="@menu/bottom_navigation"></com.google.android.material.bottomnavigation.BottomNavigationView>
 </androidx.constraintlayout.widget.ConstraintLayout>
-
