@@ -24,43 +24,67 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDoctoravailableappointmentBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
-    var shirtstart=false
-    var shirtend=false
+    var shirtstart = false
+    var shirtend = false
+
     //to record the available day
-    var monday=false
-    var tuesday=false
-    var wednesday=false
-    var thursday=false
-    var friday=false
-    var saturday=false
-    var sunday=false
-    var documentIDs=""
+    var monday = false
+    var tuesday = false
+    var wednesday = false
+    var thursday = false
+    var friday = false
+    var saturday = false
+    var sunday = false
+    var documentIDs = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDoctoravailableappointmentBinding.inflate(layoutInflater)
         setContentView(binding.root)
         firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser=firebaseAuth.currentUser
-        var userID=""
+        val currentUser = firebaseAuth.currentUser
+        var userID = ""
+
+
+        binding.shiftET.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val inputText = s.toString()
+                val timePattern = Regex("^([01]?[0-9]|2[0-3])[0-5][0-9]$")
+
+                if (!timePattern.matches(inputText)) {
+                    binding.shiftET.error = "Invalid time format"
+                } else {
+                    binding.shiftET.error = null
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not needed for validation
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Not needed for validation
+            }
+        })
+
 
         firestore().getUserPosition(this) { position ->
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
                 bottomNavigationView.setSelectedItemId(R.id.others);
-                IntentManager(this, bottomNavigationView,position)
+                IntentManager(this, bottomNavigationView, position)
             }
         }
 
 
         if (currentUser != null) {
-         userID = currentUser.uid
+            userID = currentUser.uid
         } else {
             println("No user is currently signed in.")
         }
 
-        firestore().getAppointmentAvailable(this) {documentID, appointmentAvailable ->
+        firestore().getAppointmentAvailable(this) { documentID, appointmentAvailable ->
             if (appointmentAvailable != null) {
-                documentIDs=documentID?:"DefaultDocumentId"
+                documentIDs = documentID ?: "DefaultDocumentId"
                 binding.button.setText("Save Edit")
                 binding.shiftET.setText(appointmentAvailable.appointmentStartTime)
                 binding.EndshiftET.setText(appointmentAvailable.appointmentEndTime)
@@ -71,32 +95,34 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
                 binding.checkFriday.isChecked = appointmentAvailable.friday
                 binding.checkSaturday.isChecked = appointmentAvailable.saturday
                 binding.checkSunday.isChecked = appointmentAvailable.sunday
-            }else
-            {
-                Log.d("Fail","Fail")
-                Toast.makeText(this,"Fail", Toast.LENGTH_SHORT)
+            } else {
+                Log.d("Fail", "Fail")
+                Toast.makeText(this, "Fail", Toast.LENGTH_SHORT)
             }
         }
 
 
 
-        binding.button.setOnClickListener{
+        binding.button.setOnClickListener {
 
-            val time=binding.shiftET.text.toString()
-            val timeEnd=binding.EndshiftET.text.toString()
+            val time = binding.shiftET.text.toString()
+            val timeEnd = binding.EndshiftET.text.toString()
             val isValidFormat = validateTimeFormat(time)
-            if(time.length<4&& timeEnd.length<4)
-            {
-                Toast.makeText(this, "Please enter valid Hours format. For example 0900", Toast.LENGTH_SHORT).show()
-            }
-            else if (!isValidFormat) {
+            if (time.length < 4 && timeEnd.length < 4) {
+                Toast.makeText(
+                    this,
+                    "Please enter valid Hours format. For example 0900",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (!isValidFormat) {
                 Toast.makeText(this, "Please enter valid Hours format", Toast.LENGTH_SHORT).show()
-            }
-            else if (timeEnd.toInt()<time.toInt())
-            {
-                Toast.makeText(this,"The end time cannot larger than start time",Toast.LENGTH_SHORT).show()
-            }
-            else {
+            } else if (timeEnd.toInt() < time.toInt()) {
+                Toast.makeText(
+                    this,
+                    "The end time cannot larger than start time",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
 
                 val daysOfWeek = listOf(
                     binding.checkMonday,
@@ -123,37 +149,50 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
                 friday = days[4]
                 saturday = days[5]
                 sunday = days[6]
+                if (!days[0] && !days[1] && !days[2] && !days[3] && !days[4] && !days[5] && !days[6]) {
+                    Toast.makeText(
+                        this,
+                        "Please select at least one day for appointment",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
 
-                val appointmentAvailable = AppointmentAvailable(
-                    userID,
-                    appoinmentStart,
-                    appoinmentEnd,
-                    monday,
-                    tuesday,
-                    wednesday,
-                    thursday,
-                    friday,
-                    saturday,
-                    sunday
-                )
-                if (binding.button.text == "Submit") {
-                    firestore().createAvailableAppointment(this, appointmentAvailable)
-                    showDialogSuccessUpdate()
-                } else if (binding.button.text == "Save Edit") {
-                    val dataToUpdate = mapOf(
-                        "appointmentStartTime" to appoinmentStart,
-                        "appointmentEndTime" to appoinmentEnd,
-                        "monday" to monday,
-                        "tuesday" to tuesday,
-                        "wednesday" to wednesday,
-                        "thursday" to thursday,
-                        "friday" to friday,
-                        "saturday" to saturday,
-                        "sunday" to sunday
+
+                    val appointmentAvailable = AppointmentAvailable(
+                        userID,
+                        appoinmentStart,
+                        appoinmentEnd,
+                        monday,
+                        tuesday,
+                        wednesday,
+                        thursday,
+                        friday,
+                        saturday,
+                        sunday
                     )
+                    if (binding.button.text == "Submit") {
+                        firestore().createAvailableAppointment(this, appointmentAvailable)
+                        showDialogSuccessUpdate()
+                    } else if (binding.button.text == "Save Edit") {
+                        val dataToUpdate = mapOf(
+                            "appointmentStartTime" to appoinmentStart,
+                            "appointmentEndTime" to appoinmentEnd,
+                            "monday" to monday,
+                            "tuesday" to tuesday,
+                            "wednesday" to wednesday,
+                            "thursday" to thursday,
+                            "friday" to friday,
+                            "saturday" to saturday,
+                            "sunday" to sunday
+                        )
 
-                    firestore().updateDocument("appointmentAvailable", documentIDs, dataToUpdate)
-                    showDialogSuccessUpdate()
+                        firestore().updateDocument(
+                            "appointmentAvailable",
+                            documentIDs,
+                            dataToUpdate
+                        )
+                        showDialogSuccessUpdate()
+                    }
                 }
             }
         }
@@ -167,7 +206,10 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                val hours=  runExpectedEndHours( binding.shiftET.text.toString(),binding.EndshiftET.text.toString())
+                val hours = runExpectedEndHours(
+                    binding.shiftET.text.toString(),
+                    binding.EndshiftET.text.toString()
+                )
                 binding.totalhours.text = "Total Hours: $hours"
             }
         })
@@ -182,19 +224,20 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                val hours=  runExpectedEndHours( binding.shiftET.text.toString(),binding.EndshiftET.text.toString())
+                val hours = runExpectedEndHours(
+                    binding.shiftET.text.toString(),
+                    binding.EndshiftET.text.toString()
+                )
                 binding.totalhours.text = "Total Hours: $hours"
             }
         })
 
 
-
     }
 
 
-    fun runExpectedEndHours(shirtHours:String,EndshiftET: String): Float
-    {
-        if(shirtHours.length>=4&&EndshiftET.length>=4) {
+    fun runExpectedEndHours(shirtHours: String, EndshiftET: String): Float {
+        if (shirtHours.length >= 4 && EndshiftET.length >= 4) {
             val startHour = shirtHours.substring(0, 2).toFloat()
             val startMinute = shirtHours.substring(2).toFloat()
             val endHour = EndshiftET.substring(0, 2).toFloat()
@@ -209,9 +252,7 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
             val differenceInHours = differenceInMinutes / 60
 
             return differenceInHours
-        }
-        else
-        {
+        } else {
             return -1.0f
         }
     }
@@ -227,13 +268,13 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
         val dialogView = inflater.inflate(R.layout.activity_dialog_verification, null)
 
         val textViewMessage = dialogView.findViewById<TextView>(R.id.textViewMessage)
-        textViewMessage.text ="The information have updated!"
+        textViewMessage.text = "The information have updated!"
         builder.setView(dialogView)
         val dialog = builder.create()
 
         val buttonDismiss = dialogView.findViewById<Button>(R.id.buttonDismiss)
-        val buttonEmail=dialogView.findViewById<Button>(R.id.buttonResentVerification)
-        buttonEmail.visibility= View.GONE
+        val buttonEmail = dialogView.findViewById<Button>(R.id.buttonResentVerification)
+        buttonEmail.visibility = View.GONE
         buttonDismiss.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, DoctorHomeActivity::class.java)
