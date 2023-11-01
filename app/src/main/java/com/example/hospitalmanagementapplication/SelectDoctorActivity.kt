@@ -38,6 +38,8 @@ class SelectDoctorActivity : AppCompatActivity() {
     private lateinit var doctorAdapter: DoctorAdapter
     private lateinit var hospitalItemSelected: Any
     private lateinit var departmentItemSelected: Any
+    private var currentFilterType: Int = 0
+
     private var originalDoctorList: List<doctorInformation> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,6 +139,7 @@ class SelectDoctorActivity : AppCompatActivity() {
         autoComplete.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 hospitalItemSelected = allHospital[position].documentId
+                autoComplete.setAdapter(null)
                 filterDoctors(hospitalItemSelected.toString(),2)
             }
 
@@ -199,6 +202,7 @@ class SelectDoctorActivity : AppCompatActivity() {
         departmentAutoComplete.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 departmentItemSelected = allDepartment[position].documentID
+                departmentAutoComplete.setAdapter(null)
                 filterDoctors(departmentItemSelected.toString(),3)
 
             }
@@ -310,17 +314,46 @@ class SelectDoctorActivity : AppCompatActivity() {
     }
 
     private fun filterDoctors(query: String, type: Int) {
-        val filteredDoctors = mutableListOf<doctorInformation>()
-        val doctorList = doctorAdapter.getDoctors()
+        currentFilterType = type
+        val doctorList = if (type == 0) {
+            originalDoctorList // If type is 0, use the original doctor list
+        } else {
+            doctorAdapter.getDoctors() // Otherwise, use the current doctor list
+        }
 
+        val filteredDoctors = mutableListOf<doctorInformation>()
         var callbacksCompleted = 0
 
         for (doctor in doctorList) {
-            if (type == 1) {
-                getUserFullName(doctor.userID) { fullName ->
+            when (type) {
+                1 -> {
+                    getUserFullName(doctor.userID) { fullName ->
+                        callbacksCompleted++
+                        if (fullName.toLowerCase().contains(query)) {
+                            // Add the doctor to the filtered list
+                            filteredDoctors.add(doctor)
+                        }
+
+                        if (callbacksCompleted == doctorList.size) {
+                            // All callbacks have completed, update the RecyclerView
+                            doctorAdapter.setDoctors(filteredDoctors)
+                        }
+                    }
+                }
+                2 -> {
                     callbacksCompleted++
-                    if (fullName.toLowerCase().contains(query)) {
-                        // Add the doctor to the filtered list
+                    if (doctor.hospital == query) {
+                        filteredDoctors.add(doctor)
+                    }
+
+                    if (callbacksCompleted == doctorList.size) {
+                        // All callbacks have completed, update the RecyclerView
+                        doctorAdapter.setDoctors(filteredDoctors)
+                    }
+                }
+                3 -> {
+                    callbacksCompleted++
+                    if (doctor.department == query) {
                         filteredDoctors.add(doctor)
                     }
 
@@ -330,37 +363,16 @@ class SelectDoctorActivity : AppCompatActivity() {
                     }
                 }
             }
-            else if(type==2){
-                callbacksCompleted++
-                if(doctor.hospital==query)
-                {
-                    filteredDoctors.add(doctor)
-                }
-                if (callbacksCompleted == doctorList.size) {
-                    // All callbacks have completed, update the RecyclerView
-                    doctorAdapter.setDoctors(filteredDoctors)
-                }
-            }
-            else if(type==3){
-                callbacksCompleted++
-                if(doctor.department==query)
-                {
-                    filteredDoctors.add(doctor)
-                }
-                if (callbacksCompleted == doctorList.size) {
-                    // All callbacks have completed, update the RecyclerView
-                    doctorAdapter.setDoctors(filteredDoctors)
-                }
-            }
-
-
-
         }
     }
 
     private fun resetDoctorList() {
-        startActivity(intent)
-        finish()
+        // Reset the filter type and show the original doctor list
+        currentFilterType = 0
+        doctorAdapter.setDoctors(originalDoctorList)
+        binding.searchBarText.text.clear()
+        binding.departmentAutoCompleteTextView.text.clear()
+        binding.hospitalAutoCompleteTextView.text.clear()
     }
 
 
