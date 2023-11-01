@@ -86,14 +86,25 @@ class AddDepartmentActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                 .setMessage("Are you sure you want to delete this department?")
                 .setPositiveButton("Yes") { _, _ ->
-                    firestore().deleteDocument(departmentID, "department",
-                        onSuccess = {
-                            val intent = Intent(this, AllDepartmentActivity::class.java)
-                            startActivity(intent)
-                        },
-                        onFailure = { e ->
-                            Log.w("ERROR", "Error deleting document", e)
-                        })
+                    // Call the function to check if an item with the respective foreign key exists
+                    firestore().getForeignKeyItem(departmentID, "department", "doctorInformation") { success ->
+                        if (success) {
+                            Log.e("Foreign key exisit","OK")
+                            Toast.makeText(this, "Cannot delete because the department is referenced.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.e("Foreign key not exisit","OK")
+                            firestore().deleteDocument(departmentID, "department",
+                                onSuccess = {
+                                    val intent = Intent(this, AllDepartmentActivity::class.java)
+                                    startActivity(intent)
+                                },
+                                onFailure = { e ->
+                                    Log.w("ERROR", "Error deleting document", e)
+                                })
+                        }
+                    }
+
+
                 }
                 .setNegativeButton("No", null)
                 .show()

@@ -1234,6 +1234,24 @@ class firestore {
     }
 
 
+    fun getForeignKeyItem(respectiveID: String, respectiveName: String, collectionName: String, onSuccess: (Boolean) -> Unit) {
+        Log.e("Collection Name",collectionName)
+        Log.e("Respective Name",respectiveName)
+        Log.e("Respective ID",respectiveID)
+        mFirestore.collection(collectionName)
+            .whereEqualTo(respectiveName, respectiveID)
+            .get()
+            .addOnSuccessListener { result ->
+                val isNotNull = result != null && !result.isEmpty
+                onSuccess(isNotNull)
+            }
+            .addOnFailureListener { e ->
+                // Handle the failure here, e.g., log the error
+                onSuccess(false) // Return false in case of an error
+            }
+    }
+
+
 
 
 
