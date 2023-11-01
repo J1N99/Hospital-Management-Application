@@ -85,10 +85,12 @@ class ViewHospitalActivity :AppCompatActivity() {
             binding.currentAddress.text = "Current Address: $currentAddress"
         }
 
+
+        progressDialog = Loader(this)
+        progressDialog.show()
         // Fetch hospitals from Firestore and calculate distances
         firestore().getAllHospital { allHospitalList ->
-            progressDialog = Loader(this)
-            progressDialog.show()
+
             sortedHospitalList = allHospitalList.mapNotNull { hospitalInfo ->
                 val documentID = hospitalInfo.documentId
                 val address = hospitalInfo.address
@@ -110,12 +112,10 @@ class ViewHospitalActivity :AppCompatActivity() {
                         )
                         Hospital(documentID, hospital, address, privateGovernment, distance)
                     } else {
-                        progressDialog.dismiss()
                         null
 
                     }
                 } else {
-                    progressDialog.dismiss()
                     null
                 }
             }.sortedBy { it.distance }
