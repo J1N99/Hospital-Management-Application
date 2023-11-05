@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.hospitalmanagementapplication.model.Appointment
 import com.example.hospitalmanagementapplication.model.Medicine
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
@@ -53,6 +54,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var appointmentAdapter: AppointmentAdapter
+    private lateinit var progressDialog: Loader
 
     private var appointmentID = ""
     private var doctorId = ""
@@ -179,6 +181,8 @@ class ViewAppointmentActivity : AppCompatActivity() {
             }
 
             holder.viewPDF.setOnClickListener {
+                progressDialog = Loader(this@ViewAppointmentActivity)
+                progressDialog.show()
                 appointmentID = appointment.documentID ?: ""
                 doctorId = appointment.doctorId ?: ""
                 patientID = appointment.userID ?: ""
@@ -522,7 +526,7 @@ class ViewAppointmentActivity : AppCompatActivity() {
 
 
                 Toast.makeText(this, "PDF created successfully", Toast.LENGTH_SHORT).show()
-
+                progressDialog.dismiss()
                 openPdf()
 
             } catch (e: Exception) {

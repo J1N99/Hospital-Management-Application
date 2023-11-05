@@ -22,6 +22,7 @@ import com.example.hospitalmanagementapplication.model.Illness
 import com.example.hospitalmanagementapplication.model.Medicine
 import com.example.hospitalmanagementapplication.model.PDFInfo
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.android.material.chip.Chip
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
@@ -46,6 +47,8 @@ class DoctorAddPDF : AppCompatActivity() {
     private lateinit var itemSelected: Any
     private val userSelectedTags = mutableListOf<String>()
     private val medicineSelectedTags = mutableListOf<String>()
+    private lateinit var progressDialog: Loader
+
 
     /* pass data from other page*/
     private var appointmentID = ""
@@ -141,6 +144,9 @@ class DoctorAddPDF : AppCompatActivity() {
 
 
         binding.button2.setOnClickListener {
+
+            progressDialog = Loader(this@DoctorAddPDF)
+            progressDialog.show()
             firestore().checkPDFandDisplay(this, appointmentID) { pdfInfoList ->
                 if (pdfInfoList.isNotEmpty()) {
                     val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
@@ -168,7 +174,8 @@ class DoctorAddPDF : AppCompatActivity() {
             if (illness.isEmpty() || (medicine.isEmpty() && action.isEmpty())) {
                 Toast.makeText(this, "Please enter all the fields", Toast.LENGTH_SHORT).show()
             } else {
-
+                progressDialog = Loader(this@DoctorAddPDF)
+                progressDialog.show()
                 // Format the current date and time
                 val currentDateTime =
                     SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
@@ -661,7 +668,7 @@ class DoctorAddPDF : AppCompatActivity() {
 
 
                 Toast.makeText(this, "PDF created successfully", Toast.LENGTH_SHORT).show()
-
+                progressDialog.dismiss()
                 openPdf(pdfFileName)
 
             } catch (e: Exception) {
