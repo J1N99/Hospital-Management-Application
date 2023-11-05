@@ -37,6 +37,8 @@ import com.example.hospitalmanagementapplication.model.Hospital
 import com.example.hospitalmanagementapplication.model.Illness
 import com.example.hospitalmanagementapplication.model.department
 import com.example.hospitalmanagementapplication.userDetailsActivity
+import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class DoctorInformationActivity : AppCompatActivity() {
 
@@ -50,6 +52,7 @@ class DoctorInformationActivity : AppCompatActivity() {
     private lateinit var uploadButton: Button
     private lateinit var itemSelected: Any
     private lateinit var departmentItemSelected: Any
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     private var selectedImageUri: Uri? = null
     private var imageFileName = ""
@@ -59,6 +62,13 @@ class DoctorInformationActivity : AppCompatActivity() {
         binding = ActivityCreatedoctorinformationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        firestore().getUserPosition(this) { position ->
+            if (position != null) {
+                bottomNavigationView = findViewById(R.id.bottomNavigationView)
+                bottomNavigationView.setSelectedItemId(R.id.others);
+                IntentManager(this, bottomNavigationView,position)
+            }
+        }
         // Initialize Firebase
         FirebaseApp.initializeApp(this)
 

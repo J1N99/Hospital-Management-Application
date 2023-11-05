@@ -113,10 +113,6 @@ class DoctorHomeActivity : AppCompatActivity() {
                 startActivity(intent)
 
             }
-            //delete later
-            binding.redesign.setOnClickListener {
-                val intent = Intent(this, RedesignActivity::class.java)
-                startActivity(intent)
-            }
+
         }
     }
