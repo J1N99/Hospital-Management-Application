@@ -67,6 +67,27 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
         })
 
 
+        binding.EndshiftET.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val inputText = s.toString()
+                val timePattern = Regex("^([01]?[0-9]|2[0-3])[0-5][0-9]$")
+
+                if (!timePattern.matches(inputText)) {
+                    binding.EndshiftET.error = "Invalid time format"
+                } else {
+                    binding.EndshiftET.error = null
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not needed for validation
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Not needed for validation
+            }
+        })
+
         firestore().getUserPosition(this) { position ->
             if (position != null) {
                 bottomNavigationView = findViewById(R.id.bottomNavigationView)
