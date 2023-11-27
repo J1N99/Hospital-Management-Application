@@ -257,7 +257,7 @@ class SelectDoctorActivity : AppCompatActivity() {
                 firestore().getDepartmentDetails(this@SelectDoctorActivity, doctor.department) { departments ->
                     if (departments != null) {
 
-                        department.text = "Department: " + departments.department
+                        department.text = "Department: " + departments.department+"\n"
                     }
                 }
 
@@ -269,16 +269,16 @@ class SelectDoctorActivity : AppCompatActivity() {
                     doctor.hospital
                 ) { hospitals ->
                     if (hospitals != null) {
-                        hospital.text = "Hospital: " + hospitals.hospital
+                        hospital.text = "Hospital: " + hospitals.hospital +"\n"
                     }
                 }
 
-                qualification.text = "Qualification: " + doctor.quanlification
+                qualification.text = "Qualification: " + doctor.quanlification+"\n"
                 val userId = doctor.userID
                 firestore().getOtherUserDetails(this@SelectDoctorActivity, userId ?: "") { user ->
                     if (user != null) {
                         val doctorName = "DR " + user.firstname + " " + user.lastname
-                        name.text = "Doctor Name: $doctorName"
+                        name.text = "Doctor Name: $doctorName\n"
                     }
                 }
 

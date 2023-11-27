@@ -52,11 +52,11 @@ class ProfileActivity:AppCompatActivity() {
                 documentID = user.id
                 binding.firstNameEt.setText(user.firstname)
                 binding.firstNameEt.isEnabled = false
-                binding.firstNameEt.setBackgroundResource(android.R.color.darker_gray)
+
 
                 binding.lastNameET.setText(user.lastname)
                 binding.lastNameET.isEnabled = false
-                binding.lastNameET.setBackgroundResource(android.R.color.darker_gray)
+
 
                 val dob = user.dob.split("-")
 
@@ -71,12 +71,12 @@ class ProfileActivity:AppCompatActivity() {
 
                 binding.ageET.setText(user.dob)
                 binding.ageET.isEnabled = false
-                binding.ageET.setBackgroundResource(android.R.color.darker_gray)
+
 
 
                 binding.icNumberET.setText(user.ic)
                 binding.icNumberET.isEnabled = false
-                binding.icNumberET.setBackgroundResource(android.R.color.darker_gray)
+
 
                 binding.radioMale.isEnabled = false
                 binding.radioFemale.isEnabled = false
@@ -104,10 +104,10 @@ class ProfileActivity:AppCompatActivity() {
         binding.button.setOnClickListener {
             if (binding.button.text == "Edit") {
                 binding.firstNameEt.isEnabled = true
-                binding.firstNameEt.setBackgroundResource(android.R.color.transparent)
+
 
                 binding.lastNameET.isEnabled = true
-                binding.lastNameET.setBackgroundResource(android.R.color.transparent)
+
 
 
 
@@ -154,10 +154,10 @@ class ProfileActivity:AppCompatActivity() {
                 }
 
                 binding.ageET.isEnabled = true
-                binding.ageET.setBackgroundResource(android.R.color.transparent)
+
 
                 binding.icNumberET.isEnabled = true
-                binding.icNumberET.setBackgroundResource(android.R.color.transparent)
+
 
                 binding.radioMale.isEnabled = true
                 binding.radioFemale.isEnabled = true

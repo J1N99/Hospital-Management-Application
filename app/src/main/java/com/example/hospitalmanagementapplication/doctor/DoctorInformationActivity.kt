@@ -69,8 +69,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                 IntentManager(this, bottomNavigationView,position)
             }
         }
-        // Initialize Firebase
-        FirebaseApp.initializeApp(this)
+
 
         imageView = binding.profileImageView
         selectImageButton = binding.selectImagebtn
@@ -110,8 +109,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                     allHospital.filter { it.hospital.contains(s.toString(), ignoreCase = true) }
 
                 if (filteredIllnesses.isEmpty()) {
-                    // No results found, clear the text
-                    autoComplete.text = null
+
                 }
 
                 // Update the adapter with filtered results
@@ -169,8 +167,7 @@ class DoctorInformationActivity : AppCompatActivity() {
                     allDepartment.filter { it.department.contains(s.toString(), ignoreCase = true) }
 
                 if (filteredDepartment.isEmpty()) {
-                    // No results found, clear the text
-                    departmentAutoComplete.text = null
+
                 }
 
                 // Update the adapter with filtered results

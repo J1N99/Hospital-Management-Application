@@ -54,8 +54,7 @@
             android:clickable="true"
             android:contentDescription="Profile Image"
             android:scaleType="centerCrop"
-            android:src="@drawable/baseline_person_24"
-            style="@style/nightForIcon"/>
+            />
 
     </FrameLayout>
 
