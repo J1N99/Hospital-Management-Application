@@ -143,6 +143,12 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
                     "The end time cannot larger than start time",
                     Toast.LENGTH_SHORT
                 ).show()
+            } else if ((timeEnd.toInt() - time.toInt()) < 100) {
+                Toast.makeText(
+                    this,
+                    "The appointment must available 1 hour",
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
 
                 val daysOfWeek = listOf(

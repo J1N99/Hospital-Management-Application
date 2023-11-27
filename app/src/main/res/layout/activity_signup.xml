@@ -84,7 +84,7 @@
             style="@style/LoginTextInputInnerFieldStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/type_your_password"
+            android:hint="Repeat Your Password"
             android:inputType="textPassword"
             android:textColorHint="#546E7A"
             tools:ignore="VisualLintTextFieldSize" />

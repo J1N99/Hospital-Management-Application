@@ -50,8 +50,8 @@ class DoctorInformationActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var selectImageButton: Button
     private lateinit var uploadButton: Button
-    private lateinit var itemSelected: Any
-    private lateinit var departmentItemSelected: Any
+    private var itemSelected: Any=""
+    private var departmentItemSelected: Any=""
     private lateinit var bottomNavigationView: BottomNavigationView
 
     private var selectedImageUri: Uri? = null
