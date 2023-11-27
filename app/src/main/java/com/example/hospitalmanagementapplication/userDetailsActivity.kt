@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 class userDetailsActivity : AppCompatActivity() {
 
@@ -27,7 +28,6 @@ class userDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityUserdetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Log.d("Inside", "Hello world")
         firebaseAuth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance() // Initialize Firebase database
 
@@ -37,11 +37,20 @@ class userDetailsActivity : AppCompatActivity() {
             var ic = binding.icNumberET.text.toString().trim()
             var DOB = binding.ageET.text.toString().trim()
 
-            if (lastname.isNotEmpty() && firstname.isNotEmpty() && ic.isNotEmpty() && DOB.isNotEmpty()) {
-                saveUserDetails()
-            } else {
-                Toast.makeText(this, "Please enter all the field", Toast.LENGTH_SHORT).show()
+            if (!isNumeric(ic)) {
+                // Input is a valid number
+                Toast.makeText(this, "Input is not valid number", Toast.LENGTH_SHORT).show()
             }
+            else
+            {
+                if (lastname.isNotEmpty() && firstname.isNotEmpty() && ic.isNotEmpty() && DOB.isNotEmpty()) {
+                    saveUserDetails()
+                } else {
+                    Toast.makeText(this, "Please enter all the field", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+
 
         }
 
@@ -160,6 +169,11 @@ class userDetailsActivity : AppCompatActivity() {
         val intent = Intent(this, userDetailsActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun isNumeric(input: String): Boolean {
+        val numericPattern: Pattern = Pattern.compile("[0-9]+")
+        return numericPattern.matcher(input).matches()
     }
 }
 

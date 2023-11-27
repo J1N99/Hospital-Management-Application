@@ -11,6 +11,7 @@ import com.example.hospitalmanagementapplication.*
 import com.example.hospitalmanagementapplication.databinding.ActivityClerkdashboardBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +21,7 @@ class ClerkDashboardActivity:AppCompatActivity() {
     private lateinit var binding: ActivityClerkdashboardBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var progressDialog: Loader
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
@@ -39,31 +41,36 @@ class ClerkDashboardActivity:AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser: FirebaseUser? = firebaseAuth.currentUser
 
-
+        progressDialog = Loader(this)
+        progressDialog.show()
         firestore().getAnnouncement { announcementData ->
             if (announcementData != null) {
                 // Handle the announcement data here
-                binding.titleAnnouncement.text= announcementData["announcementTitle"].toString()
-                binding.descriptionAnnouncement.text=announcementData["announcement"].toString()
-            }
-        }
+                binding.titleAnnouncement.text = announcementData["announcementTitle"].toString()
+                binding.descriptionAnnouncement.text = announcementData["announcement"].toString()
+
+                // Continue with the next Firestore call
+                if (currentUser != null) {
+                    firestore().getUserDetails(this) { user ->
 
 
-        if (currentUser != null) {
-            firestore().getUserDetails(this) { user ->
-                if (user != null) {
-                    binding.welcomeText.text ="Hi "+ user.firstname+" "+user.lastname
+                        if (user != null) {
+                            binding.welcomeText.text = "Hi " + user.firstname + " " + user.lastname
+                            progressDialog.dismiss() // Dismiss the loader after the second callback
+                        } else {
+                            Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 } else {
-                    Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                    progressDialog.dismiss() // Dismiss the loader if there is no current user
+                    val intent = Intent(this, SignInActivity::class.java)
+                    startActivity(intent)
                 }
+            } else {
+                progressDialog.dismiss() // Dismiss the loader if the announcementData is null
+                Toast.makeText(this, "Announcement data is null", Toast.LENGTH_SHORT).show()
             }
         }
-        else
-        {
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
-        }
-
 
 
         binding.addHospital.setOnClickListener{

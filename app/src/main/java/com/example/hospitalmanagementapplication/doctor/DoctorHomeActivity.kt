@@ -13,6 +13,7 @@ import com.example.hospitalmanagementapplication.clerk.ClerkDashboardActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityDoctorhomeBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.utils.IntentManager
+import com.example.hospitalmanagementapplication.utils.Loader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,6 +24,7 @@ class DoctorHomeActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var userPosition:Number
+    private lateinit var progressDialog: Loader
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
@@ -68,28 +70,36 @@ class DoctorHomeActivity : AppCompatActivity() {
 
 
 
-            firestore().getAnnouncement { announcementData ->
-                if (announcementData != null) {
-                    // Handle the announcement data here
-                    binding.titleAnnouncement.text =
-                        announcementData["announcementTitle"].toString()
-                    binding.descriptionAnnouncement.text =
-                        announcementData["announcement"].toString()
-                }
-            }
+        progressDialog = Loader(this)
+        progressDialog.show()
+        firestore().getAnnouncement { announcementData ->
+            if (announcementData != null) {
+                // Handle the announcement data here
+                binding.titleAnnouncement.text = announcementData["announcementTitle"].toString()
+                binding.descriptionAnnouncement.text = announcementData["announcement"].toString()
 
-            if (currentUser != null) {
-                firestore().getUserDetails(this) { user ->
-                    if (user != null) {
-                        binding.welcomeText.text = "Hi " + user.firstname + " " + user.lastname
-                    } else {
-                        Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                // Continue with the next Firestore call
+                if (currentUser != null) {
+                    firestore().getUserDetails(this) { user ->
+
+
+                        if (user != null) {
+                            binding.welcomeText.text = "Hi " + user.firstname + " " + user.lastname
+                            progressDialog.dismiss() // Dismiss the loader after the second callback
+                        } else {
+                            Toast.makeText(this, "User is null", Toast.LENGTH_SHORT).show()
+                        }
                     }
+                } else {
+                    progressDialog.dismiss() // Dismiss the loader if there is no current user
+                    val intent = Intent(this, SignInActivity::class.java)
+                    startActivity(intent)
                 }
             } else {
-                val intent = Intent(this, SignInActivity::class.java)
-                startActivity(intent)
+                progressDialog.dismiss() // Dismiss the loader if the announcementData is null
+                Toast.makeText(this, "Announcement data is null", Toast.LENGTH_SHORT).show()
             }
+        }
 
 
             binding.logoutButton.setOnClickListener {
