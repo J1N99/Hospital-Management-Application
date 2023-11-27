@@ -76,23 +76,24 @@
                             android:id="@+id/heightLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/imageView"
-                            android:text="Height: "
+                            android:text="Height:"
                             android:textColor="@color/white"
-                            android:textSize="13sp" />
+                            android:textSize="16dp" />
 
                         <TextView
                             android:id="@+id/heightET"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/heightLabel"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/imageView"
                             android:text="--"
                             android:textColor="@color/white"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
+                            android:textSize="16dp"
+                            android:textStyle="bold"
+                            android:maxLines="1" />
 
 
                     </RelativeLayout>
@@ -135,11 +136,11 @@
                             android:id="@+id/weightLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/weightImageView"
                             android:text="Weight: "
                             android:textColor="@color/white"
-                            android:textSize="13sp"
+                            android:textSize="15dp"
 
                             />
 
@@ -148,11 +149,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/weightLabel"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/weightImageView"
                             android:text="--"
                             android:textColor="@color/white"
-                            android:textSize="24sp"
+                            android:textSize="16dp"
                             android:textStyle="bold" />
 
 
@@ -194,22 +195,22 @@
                             android:id="@+id/bmiLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/bmiImageView"
                             android:text="BMI: "
                             android:textColor="@color/white"
-                            android:textSize="13sp" />
+                            android:textSize="13dp" />
 
                         <TextView
                             android:id="@+id/bmiResult"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/bmiLabel"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/bmiImageView"
                             android:text="--"
                             android:textColor="@color/white"
-                            android:textSize="24sp"
+                            android:textSize="16dp"
                             android:textStyle="bold" />
 
 
@@ -251,22 +252,22 @@
                             android:id="@+id/bloodTypeLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/bloodTypeImage"
                             android:text="Blood Type: "
                             android:textColor="@color/white"
-                            android:textSize="13sp" />
+                            android:textSize="16dp" />
 
                         <TextView
                             android:id="@+id/bloodTypeResult"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/bloodTypeLabel"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toRightOf="@id/bloodTypeImage"
                             android:text="--"
                             android:textColor="@color/white"
-                            android:textSize="24sp"
+                            android:textSize="16dp"
                             android:textStyle="bold" />
 
 

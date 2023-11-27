@@ -71,13 +71,13 @@ class AddIllnessActivity : AppCompatActivity() {
 
                 if (binding.button.text == "Save Edit") {
 
-
+                    Log.e("test",nameOfIllness)
                     val dataToUpdate = mapOf(
-                        "nameOfIllness" to nameOfIllness,
+                        "illnessName" to nameOfIllness,
                         "description" to description,
                         "actionTaken" to actionTaken
                     )
-
+                    Log.e("test",dataToUpdate.toString())
                     firestore().updateDocument("illness", illnessID, dataToUpdate)
                     showDialogSuccessUpdate("The information have updated!")
                 } else {

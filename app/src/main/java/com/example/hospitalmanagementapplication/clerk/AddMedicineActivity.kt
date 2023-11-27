@@ -24,7 +24,7 @@ class AddMedicineActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var imageView: ImageView
-    private lateinit var itemSelected: Any
+    private var itemSelected: Any=""
     private var medicineID = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +78,7 @@ class AddMedicineActivity : AppCompatActivity() {
             var nameOfMedicine = binding.nameOfMedicineET.text.toString().trim()
             var description = binding.descriptionET.text.toString().trim()
             var medicineTakenTime = itemSelected.toString()
-            if (nameOfMedicine.isEmpty()  || description.isEmpty() || medicineTakenTime.isEmpty()) {
+            if (nameOfMedicine.isEmpty()  || description.isEmpty() || medicineTakenTime=="") {
                 Toast.makeText(this, "Please enter all the fields", Toast.LENGTH_SHORT).show()
             } else {
 
