@@ -204,40 +204,41 @@ class ViewAppointmentActivity : AppCompatActivity() {
                             }
                         }
                     }
-                }
-                //get doctor details
-                firestore().getOtherUserDetails(
-                    this@ViewAppointmentActivity,
-                    doctorId ?: ""
-                ) { user ->
-                    if (user != null) {
-                        doctorName = user.firstname + " " + user.lastname
-                        doctorEmail = user.email
-                    }
-                }
-                //get patient details
-                firestore().getOtherUserDetails(
-                    this@ViewAppointmentActivity,
-                    patientID ?: ""
-                ) { user ->
-                    if (user != null) {
-                        patientName = user.firstname + "" + user.lastname
-                        patientIC = user.ic
-                        patientGender = user.gender
-                    }
-                }
 
-                firestore().checkPDFandDisplay(
-                    this@ViewAppointmentActivity,
-                    appointmentID ?: ""
-                ) { pdfInfoList ->
-                    if (pdfInfoList.isNotEmpty()) {
-                        val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
-                        illnessName = firstPdfInfo.illness
-                        medicinePDF = firstPdfInfo.medicine
-                        actionPDF = firstPdfInfo.action
-                        pdfFileName = firstPdfInfo.PDFName
-                        createPdf()
+                    //get doctor details
+                    firestore().getOtherUserDetails(
+                        this@ViewAppointmentActivity,
+                        doctorId ?: ""
+                    ) { user ->
+                        if (user != null) {
+                            doctorName = user.firstname + " " + user.lastname
+                            doctorEmail = user.email
+                        }
+                    }
+                    //get patient details
+                    firestore().getOtherUserDetails(
+                        this@ViewAppointmentActivity,
+                        patientID ?: ""
+                    ) { user ->
+                        if (user != null) {
+                            patientName = user.firstname + "" + user.lastname
+                            patientIC = user.ic
+                            patientGender = user.gender
+                        }
+                    }
+
+                    firestore().checkPDFandDisplay(
+                        this@ViewAppointmentActivity,
+                        appointmentID ?: ""
+                    ) { pdfInfoList ->
+                        if (pdfInfoList.isNotEmpty()) {
+                            val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
+                            illnessName = firstPdfInfo.illness
+                            medicinePDF = firstPdfInfo.medicine
+                            actionPDF = firstPdfInfo.action
+                            pdfFileName = firstPdfInfo.PDFName
+                            createPdf()
+                        }
                     }
                 }
             }
@@ -455,8 +456,6 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 itemListTable.addCell(illnessCell)
 
 
-
-
                 val allMedicine = medicinePDF
                 val itemsMedicine = allMedicine.split(",").map { it.trim() }
                 val medicineList = mutableListOf<Medicine?>()
@@ -474,16 +473,6 @@ class ViewAppointmentActivity : AppCompatActivity() {
                     "${medicine?.medicineName ?: ""} - ${medicine?.medicationTime ?: ""}"
                 }
                 val resultMedicineName = concatenatedMedicineInfoList.joinToString("\n")
-
-
-
-
-
-
-
-
-
-
 
 
                 val medicineCell =
