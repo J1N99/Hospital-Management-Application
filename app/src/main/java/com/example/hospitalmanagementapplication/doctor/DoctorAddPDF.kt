@@ -116,6 +116,7 @@ class DoctorAddPDF : AppCompatActivity() {
                     chip.setOnCloseIconClickListener {
                         // Remove the chip when the close icon is clicked
                         binding.chipGroup.removeView(chip)
+                        userSelectedTags.remove(soloIllness)
 
                     }
 
@@ -133,6 +134,7 @@ class DoctorAddPDF : AppCompatActivity() {
                     chip.setOnCloseIconClickListener {
                         // Remove the chip when the close icon is clicked
                         binding.chipGroupMedicine.removeView(chip)
+                        medicineSelectedTags.remove(soloMedicine)
                     }
 
                     // Add the chip to a ChipGroup (assuming you have a ChipGroup named 'binding.chipGroup')
