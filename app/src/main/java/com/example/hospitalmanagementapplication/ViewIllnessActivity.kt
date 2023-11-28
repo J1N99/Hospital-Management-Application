@@ -99,9 +99,9 @@ class IllnessAdapter(private val context: Context, private val illnessList: Muta
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val illness = illnessList[position]
-        holder.nameOfIllness.text = "Illness Name: "+illness.illnessName
-        holder.description.text ="Illness Description: "+ illness.description
-        holder.actionTaken.text = "Illness Taken: "+ illness.actionTaken
+        holder.nameOfIllness.text = "Illness Name: "+illness.illnessName+"\n"
+        holder.description.text ="Illness Description: "+ illness.description+"\n"
+        holder.actionTaken.text = "Illness Taken: "+ illness.actionTaken+"\n"
     }
 
     override fun getItemCount(): Int {

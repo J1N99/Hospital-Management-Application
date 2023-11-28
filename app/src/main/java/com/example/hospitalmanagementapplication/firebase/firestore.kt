@@ -1091,16 +1091,15 @@ class firestore {
 
                         Log.e("Second",timeDiff.toString())
                         Log.e("Third",notificationThreshold.toString())
+                        val excludeThreshold = 6900000  // 1 hour and 55 minutes in milliseconds
 
 
-
-                        if (timeDiff >=0 && timeDiff<=notificationThreshold) {
+                        if (timeDiff >=0 && timeDiff<=notificationThreshold && timeDiff > excludeThreshold) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val channel = NotificationChannel("Appoint Reminder", "Appointment Reminders", NotificationManager.IMPORTANCE_HIGH)
                                 val notificationManager = context.getSystemService(NotificationManager::class.java)
                                 notificationManager?.createNotificationChannel(channel)
                             }
-                            Log.e("RUN","POKAI")
 
                             val intent = Intent(context, ViewAppointmentActivity::class.java)
                             val pendingIntent = PendingIntent.getActivity(
