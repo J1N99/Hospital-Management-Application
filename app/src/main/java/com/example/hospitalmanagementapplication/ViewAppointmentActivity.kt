@@ -237,9 +237,11 @@ class ViewAppointmentActivity : AppCompatActivity() {
                             medicinePDF = firstPdfInfo.medicine
                             actionPDF = firstPdfInfo.action
                             pdfFileName = firstPdfInfo.PDFName
-                            createPdf()
+
                         }
+                        createPdf()
                     }
+
                 }
             }
 

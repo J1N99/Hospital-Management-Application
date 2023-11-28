@@ -318,8 +318,6 @@ class firestore {
             .set(appointmentAvailable, SetOptions.merge())
             .addOnSuccessListener { documentReference ->
                 Log.d("Tag-Document ID", "Document added with ID: $documentReference")
-                val intent = Intent(activity, DoctorHomeActivity::class.java)
-                activity.startActivity(intent)
             }
             .addOnFailureListener { e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)

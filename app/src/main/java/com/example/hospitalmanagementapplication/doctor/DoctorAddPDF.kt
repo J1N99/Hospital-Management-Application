@@ -109,12 +109,14 @@ class DoctorAddPDF : AppCompatActivity() {
                 val illness = firstPdfInfo.illness
                 val seperateIllness = illness.split(",")
                 for (soloIllness in seperateIllness) {
+                    userSelectedTags.add(soloIllness)
                     val chip = Chip(this)
                     chip.text = soloIllness
                     chip.isCloseIconVisible = true
                     chip.setOnCloseIconClickListener {
                         // Remove the chip when the close icon is clicked
                         binding.chipGroup.removeView(chip)
+
                     }
 
                     // Add the chip to a ChipGroup (assuming you have a ChipGroup named 'binding.chipGroup')
@@ -124,6 +126,7 @@ class DoctorAddPDF : AppCompatActivity() {
                 val medicine = firstPdfInfo.medicine
                 val seperateMedicine = medicine.split(",")
                 for (soloMedicine in seperateMedicine) {
+                    medicineSelectedTags.add(soloMedicine)
                     val chip = Chip(this)
                     chip.text = soloMedicine
                     chip.isCloseIconVisible = true
@@ -272,7 +275,7 @@ class DoctorAddPDF : AppCompatActivity() {
                 chip.setOnCloseIconClickListener {
                     // Remove the selected tag when the close icon is clicked
                     binding.chipGroupMedicine.removeView(chip)
-                    userSelectedTags.remove(selectedOption)
+                    medicineSelectedTags.remove(selectedOption)
                 }
                 binding.chipGroupMedicine.addView(chip)
                 binding.autoCompleteMedicineET.text = null // Clear the AutoCompleteTextView
