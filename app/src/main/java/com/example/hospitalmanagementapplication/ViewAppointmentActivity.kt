@@ -186,7 +186,10 @@ class ViewAppointmentActivity : AppCompatActivity() {
                 appointmentID = appointment.documentID ?: ""
                 doctorId = appointment.doctorId ?: ""
                 patientID = appointment.userID ?: ""
-                //get hospital info
+
+                var callbackCount = 0
+
+                // Callback for getDoctorInfo
                 firestore().getDoctorInfo(
                     this@ViewAppointmentActivity,
                     doctorId ?: ""
@@ -202,46 +205,53 @@ class ViewAppointmentActivity : AppCompatActivity() {
                                 hospitalName = hospital.hospital
                                 hospitalAddress = hospital.address
                             }
+                            callbackCount++
+                            checkCallbacks(callbackCount)
                         }
                     }
+                }
 
-                    //get doctor details
-                    firestore().getOtherUserDetails(
-                        this@ViewAppointmentActivity,
-                        doctorId ?: ""
-                    ) { user ->
-                        if (user != null) {
-                            doctorName = user.firstname + " " + user.lastname
-                            doctorEmail = user.email
-                        }
+                // Callback for getOtherUserDetails (doctor)
+                firestore().getOtherUserDetails(
+                    this@ViewAppointmentActivity,
+                    doctorId ?: ""
+                ) { user ->
+                    if (user != null) {
+                        doctorName = user.firstname + " " + user.lastname
+                        doctorEmail = user.email
                     }
-                    //get patient details
-                    firestore().getOtherUserDetails(
-                        this@ViewAppointmentActivity,
-                        patientID ?: ""
-                    ) { user ->
-                        if (user != null) {
-                            patientName = user.firstname + "" + user.lastname
-                            patientIC = user.ic
-                            patientGender = user.gender
-                        }
+                    callbackCount++
+                    checkCallbacks(callbackCount)
+                }
+
+                // Callback for getOtherUserDetails (patient)
+                firestore().getOtherUserDetails(
+                    this@ViewAppointmentActivity,
+                    patientID ?: ""
+                ) { user ->
+                    if (user != null) {
+                        patientName = user.firstname + "" + user.lastname
+                        patientIC = user.ic
+                        patientGender = user.gender
                     }
+                    callbackCount++
+                    checkCallbacks(callbackCount)
+                }
 
-                    firestore().checkPDFandDisplay(
-                        this@ViewAppointmentActivity,
-                        appointmentID ?: ""
-                    ) { pdfInfoList ->
-                        if (pdfInfoList.isNotEmpty()) {
-                            val firstPdfInfo = pdfInfoList[0] //cause only call one data to show it
-                            illnessName = firstPdfInfo.illness
-                            medicinePDF = firstPdfInfo.medicine
-                            actionPDF = firstPdfInfo.action
-                            pdfFileName = firstPdfInfo.PDFName
-
-                        }
-                        createPdf()
+                // Callback for checkPDFandDisplay
+                firestore().checkPDFandDisplay(
+                    this@ViewAppointmentActivity,
+                    appointmentID ?: ""
+                ) { pdfInfoList ->
+                    if (pdfInfoList.isNotEmpty()) {
+                        val firstPdfInfo = pdfInfoList[0]
+                        illnessName = firstPdfInfo.illness
+                        medicinePDF = firstPdfInfo.medicine
+                        actionPDF = firstPdfInfo.action
+                        pdfFileName = firstPdfInfo.PDFName
                     }
-
+                    callbackCount++
+                    checkCallbacks(callbackCount)
                 }
             }
 
@@ -308,6 +318,11 @@ class ViewAppointmentActivity : AppCompatActivity() {
             .into(imageView) // Assuming 'imageView' is the target ImageView where you want to display the image
     }
 
+    fun checkCallbacks(callbackCount: Int) {
+        if (callbackCount == 4) { // Adjust the count based on the number of callbacks
+            createPdf()
+        }
+    }
     private fun createPdf() {
 
         if (isExternalStorageWritable()) {
