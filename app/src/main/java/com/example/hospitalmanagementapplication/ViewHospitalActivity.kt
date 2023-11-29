@@ -11,6 +11,8 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -89,6 +91,9 @@ class ViewHospitalActivity :AppCompatActivity() {
         progressDialog = Loader(this)
         progressDialog.show()
         // Fetch hospitals from Firestore and calculate distances
+        val handler = Handler(Looper.getMainLooper())
+
+        handler.postDelayed({
         firestore().getAllHospital { allHospitalList ->
 
             sortedHospitalList = allHospitalList.mapNotNull { hospitalInfo ->
@@ -124,6 +129,7 @@ class ViewHospitalActivity :AppCompatActivity() {
             recyclerView.adapter = adapter
             progressDialog.dismiss()
         }
+        }, 2000) // 3000 milliseconds = 3 seconds
 
         binding.searchBarText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
