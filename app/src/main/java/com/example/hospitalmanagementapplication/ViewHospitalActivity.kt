@@ -161,7 +161,7 @@ class ViewHospitalActivity :AppCompatActivity() {
                 }
             }
         }
-        return null // Return null if unable to get the address
+        return "Wisma Greenhall 43, Green Hall, 10200 George Town, Pulau Pinang" // Return null if unable to get the address
     }
 
     fun getLatLngFromAddress(context: Context, addressStr: String): String? {
