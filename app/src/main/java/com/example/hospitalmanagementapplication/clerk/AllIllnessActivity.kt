@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.hospitalmanagementapplication.databinding.ActivityAllillnessBinding
 import com.example.hospitalmanagementapplication.firebase.firestore
 import com.example.hospitalmanagementapplication.model.Illness
+import com.example.hospitalmanagementapplication.model.User
 import com.example.hospitalmanagementapplication.utils.IntentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +21,7 @@ class AllIllnessActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var itemSelected: Any
     private lateinit var illnessList: List<Illness>
+    private lateinit var filteredList: List<Illness>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,7 @@ class AllIllnessActivity : AppCompatActivity() {
 
         firestore().getAllIllness { allIllness ->
             illnessList = allIllness
+            filteredList=illnessList
             val illnessAdapter = ArrayAdapter(
                 this@AllIllnessActivity,
                 android.R.layout.simple_list_item_1,
@@ -48,7 +51,7 @@ class AllIllnessActivity : AppCompatActivity() {
             binding.illnessListView.adapter = illnessAdapter
 
             binding.illnessListView.setOnItemClickListener { parent, view, position, id ->
-                val selectedIllnessId = illnessList[position].documentID
+                val selectedIllnessId = filteredList[position].documentID
                 val intent = Intent(this, AddIllnessActivity::class.java)
                 intent.putExtra("illnessID", selectedIllnessId)
                 startActivity(intent)
@@ -63,7 +66,7 @@ class AllIllnessActivity : AppCompatActivity() {
 
                 // Only filter the list if there is non-empty search text
                 if (searchText.isNotEmpty()) {
-                    val filteredList = illnessList.filter { illnessList ->
+                     filteredList = illnessList.filter { illnessList ->
                         illnessList.illnessName.lowercase().contains(searchText)
                     }
 

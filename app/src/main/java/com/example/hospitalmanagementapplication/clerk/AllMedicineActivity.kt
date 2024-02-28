@@ -20,6 +20,8 @@ class AllMedicineActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var itemSelected: Any
     private lateinit var medicineList: List<Medicine>
+    private lateinit var filteredList: List<Medicine>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,7 @@ class AllMedicineActivity : AppCompatActivity() {
 
         firestore().getAllMedicine { allMedicine ->
             medicineList = allMedicine
+            filteredList=medicineList
             val medicineAdapter = ArrayAdapter(
                 this@AllMedicineActivity,
                 android.R.layout.simple_list_item_1,
@@ -48,7 +51,7 @@ class AllMedicineActivity : AppCompatActivity() {
             binding.medicineListView.adapter = medicineAdapter
 
             binding.medicineListView.setOnItemClickListener { parent, view, position, id ->
-                val selectedMedicineId = medicineList[position].documentID
+                val selectedMedicineId = filteredList[position].documentID
                 val intent = Intent(this, AddMedicineActivity::class.java)
                 intent.putExtra("medicineID", selectedMedicineId)
                 startActivity(intent)
@@ -63,7 +66,7 @@ class AllMedicineActivity : AppCompatActivity() {
 
                 // Only filter the list if there is non-empty search text
                 if (searchText.isNotEmpty()) {
-                    val filteredList = medicineList.filter { medicineList ->
+                     filteredList = medicineList.filter { medicineList ->
                         medicineList.medicineName.lowercase().contains(searchText)
                     }
 

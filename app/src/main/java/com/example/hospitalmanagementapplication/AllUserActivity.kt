@@ -20,6 +20,8 @@ class AllUserActivity: AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var userList: List<User>
     private lateinit var progressDialog: Loader
+    private lateinit var filteredList: List<User>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,13 +41,14 @@ class AllUserActivity: AppCompatActivity() {
             progressDialog = Loader(this)
             progressDialog.show()
             userList = users
+            filteredList = userList
             val userAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, users.map { "${it.firstname} ${it.lastname} - ${it.ic}" })
             binding.userListView.adapter = userAdapter
             progressDialog.dismiss()
         }
 
         binding.userListView.setOnItemClickListener { parent, view, position, id ->
-            val selectedUserId = userList[position].id
+            val selectedUserId = filteredList[position].id
             val intent = Intent(this, UpdatePositionActivity::class.java)
             intent.putExtra("userId", selectedUserId)
             startActivity(intent)
@@ -58,7 +61,7 @@ class AllUserActivity: AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 // Filter the user list based on the search input
                 val searchText = s.toString().lowercase()
-                val filteredList = userList.filter { user ->
+                filteredList = userList.filter { user ->
                     user.firstname.lowercase().contains(searchText) ||
                             user.lastname.lowercase().contains(searchText) ||
                             user.ic.lowercase().contains(searchText)

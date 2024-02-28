@@ -643,10 +643,6 @@ class firestore {
             .addOnSuccessListener { documentReference ->
                 Log.d("Tag-Document ID", "Document added with ID: $documentReference")
 
-                // Create an Intent to start the HomeActivity
-                val intent = Intent(activity, DoctorHomeActivity::class.java)
-                // Start the HomeActivity using the intent
-                activity.startActivity(intent)
             }
             .addOnFailureListener { e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)
@@ -811,11 +807,6 @@ class firestore {
             .set(illnessInfo, SetOptions.merge())
             .addOnSuccessListener { documentReference ->
                 Log.d("Tag-Document ID", "Document added with ID: $documentReference")
-
-                // Create an Intent to start the HomeActivity
-                val intent = Intent(activity, ClerkDashboardActivity::class.java)
-                // Start the HomeActivity using the intent
-                activity.startActivity(intent)
             }
             .addOnFailureListener { e ->
                 Log.w(ContentValues.TAG, "Error adding document", e)

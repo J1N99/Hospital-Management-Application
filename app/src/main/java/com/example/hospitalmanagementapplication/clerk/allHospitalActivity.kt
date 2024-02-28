@@ -21,6 +21,7 @@ class allHospitalActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var itemSelected: Any
     private lateinit var hospitalList: List<Hospital>
+    private lateinit var filteredList: List<Hospital>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,7 @@ class allHospitalActivity : AppCompatActivity() {
 
         firestore().getAllHospital { allHospitalList ->
             hospitalList = allHospitalList
+            filteredList=hospitalList
             val hospitalAdapter = ArrayAdapter(
                 this@allHospitalActivity,
                 android.R.layout.simple_list_item_1,
@@ -46,7 +48,7 @@ class allHospitalActivity : AppCompatActivity() {
             binding.hospitalListview.adapter = hospitalAdapter
 
             binding.hospitalListview.setOnItemClickListener { parent, view, position, id ->
-                val selectedHospitalId = hospitalList[position].documentId
+                val selectedHospitalId = filteredList[position].documentId
                 val intent = Intent(this, addHospitalActivity::class.java)
                 intent.putExtra("hospitalId", selectedHospitalId)
                 startActivity(intent)
@@ -61,7 +63,7 @@ class allHospitalActivity : AppCompatActivity() {
 
                 // Only filter the list if there is non-empty search text
                 if (searchText.isNotEmpty()) {
-                    val filteredList = hospitalList.filter { hospitalList ->
+                     filteredList = hospitalList.filter { hospitalList ->
                         hospitalList.hospital.lowercase().contains(searchText)
                     }
 

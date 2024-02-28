@@ -129,7 +129,7 @@ class DoctorAvailableAppointmentActivity : AppCompatActivity() {
             val time = binding.shiftET.text.toString()
             val timeEnd = binding.EndshiftET.text.toString()
             val isValidFormat = validateTimeFormat(time)
-            if (time.length < 4 && timeEnd.length < 4) {
+            if (time.length < 4 || timeEnd.length < 4) {
                 Toast.makeText(
                     this,
                     "Please enter valid Hours format. For example 0900",

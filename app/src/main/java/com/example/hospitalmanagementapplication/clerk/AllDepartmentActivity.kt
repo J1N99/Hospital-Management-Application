@@ -20,6 +20,7 @@ class AllDepartmentActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var itemSelected: Any
     private lateinit var departmentList: List<department>
+    private lateinit var filteredList: List<department>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +38,7 @@ class AllDepartmentActivity : AppCompatActivity() {
 
         firestore().getAllDepartment { departmentListDetails ->
             departmentList = departmentListDetails
+            filteredList=departmentList
             val departmentAdapter = ArrayAdapter(
                 this@AllDepartmentActivity,
                 android.R.layout.simple_list_item_1,
@@ -45,7 +47,7 @@ class AllDepartmentActivity : AppCompatActivity() {
             binding.departmentListview.adapter = departmentAdapter
 
             binding.departmentListview.setOnItemClickListener { parent, view, position, id ->
-                val selectedHospitalId = departmentList[position].documentID
+                val selectedHospitalId = filteredList[position].documentID
                 val intent = Intent(this, AddDepartmentActivity::class.java)
                 intent.putExtra("departmentID", selectedHospitalId)
                 startActivity(intent)
@@ -60,7 +62,7 @@ class AllDepartmentActivity : AppCompatActivity() {
 
                 // Only filter the list if there is non-empty search text
                 if (searchText.isNotEmpty()) {
-                    val filteredList = departmentList.filter { departmentList ->
+                     filteredList = departmentList.filter { departmentList ->
                         departmentList.department!!.lowercase().contains(searchText)
                     }
 

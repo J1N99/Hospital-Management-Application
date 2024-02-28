@@ -75,7 +75,7 @@ class addHospitalActivity : AppCompatActivity() {
 
             var hospital = binding.hospitalET.text.toString().trim()
             var address = binding.addressET.text.toString().trim()
-            if (itemSelected==null || hospital.isEmpty() || address.isEmpty()) {
+            if (itemSelected=="" || hospital.isEmpty() || address.isEmpty()) {
                 Toast.makeText(this, "Please enter all the fields", Toast.LENGTH_SHORT).show()
             } else {
                 var privateGovernment = itemSelected.toString()

@@ -23,7 +23,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:hint="Search user name or IC"
+            android:hint="Search Hospital Name"
             android:imeOptions="actionSearch"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"

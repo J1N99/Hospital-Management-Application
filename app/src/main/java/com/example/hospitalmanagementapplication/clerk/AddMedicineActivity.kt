@@ -88,7 +88,7 @@ class AddMedicineActivity : AppCompatActivity() {
                     val dataToUpdate = mapOf(
                         "nameOfMedicine" to nameOfMedicine,
                         "description" to description,
-                        "medicineTaken" to medicineTakenTime
+                        "medicationTime" to medicineTakenTime
                     )
 
                     firestore().updateDocument("medicine", medicineID, dataToUpdate)
